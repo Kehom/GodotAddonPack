@@ -21,5 +21,5 @@ Finally, on some cases it may be necessary to activate the addon from the projec
 
 ## Tutorial
 
-On my web page [kehomsforge.com](http://kehomsforge.com/tutorials/multi/GodotAddonpack) there is a set of tutorials for each of the addons in this pack. Each page corresponds to one addon and contains two major sections, one explaining the basics of using the addon while the other explains a little bit of how the addon internally works.
+On my web page [kehomsforge.com](http://kehomsforge.com/tutorials/multi/GodotAddonPack) there is a set of tutorials for each of the addons in this pack. Each page corresponds to one addon and contains two major sections, one explaining the basics of using the addon while the other explains a little bit of how the addon internally works.
 
