@@ -1,0 +1,251 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Position3D",
+"class": "Cam3D",
+"language": "GDScript",
+"path": "res://addons/keh_nodes/cam3d/cam3d.gd"
+}, {
+"base": "KinematicBody",
+"class": "CharUnitClass",
+"language": "GDScript",
+"path": "res://demos/network/scenes/unit.gd"
+}, {
+"base": "Reference",
+"class": "EncDecBuffer",
+"language": "GDScript",
+"path": "res://addons/keh_general/data/encdecbuffer.gd"
+}, {
+"base": "Reference",
+"class": "EntityInfo",
+"language": "GDScript",
+"path": "res://addons/keh_network/entityinfo.gd"
+}, {
+"base": "Reference",
+"class": "InputData",
+"language": "GDScript",
+"path": "res://addons/keh_network/inputdata.gd"
+}, {
+"base": "SnapEntityBase",
+"class": "MegaSnapClutter",
+"language": "GDScript",
+"path": "res://demos/mega/scripts/megasnapclutter.gd"
+}, {
+"base": "SnapEntityBase",
+"class": "MegaSnapPCharacter",
+"language": "GDScript",
+"path": "res://demos/mega/scripts/megasnappchar.gd"
+}, {
+"base": "SnapEntityBase",
+"class": "MegaSnapProjectile",
+"language": "GDScript",
+"path": "res://demos/mega/scripts/megasnapprojectile.gd"
+}, {
+"base": "Reference",
+"class": "NetCustomProperty",
+"language": "GDScript",
+"path": "res://addons/keh_network/customproperty.gd"
+}, {
+"base": "NetNodeSpawner",
+"class": "NetDefaultSpawner",
+"language": "GDScript",
+"path": "res://addons/keh_network/defaultspawner.gd"
+}, {
+"base": "Reference",
+"class": "NetEventInfo",
+"language": "GDScript",
+"path": "res://addons/keh_network/eventinfo.gd"
+}, {
+"base": "Reference",
+"class": "NetInputInfo",
+"language": "GDScript",
+"path": "res://addons/keh_network/inputinfo.gd"
+}, {
+"base": "Reference",
+"class": "NetNodeSpawner",
+"language": "GDScript",
+"path": "res://addons/keh_network/nodespawner.gd"
+}, {
+"base": "Reference",
+"class": "NetPingInfo",
+"language": "GDScript",
+"path": "res://addons/keh_network/pinginfo.gd"
+}, {
+"base": "Reference",
+"class": "NetPlayerData",
+"language": "GDScript",
+"path": "res://addons/keh_network/playerdata.gd"
+}, {
+"base": "Node",
+"class": "NetPlayerNode",
+"language": "GDScript",
+"path": "res://addons/keh_network/playernode.gd"
+}, {
+"base": "SnapEntityBase",
+"class": "NetSnapUnit",
+"language": "GDScript",
+"path": "res://demos/network/scripts/netsnapunit.gd"
+}, {
+"base": "Reference",
+"class": "NetSnapshot",
+"language": "GDScript",
+"path": "res://addons/keh_network/snapshot.gd"
+}, {
+"base": "Reference",
+"class": "NetSnapshotData",
+"language": "GDScript",
+"path": "res://addons/keh_network/snapshotdata.gd"
+}, {
+"base": "Node",
+"class": "Network",
+"language": "GDScript",
+"path": "res://addons/keh_network/network.gd"
+}, {
+"base": "Node2D",
+"class": "RectangleDrawer",
+"language": "GDScript",
+"path": "res://demos/network/scripts/rectdrawer.gd"
+}, {
+"base": "Reference",
+"class": "SharedUtils",
+"language": "GDScript",
+"path": "res://shared/scripts/sutils.gd"
+}, {
+"base": "Node2D",
+"class": "Smooth2D",
+"language": "GDScript",
+"path": "res://addons/keh_smooth/smooth2d/smooth2d.gd"
+}, {
+"base": "Spatial",
+"class": "Smooth3D",
+"language": "GDScript",
+"path": "res://addons/keh_smooth/smooth3d/smooth3d.gd"
+}, {
+"base": "Reference",
+"class": "SnapEntityBase",
+"language": "GDScript",
+"path": "res://addons/keh_network/snapentity.gd"
+}, {
+"base": "Reference",
+"class": "UnitSelectionData",
+"language": "GDScript",
+"path": "res://demos/network/scripts/selectiondata.gd"
+} ]
+_global_script_class_icons={
+"Cam3D": "",
+"CharUnitClass": "",
+"EncDecBuffer": "",
+"EntityInfo": "",
+"InputData": "",
+"MegaSnapClutter": "",
+"MegaSnapPCharacter": "",
+"MegaSnapProjectile": "",
+"NetCustomProperty": "",
+"NetDefaultSpawner": "",
+"NetEventInfo": "",
+"NetInputInfo": "",
+"NetNodeSpawner": "",
+"NetPingInfo": "",
+"NetPlayerData": "",
+"NetPlayerNode": "",
+"NetSnapUnit": "",
+"NetSnapshot": "",
+"NetSnapshotData": "",
+"Network": "",
+"RectangleDrawer": "",
+"SharedUtils": "",
+"Smooth2D": "",
+"Smooth3D": "",
+"SnapEntityBase": "",
+"UnitSelectionData": ""
+}
+
+[application]
+
+config/name="Addons"
+run/main_scene="res://main.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+network="*res://addons/keh_network/network.gd"
+
+[debug]
+
+gdscript/completion/autocomplete_setters_and_getters=true
+
+[editor_plugins]
+
+enabled=PoolStringArray( "keh_network", "keh_smooth" )
+
+[input]
+
+move_forward={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":87,"unicode":0,"echo":false,"script":null)
+ ]
+}
+move_backward={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":83,"unicode":0,"echo":false,"script":null)
+ ]
+}
+move_left={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":65,"unicode":0,"echo":false,"script":null)
+ ]
+}
+move_right={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":68,"unicode":0,"echo":false,"script":null)
+ ]
+}
+jump={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":32,"unicode":0,"echo":false,"script":null)
+ ]
+}
+sprint={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777237,"unicode":0,"echo":false,"script":null)
+ ]
+}
+shoot={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+select_unit={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+command_unit={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":2,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+multiselect={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777238,"unicode":0,"echo":false,"script":null)
+ ]
+}
+
+[physics]
+
+common/physics_fps=30
+3d/physics_engine="Bullet"
+
+[rendering]
+
+quality/shadows/filter_mode=2
+quality/filters/msaa=1
+environment/default_environment="res://default_env.tres"

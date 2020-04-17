@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://shared/scenes/clutter_base.gd" type="Script" id=1]
+
+[node name="clutter_base" type="RigidBody"]
+custom_integrator = true
+script = ExtResource( 1 )

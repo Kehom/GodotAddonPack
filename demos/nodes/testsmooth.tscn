@@ -1,0 +1,281 @@
+[gd_scene load_steps=19 format=2]
+
+[ext_resource path="res://demos/nodes/testsmooth.gd" type="Script" id=1]
+[ext_resource path="res://shared/scenes/check_plane_floor.tscn" type="PackedScene" id=2]
+[ext_resource path="res://addons/keh_smooth/smooth3d/smooth3d.gd" type="Script" id=3]
+[ext_resource path="res://shared/textures/floor2d.png" type="Texture" id=4]
+[ext_resource path="res://shared/scenes/rigidb2d.tscn" type="PackedScene" id=5]
+[ext_resource path="res://icon.png" type="Texture" id=6]
+[ext_resource path="res://addons/keh_smooth/smooth2d/smooth2d.gd" type="Script" id=7]
+
+[sub_resource type="BoxShape" id=1]
+
+[sub_resource type="CubeMesh" id=2]
+
+[sub_resource type="SpatialMaterial" id=3]
+albedo_color = Color( 0.160784, 0.27451, 0.537255, 1 )
+roughness = 0.0
+
+[sub_resource type="BoxShape" id=4]
+
+[sub_resource type="CubeMesh" id=5]
+
+[sub_resource type="SpatialMaterial" id=6]
+albedo_color = Color( 0.501961, 0.0666667, 0.0666667, 1 )
+roughness = 0.0
+
+[sub_resource type="CubeMesh" id=7]
+
+[sub_resource type="SpatialMaterial" id=8]
+flags_transparent = true
+params_blend_mode = 1
+params_cull_mode = 2
+albedo_color = Color( 0.317647, 0.301961, 0.301961, 1 )
+roughness = 0.0
+
+[sub_resource type="RectangleShape2D" id=9]
+extents = Vector2( 380, 10 )
+
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 32, 32 )
+
+[sub_resource type="RectangleShape2D" id=11]
+extents = Vector2( 32, 32 )
+
+[node name="testsmooth" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="hud" type="CanvasLayer" parent="."]
+
+[node name="pnl" type="Panel" parent="hud"]
+self_modulate = Color( 1, 1, 1, 0.666667 )
+anchor_bottom = 1.0
+margin_right = 180.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_physicsfps" type="Label" parent="hud/pnl"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 88.0
+margin_bottom = 24.0
+text = "Physics FPS (%d):"
+
+[node name="sl_physicsfps" type="HSlider" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 29.0
+margin_right = 170.0
+margin_bottom = 45.0
+min_value = 5.0
+max_value = 200.0
+value = 5.0
+ticks_on_borders = true
+
+[node name="lbl_jitterfix" type="Label" parent="hud/pnl"]
+margin_left = 10.5263
+margin_top = 60.0
+margin_right = 95.5263
+margin_bottom = 74.0
+text = "Jitter fix (%f):"
+
+[node name="sl_jitterfix" type="HSlider" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 80.0
+margin_right = 170.0
+margin_bottom = 96.0
+max_value = 1.0
+step = 0.01
+ticks_on_borders = true
+
+[node name="chk_vsync" type="CheckBox" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 110.0
+margin_right = 71.0
+margin_bottom = 134.0
+text = "VSync"
+
+[node name="chk_showghost" type="CheckBox" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 134.0
+margin_right = 175.0
+margin_bottom = 158.0
+hint_tooltip = "If enabled, the non smoothed version of the objects will be
+shown with a semi-transparent material."
+text = "Show smooth target"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chk_show3d" type="CheckBox" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 170.0
+margin_right = 89.0
+margin_bottom = 194.0
+hint_tooltip = "If enabled the 3D objects will be shown."
+text = "Show 3D"
+
+[node name="chk_show2d" type="CheckBox" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 194.0
+margin_right = 89.0
+margin_bottom = 218.0
+hint_tooltip = "If enabled the 2D objects will be shown."
+text = "Show 2D"
+
+[node name="chk_enable2d" type="CheckBox" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 228.639
+margin_right = 151.0
+margin_bottom = 252.639
+pressed = true
+text = "Enable Smooth 2D"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chk_enable3d" type="CheckBox" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 252.639
+margin_right = 151.0
+margin_bottom = 276.639
+pressed = true
+text = "Enable Smooth 3D"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chk_useteleport" type="CheckBox" parent="hud/pnl"]
+margin_left = 6.0
+margin_top = 289.135
+margin_right = 150.0
+margin_bottom = 313.135
+hint_tooltip = "The smoothed objects require a \"teleport\" function to be called
+when changing the position. This toggle is meant to show what it
+looks like when the call is not done after resetting the states."
+text = "Teleport on replay"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_replay" type="Button" parent="hud/pnl"]
+margin_left = 11.0
+margin_top = 329.135
+margin_right = 80.0
+margin_bottom = 349.135
+hint_tooltip = "Reset the simulation so different physics FPS values can be tested."
+text = "Replay"
+
+[node name="lbl_fps" type="Label" parent="hud/pnl"]
+margin_left = 11.0
+margin_top = 379.135
+margin_right = 61.0
+margin_bottom = 393.135
+text = "FPS: %d"
+
+[node name="bt_back" type="Button" parent="hud/pnl"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -80.0
+margin_top = -30.0
+margin_right = -11.0
+margin_bottom = -10.0
+text = "Back"
+
+[node name="s3d" type="Spatial" parent="."]
+
+[node name="floor1" parent="s3d" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -5 )
+
+[node name="floor2" parent="s3d" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -5 )
+
+[node name="floor3" parent="s3d" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5 )
+
+[node name="floor4" parent="s3d" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5 )
+
+[node name="Camera" type="Camera" parent="s3d"]
+transform = Transform( 1, 0, 0, 0, 0.866908, 0.498467, 0, -0.498467, 0.866908, 0.243227, 9.89787, 14.763 )
+
+[node name="non_smooth" type="RigidBody" parent="s3d"]
+transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.178606, 0.383022, 0.906308, -2.0131, 11.5, 0 )
+can_sleep = false
+
+[node name="CollisionShape" type="CollisionShape" parent="s3d/non_smooth"]
+shape = SubResource( 1 )
+
+[node name="mesh" type="MeshInstance" parent="s3d/non_smooth"]
+transform = Transform( 1, -7.45058e-09, -1.49012e-08, 1.49012e-08, 1, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 2 )
+material/0 = SubResource( 3 )
+
+[node name="smoothed" type="RigidBody" parent="s3d"]
+transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.178606, 0.383022, 0.906308, 1.9869, 11.5, 0 )
+can_sleep = false
+
+[node name="CollisionShape" type="CollisionShape" parent="s3d/smoothed"]
+shape = SubResource( 4 )
+
+[node name="Smooth3D" type="Spatial" parent="s3d/smoothed"]
+script = ExtResource( 3 )
+
+[node name="mesh" type="MeshInstance" parent="s3d/smoothed/Smooth3D"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="refmesh" type="MeshInstance" parent="s3d/smoothed"]
+visible = false
+mesh = SubResource( 7 )
+material/0 = SubResource( 8 )
+
+[node name="s2d" type="Node2D" parent="."]
+
+[node name="floor2d" type="StaticBody2D" parent="s2d"]
+position = Vector2( 618.238, 555.206 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="s2d/floor2d"]
+position = Vector2( -1.08075, 0 )
+shape = SubResource( 9 )
+
+[node name="Sprite" type="Sprite" parent="s2d/floor2d/CollisionShape2D"]
+texture = ExtResource( 4 )
+
+[node name="non_smooth" parent="s2d" instance=ExtResource( 5 )]
+position = Vector2( 550, 310 )
+rotation = 0.610865
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="s2d/non_smooth"]
+shape = SubResource( 10 )
+
+[node name="Sprite" type="Sprite" parent="s2d/non_smooth"]
+texture = ExtResource( 6 )
+
+[node name="smoothed" parent="s2d" instance=ExtResource( 5 )]
+position = Vector2( 697, 310 )
+rotation = 0.610865
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="s2d/smoothed"]
+shape = SubResource( 11 )
+
+[node name="Smooth2D" type="Node2D" parent="s2d/smoothed"]
+script = ExtResource( 7 )
+
+[node name="sprite" type="Sprite" parent="s2d/smoothed/Smooth2D"]
+self_modulate = Color( 1, 0.00784314, 0.00784314, 1 )
+texture = ExtResource( 6 )
+
+[node name="refsprite" type="Sprite" parent="s2d/smoothed"]
+visible = false
+self_modulate = Color( 0.290196, 0.278431, 0.278431, 0.478431 )
+texture = ExtResource( 6 )
+[connection signal="toggled" from="hud/pnl/chk_enable2d" to="." method="_on_chk_enable2d_toggled"]
+[connection signal="toggled" from="hud/pnl/chk_enable3d" to="." method="_on_chk_enable3d_toggled"]
+[connection signal="pressed" from="hud/pnl/bt_replay" to="." method="_on_bt_replay_pressed"]
+[connection signal="pressed" from="hud/pnl/bt_back" to="." method="_on_bt_back_pressed"]

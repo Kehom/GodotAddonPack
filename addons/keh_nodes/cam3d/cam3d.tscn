@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/keh_nodes/cam3d/cam3d.gd" type="Script" id=1]
+
+[node name="Cam3D" type="Position3D"]
+script = ExtResource( 1 )
+near = 0.05
+
+[node name="camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8.5 )

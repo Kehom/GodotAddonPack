@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://shared/scenes/p3dchar_base.tscn" type="PackedScene" id=2]
+
+[sub_resource type="CapsuleMesh" id=1]
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_color = Color( 0.843137, 0.835294, 0.392157, 1 )
+roughness = 0.0
+
+[sub_resource type="CubeMesh" id=3]
+size = Vector3( 0.2, 2, 0.2 )
+
+[sub_resource type="CapsuleShape" id=4]
+
+[node name="pchar_base" instance=ExtResource( 2 )]
+
+[node name="projectile_source" parent="." index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.912154, 0.52469, -1.80162 )
+
+[node name="mainmesh" type="MeshInstance" parent="smooth3d" index="0"]
+transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, 0, 0 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 2 )
+
+[node name="directionclue" type="MeshInstance" parent="smooth3d/mainmesh" index="0"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.918205, 0.813299, 0.535878 )
+mesh = SubResource( 3 )
+material/0 = null
+
+[node name="collision" type="CollisionShape" parent="." index="2"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
+shape = SubResource( 4 )
+
+[node name="cam_attach_point" parent="." index="3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0 )

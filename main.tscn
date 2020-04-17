@@ -1,0 +1,496 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://main.gd" type="Script" id=1]
+[ext_resource path="res://main_demobts.tres" type="ButtonGroup" id=2]
+[ext_resource path="res://demos/mega/pcharbtgroup.tres" type="ButtonGroup" id=4]
+
+[node name="main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 1.0
+margin_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="mpnl" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="demo_list" type="ScrollContainer" parent="mpnl"]
+anchor_bottom = 1.0
+margin_right = 256.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="pnl" type="Panel" parent="mpnl/demo_list"]
+margin_right = 256.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="lbl_ademos" type="Label" parent="mpnl/demo_list/pnl"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -44.0
+margin_right = 45.0
+margin_bottom = 43.0
+text = "Addon demos"
+valign = 1
+
+[node name="vbox" type="VBoxContainer" parent="mpnl/demo_list/pnl"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 25.0
+margin_top = 40.0
+margin_right = -25.0
+margin_bottom = -51.0
+custom_constants/separation = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_encdec" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_right = 206.0
+margin_bottom = 20.0
+toggle_mode = true
+pressed = true
+group = ExtResource( 2 )
+text = "EncDecBuffer"
+
+[node name="bt_utils" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+visible = false
+margin_top = 30.0
+margin_right = 206.0
+margin_bottom = 50.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "Utilities"
+
+[node name="bt_smooth" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 30.0
+margin_right = 206.0
+margin_bottom = 50.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "Smoothing"
+
+[node name="bt_cam3d" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 60.0
+margin_right = 206.0
+margin_bottom = 80.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "Cam3D"
+
+[node name="bt_network" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 90.0
+margin_right = 206.0
+margin_bottom = 110.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "Network"
+
+[node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 120.0
+margin_right = 206.0
+margin_bottom = 124.0
+
+[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 134.0
+margin_right = 206.0
+margin_bottom = 154.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "Complete"
+
+[node name="bt_quit" type="Button" parent="mpnl/demo_list/pnl"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 25.0
+margin_top = -34.3674
+margin_right = 231.0
+margin_bottom = -14.3674
+text = "Quit"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="stabs" type="TabContainer" parent="mpnl"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 262.0
+tabs_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="encdecbuffer" type="Panel" parent="mpnl/stabs"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="description" type="Label" parent="mpnl/stabs/encdecbuffer"]
+margin_left = 14.0
+margin_top = 43.0
+margin_right = 744.0
+margin_bottom = 580.0
+text = "Interdependency: None
+
+The EncDecBuffer is meant to make things easier to encode values into binary format while also stripping out the variant header, which normally means at least 4 extra bytes per property stored within the binary array (PoolByteArray).
+
+In this demo there are two major panels. On the left a bunch of fields allow for entering the desired values to be encoded through the EncDecBuffer. Then the \"test\" button can be clicked to perform the operation. The right panel, then, contains 3 (read only) text fields with some information. One contains the decoded data, which should match the values used as input in the left panel. Another one contains the raw encoded binary data, in hexadecimal. Finally, the third field compares the various available compression methods using the encoded data and also the normal PoolByteArray with the out of the box method, var2bytes() function.
+
+While the sole intention behind this addon was originally meant to be used by the networking system, maybe it can be useful for other things, like a \"compact\" file save for example."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_encdecload" type="Button" parent="mpnl/stabs/encdecbuffer"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 122.0
+margin_bottom = 31.0
+text = "Load"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="utilities" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="description" type="Label" parent="mpnl/stabs/utilities"]
+margin_left = 14.0
+margin_top = 43.0
+margin_right = 744.0
+margin_bottom = 580.0
+text = "Interdependency: None
+
+The addon has been  removed (hopefully temporarily) from the project because it needs proper testing (things didn't work as expected)...
+
+This demo page has been created mostly to remind myself about this fact."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_utilsload" type="Button" parent="mpnl/stabs/utilities"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 122.0
+margin_bottom = 31.0
+disabled = true
+text = "Load"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="cam3d" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_cam3dload" type="Button" parent="mpnl/stabs/cam3d"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 114.0
+margin_bottom = 31.0
+text = "Cam3D"
+
+[node name="Label" type="Label" parent="mpnl/stabs/cam3d"]
+margin_left = 14.0
+margin_top = 41.0
+margin_right = 744.0
+margin_bottom = 293.0
+text = "Interdependency: none
+This addon is a simple node that can be attached (add scene, cam3d.tscn,  instance) into a moving object. From there, selecting the new node allows for extra configuration regarding the overal behavior. While the demo uses Smooth3D addon it's not a dependency of the Cam3D.
+
+Brief feature overview:
+- Follows a moving object from a configurable distance
+- Camera follow can be interpolated (specially useful if the target is smoothed with Smooth2D/Smooth3D)
+- Camera Lag with SmoothStart or SmoothStop
+- Camera shake using simplex noise
+- Different methods to handle \"collision\" (that is, something is in between the camera and the target object)
+- Camera rotation can be locked
+
+Demo Overview:
+The demo showcases a scene with a \"character\" moving in a circle and the Cam3D is directly attached to it. Two side panels are provided to allow manipulating the various settings of both the camera itself and a little bit of the movement. Notice the fact that it's also possible to change the Physics FPS in order to test the interpolated motion of the camera which, if enabled, will then use the \"character's\" smoothed visual representation, which is provided by the Smooth3D addon.
+
+Roughly, the left panel allows for manipulating the camera state while the right panel allows for manipulating the settings of the camera. As an example, on the left panel there is a button that adds \"trauma\" (shake) to the camera, while on the right panel it's possible to configure the behavior of the shaking."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="smooth" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_smoothload" type="Button" parent="mpnl/stabs/smooth"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 114.0
+margin_bottom = 31.0
+text = "Smoothing"
+
+[node name="Label" type="Label" parent="mpnl/stabs/smooth"]
+margin_left = 14.0
+margin_top = 41.0
+margin_right = 744.0
+margin_bottom = 293.0
+text = "Interdependency: none
+This addon is only possible thanks to the excelent contribution by Lawnjelly, which calculates the interpolation fraction (more on this shortly). Nevertheless, two nodes (Smooth2D and Smooth3D) become available once the addon is enabled from the project settings. Those nodes smoothly follow a target node (the parent of the Smooth*D). The goal here is to obtain an smooth motion when the physics simulation pace is different from the rendering pace. Think, for example, a simulation set for 60 frames per second running on a machine using a monither with faster refresh rates.
+
+Basic usage:
+Moving objects are normally based on the visual representation (sprite, mesh...) attached to a physical object (rigid body, kinematic body...). The smooth nodes will be placed \"in between\" the phyiscal and visual representation objects.
+
+Demo Overview:
+The demo contains both 2D and 3D objects, comparing the motion with and without the smooth nodes. The scene's script will, at the very beginning, enfoce a low physics update pace of only 5 ticks per second. There is a control panel that allows setting a few things as well as resetting the simulation so the various settings can be tested with different values without having to restart the demo scene.
+
+One thing to note is how unstable the simulation is with those very low physics FPS.
+
+Regarding the Interpolation fraction:
+For some reason, manually computing this fraction from GDScript results in something that will deviate from the expected value. The major problem with this deviation is that it does lead to strange and unacceptable anomalous animations. Because of that, obtaining this value from pure GDScript would require a bunch of extra computations and, quite frankly, research and tests that would be too time consuming. So again, thanks to Lawnjelly for this conttribution!
+"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="network" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_single" type="Button" parent="mpnl/stabs/network"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 75.0
+margin_bottom = 31.0
+text = "single"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_create" type="Button" parent="mpnl/stabs/network"]
+margin_left = 95.0
+margin_top = 11.0
+margin_right = 157.0
+margin_bottom = 31.0
+text = "create"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_join" type="Button" parent="mpnl/stabs/network"]
+margin_left = 122.0
+margin_top = 45.1164
+margin_right = 185.0
+margin_bottom = 65.1164
+text = "connect"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txt_serverip" type="LineEdit" parent="mpnl/stabs/network"]
+margin_left = 14.0
+margin_top = 43.0
+margin_right = 110.0
+margin_bottom = 67.0
+text = "127.0.0.1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="mpnl/stabs/network"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 82.0
+margin_right = -10.0
+margin_bottom = -10.0
+text = "Network addon interdependency: EncDecBuffer
+
+This addon requires activation through the project settings window, which will not only add a few extra settings to the first tab, it will also add the network singleton to the list (auto-load scripts, that is). To that end, if you intend to access any functionality in the network addon from another singleton script, make sure that one is loaded after the network script.
+
+This demo is meant to be a simplistic networking example, although it does make use of a somewhat advanced feature of the networking addong, which involves using custom input data. This custom input information is necessary for interactions that involve clicking in the game world to interact with the actors. This is precisely what this example showcases.
+
+Interating with this demo:
+- Left mouse button (including drawing a rectangle) allows for unit selection
+- Holding the Ctrl button maintains previously selected units when trying to select new ones.
+- Right click commands selected units to the clicked location
+- Middle mouse button allows for camera rotation.
+- Mouse wheel zoom in/out.
+- WASD move the camera around.
+- F4 returns to the main menu.
+
+Things to note:
+- There is absolutely no code to keep units from colliding with each other, which can result in some really weird behavior.
+- The box selection method is the most precise that I was able to find/implement, however it somewhat requires at least four 3D vectors to be sent as extra input data which basically inflates the bandwidth requirements by a lot if not careful when building the input object. In this example the client will only send the additional data when trying to \"commit the selection\" (that is, releasing the left mouse button). Because of the speed in which humans can actually repeatedly left click is not that high, it may be alright to send this burst of extra data from time to time."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="megademo" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="lbl_playername" type="Label" parent="mpnl/stabs/megademo"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 55.0
+margin_bottom = 35.0
+text = "Name"
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="mpnl/stabs/megademo"]
+margin_left = 63.0
+margin_top = 11.0
+margin_right = 296.0
+margin_bottom = 35.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_megasingle" type="Button" parent="mpnl/stabs/megademo"]
+margin_left = 347.425
+margin_top = 11.0
+margin_right = 427.425
+margin_bottom = 31.0
+text = "Single"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_megacreate" type="Button" parent="mpnl/stabs/megademo"]
+margin_left = 347.425
+margin_top = 41.0
+margin_right = 427.425
+margin_bottom = 61.0
+text = "Host"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_megajoin" type="Button" parent="mpnl/stabs/megademo"]
+margin_left = 347.425
+margin_top = 71.0
+margin_right = 427.425
+margin_bottom = 91.0
+text = "Join"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_playerchar" type="Label" parent="mpnl/stabs/megademo"]
+margin_left = 14.0
+margin_top = 51.0
+margin_right = 110.0
+margin_bottom = 65.0
+text = "Character type:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_charcapsule" type="Button" parent="mpnl/stabs/megademo"]
+margin_left = 14.0
+margin_top = 70.0
+margin_right = 95.0
+margin_bottom = 90.0
+toggle_mode = true
+pressed = true
+group = ExtResource( 4 )
+text = "Capsule"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_charcylinder" type="Button" parent="mpnl/stabs/megademo"]
+margin_left = 114.0
+margin_top = 70.0
+margin_right = 195.0
+margin_bottom = 90.0
+toggle_mode = true
+group = ExtResource( 4 )
+text = "Cylinder"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_charcube" type="Button" parent="mpnl/stabs/megademo"]
+margin_left = 215.425
+margin_top = 70.0
+margin_right = 296.425
+margin_bottom = 90.0
+toggle_mode = true
+group = ExtResource( 4 )
+text = "Cuboid"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="mpnl/stabs/megademo"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 14.0
+margin_top = 122.0
+margin_right = -10.0
+margin_bottom = -8.0
+text = "Demo Overview:
+This demo is meant to be a \"more complete\" example, not limiting which addons are used. In away, all of the relevant addons in this pack are used in this demo.
+
+Note that the \"character class\" buttons could also change some user interface image to preview what it looks like.
+
+This is a \"work in progress\" example which will get new features and improvements from time to time."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="mpnl/demo_list/pnl/bt_quit" to="." method="_on_bt_quit_pressed"]
+[connection signal="pressed" from="mpnl/stabs/encdecbuffer/bt_encdecload" to="." method="_on_bt_encdecload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/utilities/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/cam3d/bt_cam3dload" to="." method="_on_bt_cam3dload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/smooth/bt_smoothload" to="." method="_on_bt_smoothload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/network/bt_single" to="." method="_on_bt_single_pressed"]
+[connection signal="pressed" from="mpnl/stabs/network/bt_create" to="." method="_on_bt_create_pressed"]
+[connection signal="pressed" from="mpnl/stabs/network/bt_join" to="." method="_on_bt_join_pressed"]
+[connection signal="pressed" from="mpnl/stabs/megademo/bt_megasingle" to="." method="_on_megabt_single_pressed"]
+[connection signal="pressed" from="mpnl/stabs/megademo/bt_megacreate" to="." method="_on_megabt_host_pressed"]
+[connection signal="pressed" from="mpnl/stabs/megademo/bt_megajoin" to="." method="_on_megabt_join_pressed"]

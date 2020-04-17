@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://shared/textures/checker_2048x2048.png" type="Texture" id=1]
+
+[sub_resource type="BoxShape" id=1]
+extents = Vector3( 5, 0.1, 5 )
+
+[sub_resource type="SpatialMaterial" id=3]
+params_cull_mode = 2
+albedo_texture = ExtResource( 1 )
+
+[sub_resource type="PlaneMesh" id=2]
+material = SubResource( 3 )
+size = Vector2( 10, 10 )
+
+[node name="check_plane_floor" type="StaticBody"]
+
+[node name="collision" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0 )
+shape = SubResource( 1 )
+
+[node name="mesh" type="MeshInstance" parent="."]
+mesh = SubResource( 2 )
+material/0 = null

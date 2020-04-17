@@ -1,0 +1,260 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://shared/scenes/floor.tscn" type="PackedScene" id=1]
+[ext_resource path="res://shared/scenes/wall.tscn" type="PackedScene" id=2]
+[ext_resource path="res://demos/mega/megamain.gd" type="Script" id=3]
+[ext_resource path="res://shared/scenes/clutter_barrel.tscn" type="PackedScene" id=4]
+
+[sub_resource type="ProceduralSky" id=1]
+
+[sub_resource type="Environment" id=2]
+background_sky = SubResource( 1 )
+ambient_light_color = Color( 0.792157, 0.8, 0.72549, 1 )
+ambient_light_sky_contribution = 0.4
+tonemap_mode = 2
+tonemap_white = 6.0
+
+[node name="megamain" type="Spatial"]
+script = ExtResource( 3 )
+
+[node name="hud" type="CanvasLayer" parent="."]
+
+[node name="lbl_typeinfo" type="Label" parent="hud"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -152.5
+margin_top = 5.0
+margin_right = 152.5
+margin_bottom = 19.0
+text = "Single/Server/Client"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_fpsinfo" type="Label" parent="hud"]
+margin_left = 815.0
+margin_top = 5.0
+margin_right = 997.0
+margin_bottom = 19.0
+text = "FPS: x | Physics: x"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_latency" type="Label" parent="hud"]
+margin_left = 815.0
+margin_top = 19.0
+margin_right = 903.0
+margin_bottom = 33.0
+text = "Latency: x ms"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="box_plist" type="VBoxContainer" parent="hud"]
+margin_left = 8.0
+margin_top = 48.0
+margin_right = 180.0
+margin_bottom = 343.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_stamina" type="Label" parent="hud"]
+margin_left = 8.0
+margin_top = 5.0
+margin_right = 59.0
+margin_bottom = 19.0
+text = "Stamina"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="pg_localstamina" type="ProgressBar" parent="hud"]
+margin_left = 8.0
+margin_top = 24.0
+margin_right = 180.0
+margin_bottom = 38.0
+max_value = 1.0
+value = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="level" type="Spatial" parent="."]
+
+[node name="land" type="Spatial" parent="level"]
+
+[node name="floor01" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -24 )
+
+[node name="floor02" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -24 )
+
+[node name="floor03" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -24 )
+
+[node name="floor04" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, -24 )
+
+[node name="floor05" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -8 )
+
+[node name="floor06" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8 )
+
+[node name="floor07" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8 )
+
+[node name="floor08" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, -8 )
+
+[node name="floor09" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 8 )
+
+[node name="floor10" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 8 )
+
+[node name="floor11" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8 )
+
+[node name="floor12" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, 8 )
+
+[node name="floor13" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, 24 )
+
+[node name="floor14" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 24 )
+
+[node name="floor15" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 24 )
+
+[node name="floor16" parent="level/land" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, 24 )
+
+[node name="wall" type="Spatial" parent="level"]
+
+[node name="wall01" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 0, -32 )
+
+[node name="wall02" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -32 )
+
+[node name="wall03" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -32 )
+
+[node name="wall04" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 0, -32 )
+
+[node name="wall05" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 32, 0, -24 )
+
+[node name="wall06" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 32, 0, -8 )
+
+[node name="wall07" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 32, 0, 8 )
+
+[node name="wall08" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 32, 0, 24 )
+
+[node name="wall09" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 24, 0, 32 )
+
+[node name="wall10" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 8, 0, 32 )
+
+[node name="wall11" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -8, 0, 32 )
+
+[node name="wall12" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( -1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -24, 0, 32 )
+
+[node name="wall13" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1.31134e-07, 0, 1, 0, 1, 0, -1, 0, 1.31134e-07, -32, 0, 24 )
+
+[node name="wall14" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1.31134e-07, 0, 1, 0, 1, 0, -1, 0, 1.31134e-07, -32, 0, 8 )
+
+[node name="wall15" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1.31134e-07, 0, 1, 0, 1, 0, -1, 0, 1.31134e-07, -32, 0, -8 )
+
+[node name="wall16" parent="level/wall" instance=ExtResource( 2 )]
+transform = Transform( 1.31134e-07, 0, 1, 0, 1, 0, -1, 0, 1.31134e-07, -32, 0, -24 )
+
+[node name="clutter" type="Spatial" parent="level"]
+
+[node name="barrel01" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.26878, 0.750008, -20.678 )
+
+[node name="barrel02" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.04809, 0.750008, -19.6733 )
+
+[node name="barrel03" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.97333, 0.750008, -20.3183 )
+
+[node name="barrel04" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.89654, 0.750008, -19.0879 )
+
+[node name="barrel05" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.83552, 0.750008, -19.7889 )
+
+[node name="barrel06" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.24051, 1.85021, -19.7889 )
+
+[node name="barrel07" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.49261, 1.85021, -19.7271 )
+
+[node name="barrel08" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.89166, 2.95388, -20.2143 )
+
+[node name="barrel09" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.73215, 0.750026, -21.2721 )
+
+[node name="barrel10" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.40988, 0.750008, -21.4548 )
+
+[node name="barrel11" parent="level/clutter" instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.01424, 1.87133, -20.958 )
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="level"]
+environment = SubResource( 2 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="level"]
+transform = Transform( 0.877389, 0.268935, -0.397319, 0, 0.828129, 0.560538, 0.47978, -0.49181, 0.726591, 0, 35.1918, 34.7206 )
+light_color = Color( 0.498039, 0.494118, 0.478431, 1 )
+shadow_enabled = true
+shadow_color = Color( 0.0862745, 0.0823529, 0.0823529, 1 )
+shadow_contact = 0.1
+directional_shadow_mode = 0
+directional_shadow_blend_splits = true
+directional_shadow_depth_range = 1
+
+[node name="spawn_point" type="Spatial" parent="."]
+
+[node name="1" type="Spatial" parent="spawn_point"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -22.467, 3.7806, 20.0261 )
+
+[node name="2" type="Spatial" parent="spawn_point"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -15.2623, 3.7806, 20.0261 )
+
+[node name="3" type="Spatial" parent="spawn_point"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.0383, 3.7806, 20.0261 )
+
+[node name="4" type="Spatial" parent="spawn_point"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5.45273, 3.7806, 20.0261 )
+
+[node name="5" type="Spatial" parent="spawn_point"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7971, 3.7806, 20.0261 )
+
+[node name="6" type="Spatial" parent="spawn_point"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 21.953, 3.7806, 20.0261 )
+
+[node name="player" type="Spatial" parent="."]
+
+[node name="projectile" type="Spatial" parent="."]
+
+[node name="fallbackcam" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.598241, 0.801316, 0, -0.801316, 0.598241, 0, 39.4402, 36.2142 )
