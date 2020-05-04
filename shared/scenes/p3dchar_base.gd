@@ -249,7 +249,7 @@ func handle_input(input: InputData) -> void:
 func shoot() -> void:
 	if (!network.has_authority()):
 		return
-
+	
 	# While ideally new nodes should be spawned only on the server and use the
 	# replication system to do this task on clients, projectiles may be a bit
 	# too fast to rely on that in the sense that often the projectile will appear

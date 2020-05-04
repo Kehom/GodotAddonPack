@@ -47,6 +47,9 @@ func _ready() -> void:
 	_setup_hud()
 	_setup_net_spawners()
 	
+	# Use the incrementing ID system to handle the unique IDs of the projectiles.
+	network.register_incrementing_id("glow_projectile")
+	
 	# The networking system will emit some signals that must be handled here.
 	# The "player_added" will be used to update the HUD and only that
 	SharedUtils.connector(network, "player_added", self, "on_player_joined")
@@ -125,11 +128,6 @@ func create_player_character(pnode: NetPlayerNode) -> void:
 	if (!charnode):
 		# The desired character class hash is specified in the custom property named "char_class")
 		var chash: int = pnode.get_custom_property("char_class", _default_pchar_hash)
-#		var chash: int = pnode.get_custom_property("char_class")
-#		if (!chash):
-#			# This may happen if the scenes is directly tested without going
-#			# through the main menu
-#			chash = _default_pchar_hash
 		
 		# Spawn the node
 		charnode = network.snapshot_data.spawn_node(MegaSnapPCharacter, pnode.net_id, chash)

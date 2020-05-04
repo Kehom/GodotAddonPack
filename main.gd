@@ -79,12 +79,6 @@ func setup_megademo() -> void:
 	SharedUtils.connector($mpnl/stabs/megademo/bt_charcapsule, "pressed", self, "_on_character_clicked", [caps_hash])
 	SharedUtils.connector($mpnl/stabs/megademo/bt_charcylinder, "pressed", self, "_on_character_clicked", [cyl_hash])
 	SharedUtils.connector($mpnl/stabs/megademo/bt_charcube, "pressed", self, "_on_character_clicked", [cube_hash])
-	
-	
-	# In the mega-demo some of the dynamically spawned nodes will need unique IDs.
-	# Those will be handled by the incrementing ID system within the network
-	# system, to take advantage of the fact that it's already a singleton.
-	network.register_incrementing_id("glow_projectile")
 
 
 
