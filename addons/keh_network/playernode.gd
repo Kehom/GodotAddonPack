@@ -464,9 +464,9 @@ func sync_custom_with(pid: int) -> void:
 			rpc_id(pid, "_rem_set_custom_property", pname, prop.value)
 
 
-func get_custom_property(pname: String):
+func get_custom_property(pname: String, defval = null):
 	var prop: NetCustomProperty = _custom_data.get(pname, null)
-	return prop.value if prop else null
+	return prop.value if prop else defval
 
 # This is meant to set the custom property but by using remote calls. This should be
 # automatically called based on the replication setting. One thing to note is that

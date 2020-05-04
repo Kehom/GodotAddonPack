@@ -124,11 +124,12 @@ func create_player_character(pnode: NetPlayerNode) -> void:
 	var charnode: KinematicBody = network.snapshot_data.get_game_node(pnode.net_id, MegaSnapPCharacter)
 	if (!charnode):
 		# The desired character class hash is specified in the custom property named "char_class")
-		var chash: int = pnode.get_custom_property("char_class")
-		if (!chash):
-			# This may happen if the scenes is directly tested without going
-			# through the main menu
-			chash = _default_pchar_hash
+		var chash: int = pnode.get_custom_property("char_class", _default_pchar_hash)
+#		var chash: int = pnode.get_custom_property("char_class")
+#		if (!chash):
+#			# This may happen if the scenes is directly tested without going
+#			# through the main menu
+#			chash = _default_pchar_hash
 		
 		# Spawn the node
 		charnode = network.snapshot_data.spawn_node(MegaSnapPCharacter, pnode.net_id, chash)
