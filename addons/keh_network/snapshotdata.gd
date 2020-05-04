@@ -112,7 +112,7 @@ func spawn_node(eclass: Resource, uid: int, chash: int) -> Node:
 	
 	return ret
 
-# Retrieve a game node given it's unique ID ans associated snapshot entity class
+# Retrieve a game node given it's unique ID and associated snapshot entity class
 func get_game_node(uid: int, snapres: Resource) -> Node:
 	var ename: Dictionary = _entity_name.get(snapres)
 	var ret: Node = null

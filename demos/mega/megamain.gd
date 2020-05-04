@@ -151,7 +151,8 @@ func _setup_net_input() -> void:
 	# The main network demo of this project does not require mouse relative
 	# data (it actually uses a different method to deal with mouse input).
 	# However, this demo does require mouse relative data, so ensure it's
-	# enabled, although in the project settings said option is enabled.
+	# enabled, regardless of what has been setup in the project settings as
+	# the other demo may have changed it.
 	network.set_use_mouse_relative(true)
 	
 	# Setup the actions that are meant to be deals as boolean values, non analog
