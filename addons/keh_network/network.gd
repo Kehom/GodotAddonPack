@@ -830,10 +830,10 @@ func send_chat_message(msg: String, send_to: int = 0) -> void:
 	# The "sender" here corresponds to the local machine. So, obtain the unique ID
 	var sender: int = get_tree().get_network_unique_id()
 	if (send_to != 0):
-		rpc_id(send_to, "chat_message_received", sender, msg, false)
+		rpc_id(send_to, "chat_message", sender, msg, false)
 	else:
 		if (sender != 1):
-			rpc_id(1, "chat_message_received", sender, msg, true)
+			rpc_id(1, "chat_message", sender, msg, true)
 		else:
 			chat_message(1, msg, true)
 
