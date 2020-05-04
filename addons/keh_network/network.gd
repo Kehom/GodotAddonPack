@@ -389,8 +389,12 @@ func close_server(_message: String = "Server is closing") -> void:
 	for k in keys:
 		kick_player(k, _message)
 	
-	# Cleanup the network object
-	get_tree().set_network_peer(null)
+	# Cleanup the network object through a deferred call just to ensure all remote
+	# calls get processed.
+	get_tree().call_deferred("set_network_peer", null)
+	
+	# Remove all remote players from the internal data
+	player_data.clear_remote()
 
 
 func kick_player(id: int, reason: String) -> void:
@@ -459,7 +463,7 @@ func disconnect_from_server() -> void:
 func _on_connection_failed() -> void:
 	emit_signal("join_fail")
 	# Clear the network object
-	get_tree().set_network_peer(null)
+	get_tree().call_deferred("set_network_peer", null)
 	# At this point the local player info is likely still correct, but it doesn't hurt to ensure this fact
 	player_data.local_player.set_network_id(1)
 
@@ -515,7 +519,7 @@ remote func on_join_accepted() -> void:
 
 
 remote func on_join_rejected(reason: String) -> void:
-	# Just notify about this. Further cleanup will be done from the _on_disconnected_from_server
+	# Just notify about this. Further cleanup will be done from the _on_disconnected
 	# because technically speaking this peer has been disconnected.
 	emit_signal("join_rejected", reason)
 
