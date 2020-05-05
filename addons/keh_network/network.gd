@@ -392,9 +392,7 @@ func close_server(_message: String = "Server is closing") -> void:
 	# Cleanup the network object through a deferred call just to ensure all remote
 	# calls get processed.
 	get_tree().call_deferred("set_network_peer", null)
-	
-	# Remove all remote players from the internal data
-	player_data.clear_remote()
+
 
 
 func kick_player(id: int, reason: String) -> void:
@@ -402,6 +400,8 @@ func kick_player(id: int, reason: String) -> void:
 	rpc_id(id, "kicked", reason)
 	# Then remove the player
 	get_tree().network_peer.disconnect_peer(id)
+	# Ensure internal remote player container is properly cleared
+	_unregister_player(id)
 
 
 func _on_player_connected(id: int) -> void:
@@ -432,10 +432,12 @@ remote func server_receive_credentials(cred: Dictionary) -> void:
 	
 	# If the credential_checker funcref is invalid then automatically accept the new player.
 	# Otherwise, only if the referenced function returns true
-	if (!credential_checker || credential_checker.call_func(id, cred).length() == 0):
+	var r_reason: String = credential_checker.call_func(id, cred) if (credential_checker && credential_checker.is_valid()) else ""
+	if (r_reason.length() == 0):
 		rpc_id(id, "on_join_accepted")
 	else:
 		rpc_id(id, "on_join_rejected")
+		kick_player(id, r_reason)
 
 
 
@@ -571,7 +573,8 @@ remote func _unregister_player(_id: int) -> void:
 		# Outside code might need to do something when a player leaves the game
 		emit_signal("player_removed", _id)
 		# Mark the NetPlayerNode for removal from the tree
-		pnode.queue_free()
+		if (!pnode.is_queued_for_deletion()):
+			pnode.queue_free()
 		# And remove the reference from the internal container
 		# warning-ignore:return_value_discarded
 		player_data.remote_player.erase(_id)

@@ -15,7 +15,7 @@
 # - Use the network chat system
 # - Use the entered name in the main menu
 # - Include environment (time of day and maybe weather)
-# - Add (simple) pickups
+# - Add (simple) pickups (to showcase the network event system)
 
 extends Spatial
 
@@ -118,6 +118,7 @@ func _input(evt: InputEvent) -> void:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 			# warning-ignore:return_value_discarded
 			get_tree().change_scene("res://main.tscn")
+
 
 
 
