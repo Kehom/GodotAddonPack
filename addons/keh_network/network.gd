@@ -437,6 +437,7 @@ remote func server_receive_credentials(cred: Dictionary) -> void:
 		rpc_id(id, "on_join_accepted")
 	else:
 		rpc_id(id, "on_join_rejected")
+		# Rejected player should not remain connected
 		kick_player(id, r_reason)
 
 

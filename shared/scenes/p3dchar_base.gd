@@ -108,6 +108,9 @@ func _ready() -> void:
 
 
 func _physics_process(_dt: float) -> void:
+	# If the meta is not present then assume this belongs to the server
+	var uid: int = get_meta("uid") if has_meta("uid") else 1
+	
 	# Verify if there is any correction to be performed
 	if (_correction_data.corrected):
 		# Reset the flag otherwise this "correction" may be played again
@@ -120,14 +123,13 @@ func _physics_process(_dt: float) -> void:
 		_pitch_angle = _correction_data.angle
 		current_stamina = _correction_data.stamina
 		
-		# Replay the input objects within internal history.
-		var inlist: Array = network.player_data.local_player.get_cached_input_list()
-		for i in inlist:
-			handle_input(i)
+		# Replay the input objects within internal history if this character belongs
+		# to the local player
+		if (network.is_id_local(uid)):
+			var inlist: Array = network.player_data.local_player.get_cached_input_list()
+			for i in inlist:
+				handle_input(i)
 	
-	
-	# If the meta is not present then assume this belongs to the server
-	var uid: int = get_meta("uid") if has_meta("uid") else 1
 	# Request input data using the networking system. The argument tells which
 	# which player this data must match. Null will be returned if this machine
 	# is not meant to deal with input
