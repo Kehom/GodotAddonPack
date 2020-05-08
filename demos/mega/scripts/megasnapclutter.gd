@@ -2,7 +2,6 @@ extends SnapEntityBase
 class_name MegaSnapClutter
 
 var position: Vector3
-# The orientation is compressed using 10 bits per component precision
 var orientation: Quat
 var ang_velocity: Vector3
 var lin_velocity: Vector3

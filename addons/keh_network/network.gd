@@ -431,7 +431,7 @@ remote func server_receive_credentials(cred: Dictionary) -> void:
 	var id: int = get_tree().get_rpc_sender_id()
 	
 	# If the credential_checker funcref is invalid then automatically accept the new player.
-	# Otherwise, only if the referenced function returns true
+	# Otherwise, only if the referenced function returns "" (empty string)
 	var r_reason: String = credential_checker.call_func(id, cred) if (credential_checker && credential_checker.is_valid()) else ""
 	if (r_reason.length() == 0):
 		rpc_id(id, "on_join_accepted")

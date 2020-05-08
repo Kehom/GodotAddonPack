@@ -100,7 +100,6 @@ func encode(into: EncDecBuffer, params: Array) -> void:
 func decode(from: EncDecBuffer) -> void:
 	# At this point, "from" should already have gone past the type ID of this event
 	var params: Array = []
-	var idx: int = 0
 	
 	for pt in _param_types:
 		match pt:
