@@ -75,13 +75,17 @@ var _pitch_angle: float = 0.0
 # be used or not.
 var _correction_data: Dictionary
 
+# Cache UID - as retrieved from the meta
+var _uid: int = 0
 
 
 func _ready() -> void:
+	# If meta is not present assume this belongs to the server
+	_uid = get_meta("uid") if has_meta("uid") else 1
+	
 	# Local player character needs a camera. So, check if this is the object
 	# belongs to the local player and, if so, create the camera
-	var uid: int = get_meta("uid") if has_meta("uid") else 0
-	if (uid > 0 && network.is_id_local(uid)):
+	if (_uid > 0 && network.is_id_local(_uid)):
 		_camera_ref = camera_class.instance()
 		
 		#add_child(_camera_ref)
@@ -108,9 +112,6 @@ func _ready() -> void:
 
 
 func _physics_process(_dt: float) -> void:
-	# If the meta is not present then assume this belongs to the server
-	var uid: int = get_meta("uid") if has_meta("uid") else 1
-	
 	# Verify if there is any correction to be performed
 	if (_correction_data.corrected):
 		# Reset the flag otherwise this "correction" may be played again
@@ -125,7 +126,7 @@ func _physics_process(_dt: float) -> void:
 		
 		# Replay the input objects within internal history if this character belongs
 		# to the local player
-		if (network.is_id_local(uid)):
+		if (network.is_id_local(_uid)):
 			var inlist: Array = network.player_data.local_player.get_cached_input_list()
 			for i in inlist:
 				handle_input(i)
@@ -133,7 +134,7 @@ func _physics_process(_dt: float) -> void:
 	# Request input data using the networking system. The argument tells which
 	# which player this data must match. Null will be returned if this machine
 	# is not meant to deal with input
-	var input: InputData = network.get_input(uid)
+	var input: InputData = network.get_input(_uid)
 	
 	# Do something with the new input data
 	handle_input(input)
@@ -142,7 +143,7 @@ func _physics_process(_dt: float) -> void:
 	network.snapshot_entity(create_snapentity_object())
 	
 	# Even if the value hasn't changed this will ensure the HUD can stay updated
-	emit_signal("stamina_changed", uid, current_stamina)
+	emit_signal("stamina_changed", _uid, current_stamina)
 
 
 

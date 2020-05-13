@@ -13,27 +13,46 @@ var _hit: bool = false
 # And if there is an impact, this indicate the location
 var _impact_position: Vector3 = Vector3()
 
+# Hold correction data so it is applied only during physics process. This should
+# avoid some jittery movement
+var _correction_data: Dictionary
+
+# Cache the unique ID
+var _uid: int = 0
+
+
+func _ready() -> void:
+	_correction_data = {
+		"position": Vector3(),
+		"orientation": Quat(),
+		"has_correction": false,
+	}
+	
+	_uid = get_meta("uid") if has_meta("uid") else 0
+
 func _process(dt: float) -> void:
 	# The following will update the internal timer and force despawning of the
 	# projectile if it reaches its maximum alive time. This is safe to be
 	# done regardless if server or client
 	_time_alive += dt
 	if (_time_alive >= TIME_TO_LIVE):
-		var uid: int = get_meta("uid") if has_meta("uid") else 0
-		if (uid > 0):
-			network.snapshot_data.despawn_node(MegaSnapProjectile, uid)
+		if (_uid > 0):
+			network.snapshot_data.despawn_node(MegaSnapProjectile, _uid)
 
 
 func _physics_process(dt: float) -> void:
 	if (is_queued_for_deletion()):
 		return
 	
-	var uid: int = get_meta("uid") if has_meta("uid") else 0
-	
 	if (_hit):
 		# Force despawning since the projectile did hit something and the previous
 		# test didn't indicate this node is queued for removal
-		network.snapshot_data.despawn_node(MegaSnapProjectile, uid)
+		network.snapshot_data.despawn_node(MegaSnapProjectile, _uid)
+	
+	if (_correction_data.has_correction):
+		global_transform = Transform(Basis(_correction_data.orientation), _correction_data.position)
+		_correction_data.has_correction = false
+		$Smooth3D.snap_to_target()
 	
 	var dir: Basis = global_transform.basis
 	var motion: Vector3 = (-dir.z * SPEED * dt)
@@ -53,7 +72,7 @@ func _physics_process(dt: float) -> void:
 	# is, there is no point in adding something that is about to be removed from the
 	# game. Moreover, delta data will take care of explicitly telling about this fact.
 	if (!_hit):
-		var sobj: MegaSnapProjectile = MegaSnapProjectile.new(uid, 0)
+		var sobj: MegaSnapProjectile = MegaSnapProjectile.new(_uid, 0)
 		sobj.position = global_transform.origin
 		sobj.orientation = Quat(global_transform.basis)
 #		sobj.fired_by = 
@@ -66,8 +85,8 @@ func init(t: Transform) -> void:
 
 
 func apply_state(state: Dictionary) -> void:
-	var orient: Quat = state.orientation
+	_correction_data.position = state.position
+	_correction_data.orientation = state.orientation
+	_correction_data.has_correction = true
 
-	global_transform = Transform(Basis(orient), state.position)
-	$Smooth3D.snap_to_target()
 
