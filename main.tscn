@@ -88,23 +88,31 @@ toggle_mode = true
 group = ExtResource( 2 )
 text = "Cam3D"
 
-[node name="bt_network" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+[node name="bt_fancyle" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 90.0
 margin_right = 206.0
 margin_bottom = 110.0
 toggle_mode = true
 group = ExtResource( 2 )
+text = "Fancy Line Edit"
+
+[node name="bt_network" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 120.0
+margin_right = 206.0
+margin_bottom = 140.0
+toggle_mode = true
+group = ExtResource( 2 )
 text = "Network"
 
 [node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 120.0
-margin_right = 206.0
-margin_bottom = 124.0
-
-[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 134.0
+margin_top = 150.0
 margin_right = 206.0
 margin_bottom = 154.0
+
+[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 164.0
+margin_right = 206.0
+margin_bottom = 184.0
 toggle_mode = true
 group = ExtResource( 2 )
 text = "Complete"
@@ -483,6 +491,46 @@ autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="fancyle" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_fleload" type="Button" parent="mpnl/stabs/fancyle"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 114.0
+margin_bottom = 31.0
+text = "Open"
+
+[node name="Label" type="Label" parent="mpnl/stabs/fancyle"]
+margin_left = 14.0
+margin_top = 41.0
+margin_right = 744.0
+margin_bottom = 293.0
+text = "Interdependency: none
+This is a custom UI control that implements most of the functionality of the LineEdit control, but allows rendering images as well as some basic text formatting. The idea is to use this as input for consoles and/or chat boxes.
+
+Any different rendering (image and formatting) is based on a set of rules that must be configured during initialization. As an example, a rule can be set to convert \":)\" into an smily image.
+
+Brief feature overview:
+- Can render formatted font (bold, italic, regular, bold-italic  and underlined).
+- Render images within the input box.
+- Images are automatically scaled in order to fit the input box and sort of match the text.
+- Fully theme-able.
+
+Demo Overview:
+The demo presents a few panels, each one containing an instance of the FancyLineEdit control, initialized with a different set of rules in order to perform the rendering. There is some explanation of how each input box was configured in order to help explain what is meant to happen as well as direct a little bit on where to look at in the code.
+"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="mpnl/demo_list/pnl/bt_quit" to="." method="_on_bt_quit_pressed"]
 [connection signal="pressed" from="mpnl/stabs/encdecbuffer/bt_encdecload" to="." method="_on_bt_encdecload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/utilities/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]
@@ -494,3 +542,4 @@ __meta__ = {
 [connection signal="pressed" from="mpnl/stabs/megademo/bt_megasingle" to="." method="_on_megabt_single_pressed"]
 [connection signal="pressed" from="mpnl/stabs/megademo/bt_megacreate" to="." method="_on_megabt_host_pressed"]
 [connection signal="pressed" from="mpnl/stabs/megademo/bt_megajoin" to="." method="_on_megabt_join_pressed"]
+[connection signal="pressed" from="mpnl/stabs/fancyle/bt_fleload" to="." method="_on_bt_fleload_pressed"]

@@ -1,0 +1,490 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://demos/ui/fancy_le.gd" type="Script" id=1]
+[ext_resource path="res://addons/keh_ui/fancy_line_edit.gd" type="Script" id=2]
+[ext_resource path="res://shared/textures/smile_32x32.png" type="Texture" id=3]
+[ext_resource path="res://shared/textures/tongueout_32x32.png" type="Texture" id=4]
+[ext_resource path="res://shared/textures/wink_32x32.png" type="Texture" id=5]
+[ext_resource path="res://demos/ui/theme_fancy_le.tres" type="Theme" id=6]
+
+[node name="fancy_le" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="example1" type="Panel" parent="."]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 504.0
+margin_bottom = 88.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl" type="Label" parent="example1"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 488.0
+margin_bottom = 40.0
+text = "Example1: 3 strict rules are added in order to convert :), ;) and ;P into emojis. This is the simplest use."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="fle" type="Control" parent="example1"]
+margin_left = 8.0
+margin_top = 48.0
+margin_right = 488.0
+margin_bottom = 72.0
+rect_min_size = Vector2( 58, 24 )
+focus_mode = 2
+mouse_default_cursor_shape = 1
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+placeholder = "Type some text"
+
+[node name="example2" type="Panel" parent="."]
+margin_left = 8.0
+margin_top = 96.0
+margin_right = 504.0
+margin_bottom = 192.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl" type="Label" parent="example2"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 488.0
+margin_bottom = 60.0
+text = "Example2: Uses \"dynamic\" formatting through a custom function, which will be triggered by starting and ending something with \":\". So, try something like :wink:, :smile: or :tongueout:"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="fle" type="Control" parent="example2"]
+margin_left = 8.0
+margin_top = 64.0
+margin_right = 488.0
+margin_bottom = 88.0
+rect_min_size = Vector2( 58, 24 )
+focus_mode = 2
+mouse_default_cursor_shape = 1
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+placeholder = "Type some text"
+
+[node name="example3" type="Panel" parent="."]
+margin_left = 8.0
+margin_top = 200.0
+margin_right = 504.0
+margin_bottom = 280.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl" type="Label" parent="example3"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 488.0
+margin_bottom = 22.0
+text = "Example3: This is simply a combination of examples 1 and 2, but using green color instead of yellow"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="fle" type="Control" parent="example3"]
+margin_left = 8.0
+margin_top = 48.0
+margin_right = 488.0
+margin_bottom = 72.0
+rect_min_size = Vector2( 58, 24 )
+focus_mode = 2
+mouse_default_cursor_shape = 1
+script = ExtResource( 2 )
+placeholder = "Type some text"
+
+[node name="example4" type="Panel" parent="."]
+margin_left = 8.0
+margin_top = 288.0
+margin_right = 504.0
+margin_bottom = 408.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl" type="Label" parent="example4"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 488.0
+margin_bottom = 39.0
+text = "Example4: In addition to combining examples 1 and 2, use several buttons to add smiles into the text, where the cursor is."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="fle" type="Control" parent="example4"]
+margin_left = 8.0
+margin_top = 48.0
+margin_right = 488.0
+margin_bottom = 72.0
+rect_min_size = Vector2( 58, 24 )
+focus_mode = 2
+mouse_default_cursor_shape = 1
+script = ExtResource( 2 )
+placeholder = "Type some text"
+
+[node name="bt_smiley" type="TextureButton" parent="example4"]
+self_modulate = Color( 1, 0.86, 0.39, 1 )
+margin_left = 8.0
+margin_top = 80.0
+margin_right = 40.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 3 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 3 )
+texture_focused = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_smileg" type="TextureButton" parent="example4"]
+self_modulate = Color( 0.1, 0.86, 0.1, 1 )
+margin_left = 48.0
+margin_top = 80.0
+margin_right = 80.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 3 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 3 )
+texture_focused = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_smiler" type="TextureButton" parent="example4"]
+self_modulate = Color( 0.8, 0.2, 0.1, 1 )
+margin_left = 88.0
+margin_top = 80.0
+margin_right = 120.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 3 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 3 )
+texture_focused = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_winky" type="TextureButton" parent="example4"]
+self_modulate = Color( 1, 0.86, 0.39, 1 )
+margin_left = 136.0
+margin_top = 80.0
+margin_right = 168.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 5 )
+texture_hover = ExtResource( 5 )
+texture_focused = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_winkg" type="TextureButton" parent="example4"]
+self_modulate = Color( 0.1, 0.86, 0.1, 1 )
+margin_left = 176.0
+margin_top = 80.0
+margin_right = 208.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 5 )
+texture_hover = ExtResource( 5 )
+texture_focused = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_winkr" type="TextureButton" parent="example4"]
+self_modulate = Color( 0.8, 0.2, 0.1, 1 )
+margin_left = 216.0
+margin_top = 80.0
+margin_right = 248.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 5 )
+texture_hover = ExtResource( 5 )
+texture_focused = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_tonguey" type="TextureButton" parent="example4"]
+self_modulate = Color( 1, 0.86, 0.39, 1 )
+margin_left = 264.0
+margin_top = 80.0
+margin_right = 296.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_tongueg" type="TextureButton" parent="example4"]
+self_modulate = Color( 0.1, 0.86, 0.1, 1 )
+margin_left = 304.0
+margin_top = 80.0
+margin_right = 336.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_tonguer" type="TextureButton" parent="example4"]
+self_modulate = Color( 0.8, 0.2, 0.1, 1 )
+margin_left = 344.0
+margin_top = 80.0
+margin_right = 376.0
+margin_bottom = 112.0
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="example5" type="Panel" parent="."]
+margin_left = 8.0
+margin_top = 416.0
+margin_right = 504.0
+margin_bottom = 528.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl" type="Label" parent="example5"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 488.0
+margin_bottom = 73.0
+text = "Example5: Use \"pattern auto-format\" that begins with '/' in order to emulate commands in a console box. For simplicity only 3 \"commands\" will be accepted: help, warpto and kick. \"Invalid\" commands will be displayed in red"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="fle" type="Control" parent="example5"]
+margin_left = 8.0
+margin_top = 80.0
+margin_right = 488.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 58, 24 )
+focus_mode = 2
+mouse_default_cursor_shape = 1
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+placeholder = "Type some text"
+
+[node name="example6" type="Panel" parent="."]
+margin_left = 520.0
+margin_top = 8.0
+margin_right = 1016.0
+margin_bottom = 184.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl" type="Label" parent="example6"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 488.0
+margin_bottom = 90.0
+text = "Example6: Combines all of the previous examples. Valid commands are green and bold, while invalid are regular red. Invalid emoji ID's will be displayed in red with underline and italics. For this to work, a custom theme has been created in order to assign a different font, with bold and italics support."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="fle" type="Control" parent="example6"]
+margin_left = 8.0
+margin_top = 96.0
+margin_right = 488.0
+margin_bottom = 128.0
+rect_min_size = Vector2( 58, 24 )
+focus_mode = 2
+mouse_default_cursor_shape = 1
+theme = ExtResource( 6 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+placeholder = "Type some text"
+
+[node name="bt_smiley" type="TextureButton" parent="example6"]
+self_modulate = Color( 1, 0.86, 0.39, 1 )
+margin_left = 8.0
+margin_top = 136.0
+margin_right = 40.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 3 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 3 )
+texture_focused = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_smileg" type="TextureButton" parent="example6"]
+self_modulate = Color( 0.1, 0.86, 0.1, 1 )
+margin_left = 48.0
+margin_top = 136.0
+margin_right = 80.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 3 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 3 )
+texture_focused = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_smiler" type="TextureButton" parent="example6"]
+self_modulate = Color( 0.8, 0.2, 0.1, 1 )
+margin_left = 88.0
+margin_top = 136.0
+margin_right = 120.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 3 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 3 )
+texture_focused = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_winky" type="TextureButton" parent="example6"]
+self_modulate = Color( 1, 0.86, 0.39, 1 )
+margin_left = 136.0
+margin_top = 136.0
+margin_right = 168.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 5 )
+texture_hover = ExtResource( 5 )
+texture_focused = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_winkg" type="TextureButton" parent="example6"]
+self_modulate = Color( 0.1, 0.86, 0.1, 1 )
+margin_left = 176.0
+margin_top = 136.0
+margin_right = 208.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 5 )
+texture_hover = ExtResource( 5 )
+texture_focused = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_winkr" type="TextureButton" parent="example6"]
+self_modulate = Color( 0.8, 0.2, 0.1, 1 )
+margin_left = 216.0
+margin_top = 136.0
+margin_right = 248.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 5 )
+texture_pressed = ExtResource( 5 )
+texture_hover = ExtResource( 5 )
+texture_focused = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_tonguey" type="TextureButton" parent="example6"]
+self_modulate = Color( 1, 0.86, 0.39, 1 )
+margin_left = 264.0
+margin_top = 136.0
+margin_right = 296.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_tongueg" type="TextureButton" parent="example6"]
+self_modulate = Color( 0.1, 0.86, 0.1, 1 )
+margin_left = 304.0
+margin_top = 136.0
+margin_right = 336.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_tonguer" type="TextureButton" parent="example6"]
+self_modulate = Color( 0.8, 0.2, 0.1, 1 )
+margin_left = 344.0
+margin_top = 136.0
+margin_right = 376.0
+margin_bottom = 168.0
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 4 )
+texture_focused = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ctrl" type="Panel" parent="."]
+margin_left = 528.0
+margin_top = 488.0
+margin_right = 1024.0
+margin_bottom = 528.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_clear" type="Button" parent="ctrl"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 71.0
+margin_bottom = 28.0
+text = "Clear all"
+
+[node name="bt_back" type="Button" parent="ctrl"]
+margin_left = 424.0
+margin_top = 8.0
+margin_right = 487.0
+margin_bottom = 28.0
+text = "Back"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="ctrl/bt_clear" to="." method="_on_bt_clear_pressed"]
+[connection signal="pressed" from="ctrl/bt_back" to="." method="_on_bt_back_pressed"]

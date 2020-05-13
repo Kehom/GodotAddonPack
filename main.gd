@@ -22,6 +22,7 @@ func _ready() -> void:
 	set_tab_button("bt_utils", "utilities")
 	set_tab_button("bt_network", "network")
 	set_tab_button("bt_cam3d", "cam3d")
+	set_tab_button("bt_fancyle", "fancyle")
 	set_tab_button("bt_smooth", "smooth")
 	set_tab_button("bt_megademo", "megademo")
 	
@@ -156,6 +157,10 @@ func _on_bt_cam3dload_pressed() -> void:
 ### Smooth nodes demo
 func _on_bt_smoothload_pressed():
 	open_scene("res://demos/nodes/testsmooth.tscn")
+
+### FancyLineEdit demo
+func _on_bt_fleload_pressed() -> void:
+	open_scene("res://demos/ui/fancy_le.tscn")
 
 
 
