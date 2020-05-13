@@ -15,7 +15,7 @@ var _impact_position: Vector3 = Vector3()
 
 func _process(dt: float) -> void:
 	# The following will update the internal timer and force despawning of the
-	# projectile if it reaches it's maximum alive time. This is safe to be
+	# projectile if it reaches its maximum alive time. This is safe to be
 	# done regardless if server or client
 	_time_alive += dt
 	if (_time_alive >= TIME_TO_LIVE):

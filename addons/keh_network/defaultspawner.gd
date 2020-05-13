@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 ###############################################################################
 
-# The default spawner just takes the packed scene, through it's constructor,
+# The default spawner just takes the packed scene, through its constructor,
 # that should be used to spawn a game node. With that in mind, each type of
 # node to be dynamically spawned should have a corresponding spawner. If there
 # are more advanced things to be done with each spawning then a different class,

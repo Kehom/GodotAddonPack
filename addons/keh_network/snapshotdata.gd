@@ -112,7 +112,7 @@ func spawn_node(eclass: Resource, uid: int, chash: int) -> Node:
 	
 	return ret
 
-# Retrieve a game node given it's unique ID and associated snapshot entity class
+# Retrieve a game node given its unique ID and associated snapshot entity class
 func get_game_node(uid: int, snapres: Resource) -> Node:
 	var ename: Dictionary = _entity_name.get(snapres)
 	var ret: Node = null
@@ -139,7 +139,7 @@ func add_pre_spawned_node(eclass: Resource, uid: int, node: Node) -> void:
 		einfo.add_pre_spawned(uid, node)
 
 
-# Locate the snapshot given it's signature and return it, null if not found
+# Locate the snapshot given its signature and return it, null if not found
 func get_snapshot(signature: int) -> NetSnapshot:
 	for s in _history:
 		if (s.signature == signature):
@@ -200,7 +200,7 @@ func decode_full(from: EncDecBuffer) -> NetSnapshot:
 	var isig: int = from.read_uint()
 	
 	# This function is called only on clients, where verified snapshots are removed
-	# from it's history. This means that if this snapshot is older than the first
+	# from its history. This means that if this snapshot is older than the first
 	# in the container then it can be discarded. However the matching system here
 	# uses the input signature and not the snapshot signature (which is used to
 	# acknowledge data to the server).
@@ -212,7 +212,7 @@ func decode_full(from: EncDecBuffer) -> NetSnapshot:
 	# Decode the input signature
 	retval.input_sig = isig
 
-	# The snapshot checking algorithm requires that each entity type has it's
+	# The snapshot checking algorithm requires that each entity type has its
 	# entry within the snapshot data, so add them
 	for ehash in _entity_info:
 		retval.add_type(ehash)

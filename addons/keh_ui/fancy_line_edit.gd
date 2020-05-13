@@ -822,7 +822,7 @@ func get_default_font_color() -> Color:
 	return _use_theme.get_color("font_default_color", CNAME)
 
 
-# Given a "box size" (width/length), obtain it's scaled values so the box fits inside the edit control
+# Given a "box size" (width/length), obtain its scaled values so the box fits inside the edit control
 func get_scaled_size(original: Vector2) -> Vector2:
 	var f: Font = get_normal_font()
 	var fheight: float = f.get_height()

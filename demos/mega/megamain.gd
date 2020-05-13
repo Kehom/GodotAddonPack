@@ -19,7 +19,7 @@
 
 extends Spatial
 
-var TEMP_INT: int = 0
+#var TEMP_INT: int = 0       # (was) used for debugging
 
 # (Pre)Load the UI scene that will represent each player within the HUD
 const UIRemotePlayer: PackedScene = preload("res://shared/ui/ui_remoteplayer.tscn")
@@ -286,7 +286,7 @@ func _add_player_to_hud(pid: int) -> void:
 	# Add the node to the internal dictionary so it can be used later
 	_ui_player[pid] = ctrl
 	
-	# Setup the UI (using it's script')
+	# Setup the UI (using its script')
 	ctrl.set_player_name(str(pid))
 	
 	# Add to the HUD

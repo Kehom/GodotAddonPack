@@ -20,7 +20,7 @@ var _camera_ref: Cam3D = null
 const _floor_normal: Vector3 = Vector3.UP
 
 # Gravity is necessary in order to keep the character on the ground, so hold
-# it's magnitude
+# its magnitude
 const gravity: float = 9.81
 
 # Hold accumulated velocity through each physics iteration
@@ -151,7 +151,7 @@ func _physics_process(_dt: float) -> void:
 func apply_state(state: Dictionary) -> void:
 	_correction_data.corrected = true
 	_correction_data.transform = Transform(Basis(state.orientation), state.position)
-	_correction_data.velocity = state.velocity
+	_correction_data.velocity.y = state.vertical_vel
 	_correction_data.angle = state.angle
 	_correction_data.stamina = state.stamina
 
@@ -268,7 +268,7 @@ func shoot() -> void:
 	
 	var position_node: Position3D = $projectile_source
 	
-	# Spawn the projectile and set it's state - last argument, class_hash is not
+	# Spawn the projectile and set its state - last argument, class_hash is not
 	# needed in this demo since there aren't different types of projectiles.
 	var bullet: Node = network.snapshot_data.spawn_node(MegaSnapProjectile, projid, 0)
 	bullet.init(position_node.global_transform)
@@ -293,7 +293,8 @@ func create_snapentity_object() -> MegaSnapPCharacter:
 	var e: MegaSnapPCharacter = MegaSnapPCharacter.new(uid, chash)
 	e.position = global_transform.origin
 	e.set_orientation(Quat(global_transform.basis))
-	e.velocity = _velocity
+#	e.velocity = _velocity
+	e.vertical_vel = _velocity.y
 	e.pitch_angle = _pitch_angle
 	e.stamina = current_stamina
 	

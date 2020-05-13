@@ -1,4 +1,4 @@
-# Just a short "extension" for the RigidBody2D so it's state can be reset.
+# Just a short "extension" for the RigidBody2D so its state can be reset.
 # To do that, the custom integrator must be used
 
 extends RigidBody2D

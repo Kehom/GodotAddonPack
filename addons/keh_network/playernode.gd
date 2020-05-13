@@ -38,7 +38,7 @@ var net_id: int = 1 setget set_network_id
 # it's running and which player this node corresponds to.
 # Running on server:
 # - If this node corresponds to the local player (the server), then the
-#   cache does nothing because there is no need to validate it's data.
+#   cache does nothing because there is no need to validate its data.
 # - If this node corresponds to a client then the cache will hold the
 #   received input data, which will be retrieved from it when iterating
 #   the game state. At that moment the input is removed from the buffer
@@ -76,7 +76,7 @@ class InputCache:
 	var snapinpu: Dictionary
 	# Count the number of 0-input snapshots that weren't acknowledged by the client
 	# If this value is bigger than 0 then the server will send the newest full
-	# snapshot within it's history
+	# snapshot within its history
 	var no_input_count: int
 	# Holds the signature of the last acknowledged snapshot signature. This will be
 	# used as reference to cleanup older data.
@@ -144,7 +144,7 @@ var _custom_data: Dictionary
 
 # These vectors will be used to cache mouse data from the _input function
 # Obviously those will only be used on the local machine
-var _mposition: Vector2 = Vector2()
+#var _mposition: Vector2 = Vector2()       # Should mouse position be used?
 var _mrelative: Vector2 = Vector2()
 var _mspeed: Vector2 = Vector2()
 
@@ -179,7 +179,7 @@ func _ready() -> void:
 
 func _input(evt: InputEvent) -> void:
 	if (evt is InputEventMouseMotion):
-		_mposition = evt.position
+		#_mposition = evt.position        # Should mouse position be used?
 		_mrelative = evt.relative
 		_mspeed = evt.speed
 

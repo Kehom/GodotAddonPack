@@ -128,7 +128,7 @@ export(float) var far: float = 100.0 setget set_zfar
 ### Those bring code completion and early errors
 
 # Hold data necessary for interpolation. Internally the pivot point (Cam3D root) will be
-# snapped to it's parent. However the reference point used to move the camera backwards
+# snapped to its parent. However the reference point used to move the camera backwards
 # will be interpolated if pivot_mode is set to PivotMode.Interpolated
 class InterpData:
 	var pivot_from: Vector3             # Pivot initial location

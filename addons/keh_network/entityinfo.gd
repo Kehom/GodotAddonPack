@@ -203,7 +203,7 @@ func decode_full_entity(from: EncDecBuffer) -> SnapEntityBase:
 
 
 
-# Retrieve a game node given it's unique ID.
+# Retrieve a game node given its unique ID.
 func get_game_node(uid: int) -> Node:
 	return _nodes.get(uid)
 
@@ -267,7 +267,7 @@ func _check_properties(cname: String, rpath: String) -> void:
 		return
 	
 	# Unfortunately it's necessary to create an instance of the class in order
-	# to traverse it's properties and methods. Since this is a dummy object
+	# to traverse its properties and methods. Since this is a dummy object
 	# uid and class_hash are irrelevant
 	var obj: SnapEntityBase = create_instance(0, 0)
 	

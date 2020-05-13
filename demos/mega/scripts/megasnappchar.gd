@@ -8,7 +8,8 @@ class_name MegaSnapPCharacter
 var position: Vector3
 var orientation: Quat
 
-var velocity: Vector3
+#var velocity: Vector3
+var vertical_vel: float
 var pitch_angle: float
 var stamina: float
 
@@ -16,7 +17,8 @@ var stamina: float
 func _init(uid: int, h: int).(uid, h) -> void:
 	position = Vector3()
 	orientation = Quat()
-	velocity = Vector3()
+#	velocity = Vector3()
+	vertical_vel = 0.0
 	pitch_angle = 0.0
 	stamina = 0.0
 
@@ -26,7 +28,8 @@ func apply_state(to_node: Node) -> void:
 	to_node.apply_state({
 		"position": position,
 		"orientation": orientation,
-		"velocity": velocity,
+#		"velocity": velocity,
+		"vertical_vel": vertical_vel,
 		"angle": pitch_angle,
 		"stamina": stamina,
 	})

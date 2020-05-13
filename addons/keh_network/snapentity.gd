@@ -56,7 +56,7 @@ const CTYPE_USHORT: int = 196610
 var id: int
 
 # In order to properly spawn game objects the packed scene is necessary information and
-# some times the correct one must be replicated. Instead of sending and string (which
+# some times the correct one must be replicated. Instead of sending a string (which
 # is not supported by the automatic replication system), a "name" is hashed and that
 # value is replicated (which adds another 4 bytes). This name is the "category" when
 # registering the spawners within the snapshot data object. Still, sometimes this value
