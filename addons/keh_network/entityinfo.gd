@@ -51,6 +51,95 @@ class ReplicableProperty:
 		name = _name
 		type = _type
 		mask = _mask
+	
+	# Unfortunately must use variant (arguments) here instead of static type
+	func compare(v1, v2) -> bool:
+		return v1 == v2
+
+# This is a specialized replicable property for floating point numbers when a tolerance must
+# be used when comparing values. In this case the is_equal_approx() function is used
+class RPropApprox extends ReplicableProperty:
+	func _init(_name: String, _mask: int).(_name, TYPE_REAL, _mask) -> void:
+		pass
+	
+	func compare(v1: float, v2: float) -> bool:
+		return is_equal_approx(v1, v2)
+
+# Vector2, Vector3, Quat etc offers a function to perform the is_equal_approx() on each
+# component. This specialized ReplicableProperty performs the comparison using that
+class RPropApproxi extends ReplicableProperty:
+	func _init(_name: String, _type: int, _mask: int).(_name, _type, _mask) -> void:
+		pass
+	
+	func compare(v1, v2) -> bool:
+		return v1.is_equal_approx(v2)
+
+# Although a bunch of work to create one specialized replicable property for each one
+# of the types bellow, it has been done because there is no easy easy way to directly
+# access each component of "compound types" without using the correct names. Moreover,
+# instead of creating a new base for each of those, still directly use ReplicableProperty
+# as base in order to help with readability and **maybe** performance
+# Nevertheless, the specializations bellow are meant to offer custom tolerance values
+# to compare floating point values
+class RPropTolFloat extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_REAL, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: float, v2: float) -> bool:
+		return (abs(v1 - v2) < tolerance)
+
+class RPropTolVec2 extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_VECTOR2, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Vector2, v2: Vector2) -> bool:
+		return (abs(v1.x - v2.x) < tolerance &&
+			abs(v1.y - v2.y) < tolerance)
+
+class RPropTolRec2 extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_RECT2, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Rect2, v2: Rect2) -> bool:
+		return (abs(v1.position.x - v2.position.x) < tolerance &&
+			abs(v1.position.y - v2.position.y) < tolerance &&
+			abs(v1.size.x - v2.size.x) < tolerance &&
+			abs(v1.size.y - v2.size.y) < tolerance)
+
+class RPropTolQuat extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_QUAT, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Quat, v2: Quat) -> bool:
+		return (abs(v1.x - v2.x) < tolerance &&
+			abs(v1.y - v2.y) < tolerance &&
+			abs(v1.z - v2.z) < tolerance &&
+			abs(v1.w - v2.w) < tolerance)
+
+class RPropTolVec3 extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_VECTOR3, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Vector3, v2: Vector3) -> bool:
+		return (abs(v1.x - v2.x) < tolerance &&
+			abs(v1.y - v2.y) < tolerance &&
+			abs(v1.z - v2.z) < tolerance)
+
+class RPropTolColor extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_COLOR, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Color, v2: Color) -> bool:
+		return (abs(v1.r - v2.r) < tolerance &&
+			abs(v1.g - v2.g) < tolerance &&
+			abs(v1.b - v2.b) < tolerance &&
+			abs(v1.a - v2.a) < tolerance)
 
 
 # Storing registered spawners could be done through dictionaries however
@@ -163,7 +252,7 @@ func calculate_change_mask(e1: SnapEntityBase, e2: SnapEntityBase) -> int:
 	var cmask: int = 0
 	
 	for p in replicable:
-		if (e1.get(p.name) != e2.get(p.name)):
+		if (!p.compare(e1.get(p.name), e2.get(p.name))):
 			cmask |= p.mask
 	
 	return cmask
@@ -296,21 +385,17 @@ func _check_properties(cname: String, rpath: String) -> void:
 				continue
 			
 			var tp: int = p.type
-			if (tp == TYPE_INT && obj.has_meta(p.name)):
-				var mval: int = obj.get_meta(p.name)
-				match mval:
-					CTYPE_UINT, CTYPE_BYTE, CTYPE_USHORT:
-						tp = mval
+			var rprop: ReplicableProperty = _build_replicable_prop(p.name, tp, mask, obj)
 			
-			match tp:
-				TYPE_BOOL, TYPE_INT, TYPE_REAL, TYPE_VECTOR2, TYPE_RECT2, TYPE_QUAT, TYPE_COLOR, TYPE_VECTOR3, CTYPE_UINT, CTYPE_BYTE, CTYPE_USHORT:
-					# Create the replicable property entry in the internal array
-					replicable.push_back(ReplicableProperty.new(p.name, tp, mask))
-					# Advance the mask
-					mask *= 2
+			if (rprop):
+				# Push the replicable property into the internal container
+				replicable.push_back(rprop)
+				# Advance the mask
+				mask *= 2
+	
 	
 	# After iterating through available properties, verify if there is at least
-	# one replicable property besides "id" and "class_hash" (taking into account)
+	# one replicable property besides "id" and "class_hash" taking into account
 	# the fact that class_hash may be disabled).
 	if (replicable.size() <= min_size):
 		_resource = null
@@ -380,3 +465,65 @@ func _property_writer(repl: ReplicableProperty, entity: SnapEntityBase, into: En
 			into.write_ushort(val)
 
 
+
+func _build_replicable_prop(name: String, tp: int, mask: int, obj: Object) -> ReplicableProperty:
+	var ret: ReplicableProperty = null
+	
+	match tp:
+		TYPE_INT:
+			# Check if this integer is meant to be used with a different size in bytes
+			# when encoding/decoding into a byte array
+			if (obj.has_meta(name)):
+				var mval: int = obj.get_meta(name)
+				match mval:
+					CTYPE_UINT, CTYPE_BYTE, CTYPE_USHORT:
+						tp = mval
+			
+			# Use the regular ReplicableProperty because integers don't need tolerance to compare them
+			ret = ReplicableProperty.new(name, tp, mask)
+		
+		TYPE_REAL, TYPE_VECTOR2, TYPE_RECT2, TYPE_QUAT, TYPE_VECTOR3, TYPE_COLOR:
+			# In here, any specialized comparison will be left for later in this function
+			if (!obj.has_meta(name)):
+				# This property does not require any special comparison method, so just
+				# use the default replicable property class
+				ret = ReplicableProperty.new(name, tp, mask)
+		
+		TYPE_BOOL:
+			ret = ReplicableProperty.new(name, tp, mask)
+		
+		_:
+			# This is not a supported type. Bail so the test bellow can be done
+			return null
+	
+	if (!ret):
+		# If here, the type is supported but it does require one of the specialized ReplicableProperty
+		# because a tolerance is required when comparing values. What this means is, the test for the
+		# existance of the meta has already been done
+		var tol: float = obj.get_meta(name)
+		
+		if (tol <= 0.0):
+			# No custom tolerance is requested so use the is_equal_approx() function
+			if (tp == TYPE_REAL):
+				ret = RPropApprox.new(name, mask)
+			else:
+				ret = RPropApproxi.new(name, tp, mask)
+		
+		else:
+			# A custom tolerance is required. This means the specific type must be known in order to
+			# create the correct replicable property
+			match (tp):
+				TYPE_REAL:
+					ret = RPropTolFloat.new(name, mask, tol)
+				TYPE_VECTOR2:
+					ret = RPropTolVec2.new(name, mask, tol)
+				TYPE_RECT2:
+					ret = RPropTolRec2.new(name, mask, tol)
+				TYPE_QUAT:
+					ret = RPropTolQuat.new(name, mask, tol)
+				TYPE_VECTOR3:
+					ret = RPropTolVec3.new(name, mask, tol)
+				TYPE_COLOR:
+					ret = RPropTolColor.new(name, mask, tol)
+	
+	return ret

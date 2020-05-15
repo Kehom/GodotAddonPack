@@ -192,6 +192,10 @@ gdscript/completion/autocomplete_setters_and_getters=true
 
 enabled=PoolStringArray( "keh_network", "keh_smooth", "keh_ui" )
 
+[global]
+
+warning=true
+
 [input]
 
 move_forward={
@@ -248,6 +252,7 @@ multiselect={
 [physics]
 
 common/physics_fps=30
+common/physics_jitter_fix=0.0
 3d/physics_engine="Bullet"
 
 [rendering]

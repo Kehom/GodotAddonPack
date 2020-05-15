@@ -36,9 +36,6 @@ class_name Network
 #   properties defined within SnapEntityBase derived classes
 # - A function to "whisper" a message to the specified player in a way that the
 #   message goes through the server first. This can be useful for logging purposes
-# - One way to allow error margins to be used during the comparison of snapshot entities,
-#   more specifically when comparing floating point numbers.
-# - Replicated event system.
 
 
 # Limitations:

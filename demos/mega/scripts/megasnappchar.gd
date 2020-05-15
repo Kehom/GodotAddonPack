@@ -21,6 +21,12 @@ func _init(uid: int, h: int).(uid, h) -> void:
 	vertical_vel = 0.0
 	pitch_angle = 0.0
 	stamina = 0.0
+	
+	# Set so position, orientation and vertical velocity are compared with is_equal_approx(),
+	# which incorporates a tolerance.
+	set_meta("position", 0)
+	set_meta("orientation", 0)
+	set_meta("vertical_vel", 0)
 
 
 func apply_state(to_node: Node) -> void:
