@@ -4,7 +4,11 @@ extends SnapEntityBase
 class_name MegaSnapProjectile
 
 var position: Vector3
-var orientation: Quat
+#var orientation: Quat
+# The orientation here uses compression through the smallest three method.
+# In this case, 9 bits per component, meaning that everything fits in a single
+# integer.
+var orientation: int
 
 
 # Hold network ID of the player that fired this projectile
@@ -20,7 +24,8 @@ func _init(uid: int, h: int).(uid, h) -> void:
 	set_meta("fired_by", EncDecBuffer.CTYPE_UINT)
 	
 	position = Vector3()
-	orientation = Quat()
+#	orientation = Quat()
+	orientation = 0
 	fired_by = 1
 
 

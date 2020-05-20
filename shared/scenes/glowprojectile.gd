@@ -74,7 +74,8 @@ func _physics_process(dt: float) -> void:
 	if (!_hit):
 		var sobj: MegaSnapProjectile = MegaSnapProjectile.new(_uid, 0)
 		sobj.position = global_transform.origin
-		sobj.orientation = Quat(global_transform.basis)
+		#sobj.orientation = Quat(global_transform.basis)
+		sobj.orientation = Quantize.compress_rquat_9bits(Quat(global_transform.basis))
 #		sobj.fired_by = 
 		
 		network.snapshot_entity(sobj)
@@ -86,7 +87,7 @@ func init(t: Transform) -> void:
 
 func apply_state(state: Dictionary) -> void:
 	_correction_data.position = state.position
-	_correction_data.orientation = state.orientation
+	_correction_data.orientation = Quantize.restore_rquat_9bits(state.orientation)
 	_correction_data.has_correction = true
 
 
