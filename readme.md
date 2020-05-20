@@ -39,6 +39,13 @@ Requires Activation: no
 
 Implements a class (`EncDecBuffer`) that wraps a `PoolByteArray` and provides means to add or extract data into the wrapped array. One of the features is that it allows "short integers" (8 or 16 bits) to be encoded/decoded. The main reason for this buffer to exist is to strip out variant headers (4 bytes per property) from the encoded data, mostly for packing properties to be sent through networks. Although this can be useful for other things, like binary save files.
 
+#### data/quantize.gd
+
+Interdependency: none
+Requires Activation: no
+
+Provides means to quantize floating point numbers as well as compress rotation quaternions using the *smallest three* method. The entire functionality is provided through static functions, meaning that it's not necessary to create instances of the class (`Quantize`). Although the returned quantized data are still using the full GDScript variant data, the resulting integers can be packed into others through bit masking. Also, this data can be directly used with the encdecbuffer.gd script, meaning the two complement each other rather well.
+
 ### Network
 
 Interdependency: data/encdecbuffer.gd

@@ -114,6 +114,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/keh_network/network.gd"
 }, {
+"base": "Reference",
+"class": "Quantize",
+"language": "GDScript",
+"path": "res://addons/keh_general/data/quantize.gd"
+}, {
 "base": "Node2D",
 "class": "RectangleDrawer",
 "language": "GDScript",
@@ -166,6 +171,7 @@ _global_script_class_icons={
 "NetSnapshot": "",
 "NetSnapshotData": "",
 "Network": "",
+"Quantize": "",
 "RectangleDrawer": "",
 "SharedUtils": "",
 "Smooth2D": "",
@@ -187,6 +193,7 @@ network="*res://addons/keh_network/network.gd"
 [debug]
 
 gdscript/completion/autocomplete_setters_and_getters=true
+gdscript/warnings/unused_class_variable=true
 
 [editor_plugins]
 
@@ -195,6 +202,7 @@ enabled=PoolStringArray( "keh_network", "keh_smooth", "keh_ui" )
 [global]
 
 warning=true
+unused=true
 
 [input]
 

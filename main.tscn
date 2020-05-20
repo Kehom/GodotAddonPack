@@ -63,56 +63,55 @@ pressed = true
 group = ExtResource( 2 )
 text = "EncDecBuffer"
 
-[node name="bt_utils" type="Button" parent="mpnl/demo_list/pnl/vbox"]
-visible = false
+[node name="bt_quantize" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 30.0
 margin_right = 206.0
 margin_bottom = 50.0
 toggle_mode = true
 group = ExtResource( 2 )
-text = "Utilities"
+text = "Quantize"
 
 [node name="bt_smooth" type="Button" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 30.0
-margin_right = 206.0
-margin_bottom = 50.0
-toggle_mode = true
-group = ExtResource( 2 )
-text = "Smoothing"
-
-[node name="bt_cam3d" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 60.0
 margin_right = 206.0
 margin_bottom = 80.0
 toggle_mode = true
 group = ExtResource( 2 )
-text = "Cam3D"
+text = "Smoothing"
 
-[node name="bt_fancyle" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+[node name="bt_cam3d" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 90.0
 margin_right = 206.0
 margin_bottom = 110.0
 toggle_mode = true
 group = ExtResource( 2 )
-text = "Fancy Line Edit"
+text = "Cam3D"
 
-[node name="bt_network" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+[node name="bt_fancyle" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 120.0
 margin_right = 206.0
 margin_bottom = 140.0
 toggle_mode = true
 group = ExtResource( 2 )
+text = "Fancy Line Edit"
+
+[node name="bt_network" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 150.0
+margin_right = 206.0
+margin_bottom = 170.0
+toggle_mode = true
+group = ExtResource( 2 )
 text = "Network"
 
 [node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 150.0
-margin_right = 206.0
-margin_bottom = 154.0
-
-[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 164.0
+margin_top = 180.0
 margin_right = 206.0
 margin_bottom = 184.0
+
+[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 194.0
+margin_right = 206.0
+margin_bottom = 214.0
 toggle_mode = true
 group = ExtResource( 2 )
 text = "Complete"
@@ -173,7 +172,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="utilities" type="Panel" parent="mpnl/stabs"]
+[node name="quantize" type="Panel" parent="mpnl/stabs"]
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -182,27 +181,26 @@ margin_top = 8.0
 margin_right = -4.0
 margin_bottom = -4.0
 
-[node name="description" type="Label" parent="mpnl/stabs/utilities"]
+[node name="description" type="Label" parent="mpnl/stabs/quantize"]
 margin_left = 14.0
 margin_top = 43.0
 margin_right = 744.0
 margin_bottom = 580.0
 text = "Interdependency: None
 
-The addon has been  removed (hopefully temporarily) from the project because it needs proper testing (things didn't work as expected)...
+This addon is meant to provide means to quantize floating point numbers and also use those to compress rotation quaternions using the smallest three method.
 
-This demo page has been created mostly to remind myself about this fact."
+The example here does not directly use any of the floating point quantization functions, however it uses the quaternion compression to simulate replication of orientation. Basically, a cube is used to \"generate\" the original orientation, which is then compressed using either 9, 10 or 15 bits per component. Soon after the quaternion is restaured and applied into a second cube. In a way, to simulate the replication of the orientation through networked multiplayer games."
 autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="bt_utilsload" type="Button" parent="mpnl/stabs/utilities"]
+[node name="bt_utilsload" type="Button" parent="mpnl/stabs/quantize"]
 margin_left = 14.0
 margin_top = 11.0
 margin_right = 122.0
 margin_bottom = 31.0
-disabled = true
 text = "Load"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -533,7 +531,7 @@ __meta__ = {
 }
 [connection signal="pressed" from="mpnl/demo_list/pnl/bt_quit" to="." method="_on_bt_quit_pressed"]
 [connection signal="pressed" from="mpnl/stabs/encdecbuffer/bt_encdecload" to="." method="_on_bt_encdecload_pressed"]
-[connection signal="pressed" from="mpnl/stabs/utilities/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/quantize/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/cam3d/bt_cam3dload" to="." method="_on_bt_cam3dload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/smooth/bt_smoothload" to="." method="_on_bt_smoothload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/network/bt_single" to="." method="_on_bt_single_pressed"]

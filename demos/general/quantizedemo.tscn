@@ -1,0 +1,164 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://demos/general/quantize_checkgroup.tres" type="ButtonGroup" id=1]
+[ext_resource path="res://demos/general/quantizedemo.gd" type="Script" id=2]
+
+[sub_resource type="CubeMesh" id=1]
+
+[sub_resource type="SpatialMaterial" id=2]
+albedo_color = Color( 0.258824, 0.309804, 0.694118, 1 )
+
+[sub_resource type="CubeMesh" id=3]
+material = SubResource( 2 )
+
+[node name="quantmain" type="Spatial"]
+script = ExtResource( 2 )
+
+[node name="hud" type="CanvasLayer" parent="."]
+
+[node name="pnl" type="Panel" parent="hud"]
+self_modulate = Color( 1, 1, 1, 0.529412 )
+anchor_bottom = 1.0
+margin_right = 209.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_pivot" type="Label" parent="hud/pnl"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 48.0
+margin_bottom = 22.0
+text = "Pivot"
+
+[node name="lbl_yrotation" type="Label" parent="hud/pnl"]
+margin_left = 8.0
+margin_top = 24.0
+margin_right = 48.0
+margin_bottom = 38.0
+text = "Y Rotation"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="sl_pivyrot" type="HSlider" parent="hud/pnl"]
+margin_left = 16.0
+margin_top = 40.0
+margin_right = 192.0
+margin_bottom = 56.0
+min_value = -3.0
+max_value = 3.0
+step = 0.1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_zrotation" type="Label" parent="hud/pnl"]
+margin_left = 8.0
+margin_top = 64.0
+margin_right = 72.0
+margin_bottom = 78.0
+text = "Z Rotation"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="sl_pivzrot" type="HSlider" parent="hud/pnl"]
+margin_left = 16.0
+margin_top = 80.0
+margin_right = 192.0
+margin_bottom = 96.0
+max_value = 70.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_cube" type="Label" parent="hud/pnl"]
+margin_left = 8.0
+margin_top = 112.0
+margin_right = 48.0
+margin_bottom = 126.0
+text = "Cube X Rotation"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="sl_cubexrot" type="HSlider" parent="hud/pnl"]
+margin_left = 16.0
+margin_top = 128.0
+margin_right = 192.0
+margin_bottom = 144.0
+min_value = -3.5
+max_value = 3.5
+step = 0.1
+
+[node name="lbl_bitspercomp" type="Label" parent="hud/pnl"]
+margin_left = 8.0
+margin_top = 176.0
+margin_right = 48.0
+margin_bottom = 190.0
+text = "Bits per Quat component:"
+
+[node name="chk_9bits" type="CheckBox" parent="hud/pnl"]
+margin_left = 16.0
+margin_top = 192.0
+margin_right = 80.0
+margin_bottom = 216.0
+pressed = true
+group = ExtResource( 1 )
+text = "9 bits"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chk_10bits" type="CheckBox" parent="hud/pnl"]
+margin_left = 16.0
+margin_top = 216.0
+margin_right = 80.0
+margin_bottom = 240.0
+group = ExtResource( 1 )
+text = "10 bits"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chk_15bits" type="CheckBox" parent="hud/pnl"]
+margin_left = 16.0
+margin_top = 240.0
+margin_right = 88.0
+margin_bottom = 264.0
+group = ExtResource( 1 )
+text = "15 bits"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_back" type="Button" parent="hud/pnl"]
+margin_left = 8.0
+margin_top = 568.0
+margin_right = 88.0
+margin_bottom = 588.0
+text = "Back"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="source" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0 )
+
+[node name="cube" type="MeshInstance" parent="source"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0 )
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="replicated" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0 )
+
+[node name="cube" type="MeshInstance" parent="replicated"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0 )
+mesh = SubResource( 3 )
+material/0 = null
+
+[node name="cam" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.756801, 0.653645, 0, -0.653645, 0.756801, 0, 7.3352, 10.6415 )
+[connection signal="pressed" from="hud/pnl/bt_back" to="." method="_on_bt_back_pressed"]

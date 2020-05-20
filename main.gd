@@ -19,7 +19,7 @@ func _ready() -> void:
 	
 	# Connect the "toggled" signal on all of the "demo buttons", binding the tab index as payload
 	set_tab_button("bt_encdec", "encdecbuffer")
-	set_tab_button("bt_utils", "utilities")
+	set_tab_button("bt_quantize", "quantize")
 	set_tab_button("bt_network", "network")
 	set_tab_button("bt_cam3d", "cam3d")
 	set_tab_button("bt_fancyle", "fancyle")
@@ -145,9 +145,9 @@ func _on_bt_encdecload_pressed() -> void:
 	open_scene("res://demos/general/edbuffer.tscn")
 
 
-### The utilities demo
+### The quantize (previously named utilities) demo
 func _on_bt_utilsload_pressed() -> void:
-	open_scene("res://demos/general/utilities.tscn")
+	open_scene("res://demos/general/quantizedemo.tscn")
 
 
 ### Cam3D demo
