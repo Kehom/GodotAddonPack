@@ -41,11 +41,20 @@ var _default_pchar_hash: int = 0    # will be set during the _setup_net_spawners
 # with the created node.
 var _ui_player: Dictionary = {}
 
+# When disconnected from the server this will be displayed in a message box. In case
+# of the discionnection being caused by a kick (closing server or active by the server's player)
+# then this property will be changed.
+var _disconnected_message: String
+
+
 
 func _ready() -> void:
 	_setup_net_input()
 	_setup_hud()
 	_setup_net_spawners()
+	
+	# Set default message for disconnection frmo server.
+	_disconnected_message = "Disconnected from server, going back to the main menu."
 	
 	# Use the incrementing ID system to handle the unique IDs of the projectiles.
 	network.register_incrementing_id("glow_projectile")
@@ -62,6 +71,8 @@ func _ready() -> void:
 	# And the "disconnected" event is used to leave the game world and go back
 	# to the main menu.
 	SharedUtils.connector(network, "disconnected", self, "on_disconnected")
+	# When kicked by the server, this signal will be given.
+	SharedUtils.connector(network, "kicked", self, "on_kicked")
 	
 	# If this is a client, must notify the server that snapshot data can come
 	# this way
@@ -263,7 +274,8 @@ func on_disconnected() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
 	var err_diag: AcceptDialog = AcceptDialog.new()
-	err_diag.dialog_text = "Disconnected from server, going back to the main menu."
+	#err_diag.dialog_text = "Disconnected from server, going back to the main menu."
+	err_diag.dialog_text = _disconnected_message
 	err_diag.window_title = "Disconnected"
 	err_diag.popup_exclusive = true
 	
@@ -272,6 +284,12 @@ func on_disconnected() -> void:
 	add_child(err_diag)
 	
 	err_diag.popup_centered()
+
+
+func on_kicked(reason: String) -> void:
+	# Just change the disconnection message. The rest of the actions (displaying
+	# a message box then going back to main menu will be taken care from the "on_disconnected")
+	_disconnected_message = reason
 
 
 func _on_err_confirmed() -> void:

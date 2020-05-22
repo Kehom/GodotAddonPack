@@ -2,7 +2,7 @@ Some smaller commits related to minor fixes (specially comment corrections) are 
 
 #### 2020 May 22
 * (Network) Now properly clear remote player list when disconnecting from server.
-
+* (Megademo) Improved how to disconnection from server is dealt with (kicked vs connection loss). Mostly, multiple causes will be handled from a single place.
 
 #### 2020 May 20
 * Added a new "sub-addon" into the General addon directory, `quantize.gd`. It provides means to quantize floating point numbers as well as compression of rotation quaternions using the smallest three method. Tutorial (http://kehomsforge.com/tutorials/multi/GodotAddonPack) has been updated.
