@@ -1,5 +1,9 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 May 22
+* (Network) Now properly clear remote player list when disconnecting from server.
+
+
 #### 2020 May 20
 * Added a new "sub-addon" into the General addon directory, `quantize.gd`. It provides means to quantize floating point numbers as well as compression of rotation quaternions using the smallest three method. Tutorial (http://kehomsforge.com/tutorials/multi/GodotAddonPack) has been updated.
 * (Megademo) Now uses the rotation quaternion compression to replicate projectiles orientation.

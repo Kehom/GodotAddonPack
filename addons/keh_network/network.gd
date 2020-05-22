@@ -457,8 +457,11 @@ func disconnect_from_server() -> void:
 	if (get_tree().is_network_server()):
 		return
 	
+	# Close the connection
 	get_tree().get_network_peer().close_connection()
-	
+	# And ensure the remote player list is cleared
+	player_data.clear_remote()
+
 
 func _on_connection_failed() -> void:
 	emit_signal("join_fail")
