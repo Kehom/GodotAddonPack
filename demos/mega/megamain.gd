@@ -53,7 +53,7 @@ func _ready() -> void:
 	_setup_hud()
 	_setup_net_spawners()
 	
-	# Set default message for disconnection frmo server.
+	# Set default message for disconnection from server.
 	_disconnected_message = "Disconnected from server, going back to the main menu."
 	
 	# Use the incrementing ID system to handle the unique IDs of the projectiles.

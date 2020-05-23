@@ -50,7 +50,7 @@ const MASK_INDEX_15BIT: int = 3 << 30
 # When packing compressed quaternion data using 15 bits per component, one
 # bit becomes "wasted". While not entirely necessary, the system here uses
 # that bit to restore the signals of the original quaternion in case those
-# got flipped because the largest component were negative.
+# got flipped because the largest component was negative.
 const MASK_SIGNAL_15BIT: int = 1 << 15
 
 
@@ -229,7 +229,7 @@ static func restore_rquat_10bits(c: int) -> Quat:
 
 # Compress the given rotation quaternion using 15 bits per component. This is a "wrapper"
 # function that packs the quantized values into two intergers (using PoolIntArray). In
-# memory thsi will still use the full range of the integer values, but the second entry in
+# memory this will still use the full range of the integer values, but the second entry in
 # the returned array can safely discard 16 bits, which is basically the desired usage when
 # sending data through network. Note that in this case, using a full 32 bit + 16 bit leaves
 # room for a single bit, which is used to encode the original quaternion signal.
