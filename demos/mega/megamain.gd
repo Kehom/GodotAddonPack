@@ -42,7 +42,7 @@ var _default_pchar_hash: int = 0    # will be set during the _setup_net_spawners
 var _ui_player: Dictionary = {}
 
 # When disconnected from the server this will be displayed in a message box. In case
-# of the discionnection being caused by a kick (closing server or active by the server's player)
+# of the disconnection being caused by a kick (closing server or active by the server's player)
 # then this property will be changed.
 var _disconnected_message: String
 

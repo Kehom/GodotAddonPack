@@ -451,6 +451,17 @@ func join_server(_ip: String, _port: int) -> void:
 	# And set the network API
 	get_tree().set_network_peer(net)
 
+func _handle_disconnection() -> void:
+	# Clear the remote player list
+	player_data.clear_remote()
+	# Ensure the local player is holding the correct data (Network ID = 1)
+	player_data.local_player.set_network_id(1)
+	# As of Godot 3.2 beta (from one of the release candidates) directly setting
+	# the peer network to null (reset) results in error (object being destroyed
+	# while emitting a signal), so deferring the call to avoid that.
+	get_tree().call_deferred("set_network_peer", null)
+
+
 func disconnect_from_server() -> void:
 	if (!get_tree().has_network_peer()):
 		return
@@ -459,30 +470,23 @@ func disconnect_from_server() -> void:
 	
 	# Close the connection
 	get_tree().get_network_peer().close_connection()
-	# And ensure the remote player list is cleared
-	player_data.clear_remote()
+	# Perform some cleanup
+	_handle_disconnection()
 
 
 func _on_connection_failed() -> void:
 	emit_signal("join_fail")
-	# Clear the network object
-	get_tree().call_deferred("set_network_peer", null)
-	# At this point the local player info is likely still correct, but it doesn't hurt to ensure this fact
-	player_data.local_player.set_network_id(1)
+	# At this point local data is most likely still intact, but clean it up anyways.
+	# The _handle_disconnection() will still perform the ENet object reset, which must
+	# be done regardless.
+	_handle_disconnection()
 
 
 func _on_disconnected() -> void:
 	# Inform outside code about this event
 	emit_signal("disconnected")
-	# This is a client that got disconnected. Clear the remote player list
-	player_data.clear_remote()
-	# And ensure the local player is holding the correct data
-	player_data.local_player.set_network_id(1)
-	
-	# As of Godot 3.2 beta (from one of the release candidates) directly setting
-	# the peer network to null (reset) results in error (object being destroyed
-	# while emitting a signal), so deferring the call to avoid that.
-	get_tree().call_deferred("set_network_peer", null)
+	# Perform some cleanup
+	_handle_disconnection()
 
 
 
