@@ -131,10 +131,21 @@ func _physics_process(_dt: float) -> void:
 			for i in inlist:
 				handle_input(i)
 	
-	# Request input data using the networking system. The argument tells which
-	# which player this data must match. Null will be returned if this machine
-	# is not meant to deal with input
-	var input: InputData = network.get_input(_uid)
+	
+	var mvisible: bool = Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE
+	var input: InputData = null
+	# If this is local machine and mouse is not captured (visible) then no input
+	# should be gathered. Yet the input handling function must still be called in
+	# order to keep the character updated (maybe something is happening and affecting
+	# it - remember, multiplayer should not be paused)
+	if (network.is_id_local(_uid) && mvisible):
+		input = InputData.new(0)
+	else:
+		# Request input data using the networking system. The argument tells which player
+		# this data must match. Null will be returned if this machine is not meant to
+		# deal with input.
+		input = network.get_input(_uid)
+	
 	
 	# Do something with the new input data
 	handle_input(input)

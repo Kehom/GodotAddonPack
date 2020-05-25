@@ -1,5 +1,9 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 May 25
+* (Network) Fixed problem that caused client's snapshot container to never be cleaned up when no input data is necessary (IE.: interacting with a menu).
+* (Megademo) Added code to "simulate" this menu situation (press ESCAPE during demo to toggle).
+
 #### 2020 May 23
 * (Network) When manually disconnecting from server, reset player data (both local and remote).
 * (Network) When manually disconnecting from server, reset ENet object, which should fix problems when client goes back to main menu and start single player.

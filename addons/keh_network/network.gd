@@ -348,7 +348,6 @@ func get_input(player_id: int) -> InputData:
 	return retval
 
 
-
 ### Server...
 func create_server(port: int, _server_name: String, max_players: int) -> void:
 	# Create the network API object
@@ -643,11 +642,15 @@ func _on_snapshot_finished(snap: NetSnapshot) -> void:
 	snap.input_sig = player_data.local_player.get_last_input_signature()
 	snapshot_data._history.push_back(snap)
 	
-	if (!has_authority()):
-		return
-	
+	# Ensure the snapshot container remains with a reasonable amount of data. If this loop
+	# occurs on client, either:
+	# 1 - there was a massive data loss
+	# 2 - input data was not polled
 	while (snapshot_data._history.size() > _max_history_size):
 		snapshot_data._history.pop_front()
+	
+	if (!has_authority()):
+		return
 	
 	# Iterate through remote players and update as required
 	for pid in player_data.remote_player:

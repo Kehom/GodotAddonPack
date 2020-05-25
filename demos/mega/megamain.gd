@@ -124,11 +124,24 @@ func _physics_process(_dt: float) -> void:
 # Provide means to get back to the main menu
 func _input(evt: InputEvent) -> void:
 	if (evt is InputEventKey):
-		if (evt.pressed && evt.scancode == KEY_F4):
-			# Restore mouse visibility
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-			# warning-ignore:return_value_discarded
-			get_tree().change_scene("res://main.tscn")
+		if (evt.pressed):
+			match evt.scancode:
+				KEY_F4:
+					# Restore mouse visibility
+					Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+					# Go back to the main menu
+					# warning-ignore:return_value_discarded
+					get_tree().change_scene("res://main.tscn")
+				
+				KEY_ESCAPE:
+					# TODO: toggle visibility of a menu - set mouse mode based on that
+					# For now just toggle mouse mode
+					if (Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE):
+						# It's already visible, so capture it
+						Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+					else:
+						# It's captured, so show it
+						Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 
 

@@ -76,7 +76,7 @@ class InputCache:
 	var snapinpu: Dictionary
 	# Count the number of 0-input snapshots that weren't acknowledged by the client
 	# If this value is bigger than 0 then the server will send the newest full
-	# snapshot within its history
+	# snapshot within its history rather than calculating delta snapshot
 	var no_input_count: int
 	# Holds the signature of the last acknowledged snapshot signature. This will be
 	# used as reference to cleanup older data.
@@ -234,6 +234,30 @@ func is_ready() -> bool:
 	return _is_ready
 
 
+# This must be called only on client machines belonging to the local player. All of the cached
+# input data will be encode and sent to the server.
+func _dispatch_input_data() -> void:
+	# If this assert is failing then the function is being called on authority machine
+	assert(get_tree().has_network_peer() && !get_tree().is_network_server())
+	assert(_is_local)
+	
+	# NOTE: Should this check amount of input data and do nothing if it's 0?
+	
+	# Prepare the encdecbuffer to encode input data
+	_edec_input.buffer = PoolByteArray()
+	
+	# Encode buffer size - two bytes should give plenty of packet loss time
+	_edec_input.write_ushort(_input_cache.cbuffer.size())
+	
+	# Now encode each input object in the buffer
+	for input in _input_cache.cbuffer:
+		_input_info.encode_to(_edec_input, input)
+	
+	# Send the encoded data to the server - this should go directly to the
+	# correct player node within the server
+	rpc_unreliable_id(1, "server_receive_input", _edec_input.buffer)
+
+
 # Obtain input data. If running on the local machine the state will be polled.
 # If on a client (still local machine) then the data will be sent to the server.
 # If on server (but not local) the data will be retrieved from the cache/buffer.
@@ -252,19 +276,9 @@ func get_input(snap_sig: int) -> InputData:
 			# Local machine but on a client. This means, input data must be sent to the server
 			# First, cache the new input object
 			_input_cache.cbuffer.push_back(retval)
-			# Prepare the encdec buffer to encode the input data
-			_edec_input.buffer = PoolByteArray()
 			
-			# Encode buffer size - two bytes should give plenty of packet loss time
-			_edec_input.write_ushort(_input_cache.cbuffer.size())
-			
-			# Now encode each input object in the buffer
-			for input in _input_cache.cbuffer:
-				_input_info.encode_to(_edec_input, input)
-			
-			# Send the encoded data to the server - this should go directly to the
-			# correct player node within the server
-			rpc_unreliable_id(1, "server_receive_input", _edec_input.buffer)
+			# Send input data to the server
+			_dispatch_input_data()
 	
 	else:
 		# In theory if here it's authority machine as the assert above should
@@ -294,6 +308,7 @@ func get_input(snap_sig: int) -> InputData:
 		_input_cache.associate(snap_sig, retval.signature)
 	
 	return retval
+
 
 
 # This should already be the correct player within the hierarchy node.
