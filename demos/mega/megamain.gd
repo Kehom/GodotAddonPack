@@ -126,6 +126,9 @@ func _input(evt: InputEvent) -> void:
 	if (evt is InputEventKey):
 		if (evt.pressed):
 			match evt.scancode:
+				KEY_F1:
+					OS.vsync_enabled = !OS.vsync_enabled
+				
 				KEY_F4:
 					# Restore mouse visibility
 					Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

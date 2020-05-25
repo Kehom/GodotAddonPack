@@ -180,7 +180,8 @@ func _ready() -> void:
 func _input(evt: InputEvent) -> void:
 	if (evt is InputEventMouseMotion):
 		#_mposition = evt.position        # Should mouse position be used?
-		_mrelative = evt.relative
+		# Accumulate mouse relative so behavior is more consistent when VSync is toggled
+		_mrelative += evt.relative
 		_mspeed = evt.speed
 
 

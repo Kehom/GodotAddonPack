@@ -2,7 +2,9 @@ Some smaller commits related to minor fixes (specially comment corrections) are 
 
 #### 2020 May 25
 * (Network) Fixed problem that caused client's snapshot container to never be cleaned up when no input data is necessary (IE.: interacting with a menu).
+* (Network) Mouse relative is accumulated in order to try to obtain a more consistent behavior when toggling VSync.
 * (Megademo) Added code to "simulate" this menu situation (press ESCAPE during demo to toggle).
+* (Megademo) Added F1 key to toggle VSync mode.
 
 #### 2020 May 23
 * (Network) When manually disconnecting from server, reset player data (both local and remote).
