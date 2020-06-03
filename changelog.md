@@ -1,7 +1,7 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
 #### 2020 Jun 03
-* (Network) Added a "prediction counter" that can be used to re-simulate entities that don't need input data when correction is triggered (`network.snapshot_data.get_prediction_count()`).
+* (Network) Added a "prediction counter" that can be used to re-simulate entities that don't need input data when correction is triggered (`network.snapshot_data.get_prediction_count()`). Tutorial has been updated to show how to use this (topic `Prediction Without Input Data`).
 * (Megademo) Glowing projectiles use this counter to re-simulate the movement when corrected by server data.
 
 #### 2020 May 25
