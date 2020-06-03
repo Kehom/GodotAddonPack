@@ -1,5 +1,9 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Jun 03
+* (Network) Added a "prediction counter" that can be used to re-simulate entities that don't need input data when correction is triggered (`network.snapshot_data.get_prediction_count()`).
+* (Megademo) Glowing projectiles use this counter to re-simulate the movement when corrected by server data.
+
 #### 2020 May 25
 * (Network) Fixed problem that caused client's snapshot container to never be cleaned up when no input data is necessary (IE.: interacting with a menu).
 * (Network) Mouse relative is accumulated in order to try to obtain a more consistent behavior when toggling VSync.

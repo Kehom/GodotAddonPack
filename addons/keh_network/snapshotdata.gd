@@ -112,16 +112,40 @@ func spawn_node(eclass: Resource, uid: int, chash: int) -> Node:
 	
 	return ret
 
+# Internally used to retrieve the EntityInfo instance associated with specified snapshot entity class
+func _get_entity_info(snapres: Resource) -> EntityInfo:
+	var ename: Dictionary = _entity_name.get(snapres)
+	if (ename):
+		return _entity_info.get(ename.hash)
+	
+	return null
+
 # Retrieve a game node given its unique ID and associated snapshot entity class
 func get_game_node(uid: int, snapres: Resource) -> Node:
-	var ename: Dictionary = _entity_name.get(snapres)
 	var ret: Node = null
-	
-	if (ename):
-		var einfo: EntityInfo = _entity_info.get(ename.hash)
+	var einfo: EntityInfo = _get_entity_info(snapres)
+	if (einfo):
 		ret = einfo.get_game_node(uid)
 	
 	return ret
+
+
+# Internally used, this updates the prediction count of each entity
+func _update_prediction_count(delta: int) -> void:
+	for ehash in _entity_info:
+		var einfo: EntityInfo = _entity_info[ehash]
+		einfo.update_pred_count(delta)
+
+# Retrieve the prediction count for the specified entity
+func get_prediction_count(uid: int, snapres: Resource) -> int:
+	var ret: int = 0
+	var einfo: EntityInfo = _get_entity_info(snapres)
+	if (einfo):
+		ret = einfo.get_pred_count(uid)
+	
+	return ret
+
+
 
 # Despawn a node from the game
 func despawn_node(eclass: Resource, uid: int) -> void:
@@ -267,13 +291,17 @@ func decode_full(from: EncDecBuffer) -> NetSnapshot:
 # will make things look "less glitchy"
 func client_check_snapshot(snap: NetSnapshot) -> void:
 	var local: NetSnapshot = null
+	var popcount: int = 0
 	if (snap.input_sig > 0):
+		
 		# Locate the local snapshot with corresponding input signature. Remove it and all
 		# older than that from the internal history
 		while (_history.size() > 0 && _history.front().input_sig <= snap.input_sig):
 			local = _history.pop_front()
+			popcount += 1
 		
 		if (local.input_sig != snap.input_sig):
+			_update_prediction_count(-popcount)
 			# This should not occur!
 			return
 	
@@ -282,6 +310,7 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 	
 	
 	if (!local):
+		_update_prediction_count(-popcount)
 		# This should not occur!
 		return
 	
@@ -335,5 +364,8 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 		# remote one. The local ones must be removed from the game.
 		for uid in local_entity:
 			despawn_node(einfo._resource, uid)
+	
+	# All entities have been verified. Now update the prediction count
+	_update_prediction_count(-popcount)
 
 

@@ -236,7 +236,7 @@ func is_ready() -> bool:
 
 
 # This must be called only on client machines belonging to the local player. All of the cached
-# input data will be encode and sent to the server.
+# input data will be encoded and sent to the server.
 func _dispatch_input_data() -> void:
 	# If this assert is failing then the function is being called on authority machine
 	assert(get_tree().has_network_peer() && !get_tree().is_network_server())

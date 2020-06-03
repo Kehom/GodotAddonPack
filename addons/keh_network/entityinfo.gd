@@ -156,6 +156,24 @@ class SpawnerData:
 		parent = p
 		extra_setup = es
 
+# This inner class is meant to make things slightly easier to deal with instead of using
+# "dictionary as struct" contained in yet another dictionary. More specifically, this is
+# meant to keep track of game nodes and any other extra data associated with that specific
+# node.
+class GameEntity:
+	# The game node, mostly likely a visual representation of this entity
+	var node: Node
+	# Useful only on clients, keep track of how many frames were used during prediction for
+	# this entity. This can be used later to re-simulate entities that don't require any
+	# input data when correction is applied.
+	var predcount: int
+	
+	func _init(n: Node, pc: int) -> void:
+		node = n
+		predcount = pc
+
+
+
 # The entity type name is hashed into this property
 var _name_hash: int
 # Resource that is used in order to create instances of the object described by 
@@ -181,9 +199,9 @@ var error: String
 # class_hash takes another)).
 var _cmask_size: int
 
-# Key = unique id
-# Value = Node that is created and added into the game world 
-var _nodes: Dictionary
+# Key = unique entity ID
+# Value instance of the inner GameEntity class:
+var _entity: Dictionary
 
 
 # Key = class_hash - yes, this sort of force the creation of multiple spawners, even if the
@@ -294,30 +312,35 @@ func decode_full_entity(from: EncDecBuffer) -> SnapEntityBase:
 
 # Retrieve a game node given its unique ID.
 func get_game_node(uid: int) -> Node:
-	return _nodes.get(uid)
+	var ge: GameEntity = _entity.get(uid)
+	if (ge):
+		return ge.node
+	
+	return null
+
 
 
 # Perform full cleanup of the internal container that is used to manage the
 # game nodes.
 func clear_nodes() -> void:
-	for uid in _nodes:
-		if (!_nodes[uid].is_queued_for_deletion()):
-			_nodes[uid].queue_free()
+	for uid in _entity:
+		if (!_entity[uid].node.is_queued_for_deletion()):
+			_entity[uid].node.queue_free()
 	
-	_nodes.clear()
+	_entity.clear()
 
 
 func spawn_node(uid: int, chash: int) -> Node:
 	var ret: Node = null
-
+	
 	var sdata: SpawnerData = _spawner_data.get(chash)
 	if (sdata):
 		ret = sdata.spawner.spawn()
-
+		
 		ret.set_meta("uid", uid)
 		ret.set_meta("chash", chash)
-
-		_nodes[uid] = ret
+		
+		_entity[uid] = GameEntity.new(ret, 0)
 		sdata.parent.add_child(ret)
 		
 		if (sdata.extra_setup && sdata.extra_setup.is_valid()):
@@ -331,20 +354,20 @@ func spawn_node(uid: int, chash: int) -> Node:
 
 
 func despawn_node(uid: int) -> void:
-	var n: Node = _nodes.get(uid)
-	
-	if (n):
-		if (!n.is_queued_for_deletion()):
-			n.queue_free()
+	var n: Node = null
+	var ge: GameEntity = _entity.get(uid)
+	if (ge):
+		if (!ge.node.is_queued_for_deletion()):
+			ge.node.queue_free()
 		
 		# warning-ignore:return_value_discarded
-		_nodes.erase(uid)
+		_entity.erase(uid)
 
 
 # Game object nodes added through the editor that are meant to be replicated
 # must be registered within the network system. This function performs this
 func add_pre_spawned(uid: int, node: Node) -> void:
-	_nodes[uid] = node
+	_entity[uid] = GameEntity.new(node, 0)
 
 
 # This will check the specified resource and if there are any replicable
@@ -404,7 +427,7 @@ func _check_properties(cname: String, rpath: String) -> void:
 	
 	_name_hash = cname.hash()
 	_namestr = cname
-	_nodes = {}
+	_entity = {}
 
 
 # Based on the given instance of ReplicableProperty, reads a property from the
@@ -527,3 +550,16 @@ func _build_replicable_prop(name: String, tp: int, mask: int, obj: Object) -> Re
 					ret = RPropTolColor.new(name, mask, tol)
 	
 	return ret
+
+
+func update_pred_count(delta: int) -> void:
+	for uid in _entity:
+		_entity[uid].predcount = int(max(_entity[uid].predcount + delta, 0))
+
+
+func get_pred_count(uid: int) -> int:
+	var ge: GameEntity = _entity.get(uid)
+	if (ge):
+		return ge.predcount
+	
+	return 0

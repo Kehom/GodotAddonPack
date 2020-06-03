@@ -52,21 +52,15 @@ func _physics_process(dt: float) -> void:
 	if (_correction_data.has_correction):
 		global_transform = Transform(Basis(_correction_data.orientation), _correction_data.position)
 		_correction_data.has_correction = false
+		
+		# Re-simulate the projectile the number of times client predicted this after server data was used
+		# to trigger the correction
+		for _i in network.snapshot_data.get_prediction_count(_uid, MegaSnapProjectile):
+			_simulate(dt)
+		
 		$Smooth3D.snap_to_target()
 	
-	var dir: Basis = global_transform.basis
-	var motion: Vector3 = (-dir.z * SPEED * dt)
-	
-	var coll: KinematicCollision = move_and_collide(motion, false)
-	
-	if (coll):
-		_hit = true
-		_impact_position = coll.position
-		
-		# Projectiles are kinematic bodies. If colliding with rigid bodies a force
-		# must be applied otherwise they will remain "dormant"
-		if (coll.collider is RigidBody):
-			coll.collider.apply_impulse(coll.position, -coll.normal * 0.1)
+	_simulate(dt)
 	
 	# Only add the projectile to the snapshot if it didn't hit something. The thing
 	# is, there is no point in adding something that is about to be removed from the
@@ -80,6 +74,7 @@ func _physics_process(dt: float) -> void:
 		
 		network.snapshot_entity(sobj)
 
+
 func init(t: Transform) -> void:
 	global_transform = t
 	$Smooth3D.snap_to_target()
@@ -90,4 +85,19 @@ func apply_state(state: Dictionary) -> void:
 	_correction_data.orientation = Quantize.restore_rquat_9bits(state.orientation)
 	_correction_data.has_correction = true
 
+
+func _simulate(dt: float) -> void:
+	var dir: Basis = global_transform.basis
+	var motion: Vector3 = (-dir.z * SPEED * dt)
+	
+	var coll: KinematicCollision = move_and_collide(motion, false)
+	
+	if (coll):
+		_hit = true
+		_impact_position = coll.position
+		
+		# Projectiles are kinematic bodies. If colliding with rigid bodies a force
+		# must be applied otherwise they will remain "dormant"
+		if (coll.collider is RigidBody):
+			coll.collider.apply_impulse(coll.position, -coll.normal * 0.1)
 
