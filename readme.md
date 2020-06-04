@@ -48,10 +48,12 @@ Provides means to quantize floating point numbers as well as compress rotation q
 
 ### Network
 
-Interdependency: data/encdecbuffer.gd
+Interdependency: data/encdecbuffer.gd, data/quantize.gd*
 Requires Activation: yes
 
 This addon was born in order to help create authoritative servers that send replication data to clients through snapshots and events. Most of the process is automated and the internal design is meant to be as "less intrusive as possible". The idea is to not completely change node hierarchy and have minimal impact on game logic code.
+
+*The data/quantize.gd will be required if analog input quantization is enabled within the project settings window.
 
 
 ### Nodes

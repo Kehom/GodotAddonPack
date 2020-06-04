@@ -257,6 +257,10 @@ multiselect={
  ]
 }
 
+[keh_addons]
+
+network/quantize_analog_input=true
+
 [physics]
 
 common/physics_fps=30

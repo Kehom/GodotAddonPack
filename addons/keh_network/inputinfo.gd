@@ -30,9 +30,13 @@ extends Reference
 class_name NetInputInfo
 
 
-### Those two are options retrieved from the ProjectSettings
+### Those are options retrieved from the ProjectSettings
 var _use_mouse_relative: bool = false
 var _use_mouse_speed: bool = false
+# If this is true then analog input data will be quantized with precision of 8 bits
+# Error margin should be more than acceptable for this kind of data
+var _quantize_analog: bool = false
+
 
 # The following dictionaries are meant to hold the list of input data meant to be
 # encoded/decoded, thus replicated through the network. Each dictionary corresponds to
@@ -62,6 +66,9 @@ func _init() -> void:
 	
 	if (ProjectSettings.has_setting("keh_addons/network/use_input_mouse_speed")):
 		_use_mouse_speed = ProjectSettings.get_setting("keh_addons/network/use_input_mouse_speed")
+	
+	if (ProjectSettings.has_setting("keh_addons/network/quantize_analog_input")):
+		_quantize_analog = ProjectSettings.get_setting("keh_addons/network/quantize_analog_input")
 
 
 func has_custom_data() -> bool:
@@ -211,7 +218,13 @@ func encode_to(encdec: EncDecBuffer, input: InputData) -> void:
 				if (fval != 0):
 					cmask |= _analog_list[a].mask
 					# Since this analog input is not zero, encode it
-					encdec.write_float(fval)
+					if (_quantize_analog):
+						# Quantization is enabled, so use it
+						var quant: int = Quantize.quantize_float(fval, 0.0, 1.0, 8)
+						encdec.write_byte(quant)
+					else:
+						# Encode normaly
+						encdec.write_float(fval)
 			
 			# All relevant analogs have been encoded. If something changed the
 			# mask must be updated within the encoded byte array. The correct index
@@ -287,7 +300,15 @@ func decode_from(encdec: EncDecBuffer) -> InputData:
 			var cmask: int = _read_mask(_analog_list.size(), encdec)
 			for a in _analog_list:
 				if (cmask & _analog_list[a].mask):
-					ret.set_analog(a, encdec.read_float())
+					var val: float = 0.0
+					if (_quantize_analog):
+						# Analog quantization is enabled, so extract the quantized value first
+						var quantized: int = encdec.read_byte()
+						# Then restore the float
+						ret.set_analog(a, Quantize.restore_float(quantized, 0.0, 1.0, 8))
+					else:
+						# No quantization used, so directly take the float
+						ret.set_analog(a, encdec.read_float())
 		
 		# Decode boolean data
 		if (_bool_list.size() > 0):

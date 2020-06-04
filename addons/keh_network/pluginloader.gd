@@ -39,6 +39,7 @@ func _enter_tree():
 	_reg_setting("broadcast_measured_ping", TYPE_BOOL, true)
 	_reg_setting("use_input_mouse_relative", TYPE_BOOL, false)
 	_reg_setting("use_input_mouse_speed", TYPE_BOOL, false)
+	_reg_setting("quantize_analog_input", TYPE_BOOL, false)
 	
 	
 	# Automatically add the network class as a singleton (autoload)
@@ -58,6 +59,7 @@ func _exit_tree():
 	ProjectSettings.clear(base_path + "broadcast_measured_ping")
 	ProjectSettings.clear(base_path + "use_input_mouse_relative")
 	ProjectSettings.clear(base_path + "use_input_mouse_speed")
+	ProjectSettings.clear(base_path + "quantize_analog_input")
 
 
 # def_val is relying on the variant, thus no static typing
