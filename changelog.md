@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Jun 04
+* (Network) Maximum snapshot history size can now be configured with a different size for clients and servers. By default 60 and 120, respectively.
+
 #### 2020 Jun 03
 * (Network) Added a "prediction counter" that can be used to re-simulate entities that don't need input data when correction is triggered (`network.snapshot_data.get_prediction_count()`). Tutorial has been updated to show how to use this (topic `Prediction Without Input Data`).
 * (Megademo) Glowing projectiles use this counter to re-simulate the movement when corrected by server data.

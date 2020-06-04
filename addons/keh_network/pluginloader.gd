@@ -34,6 +34,7 @@ func _enter_tree():
 	
 	_reg_setting("compression", TYPE_INT, NetworkedMultiplayerENet.COMPRESS_RANGE_CODER, compr)
 	_reg_setting("max_snapshot_history", TYPE_INT, 120)
+	_reg_setting("max_client_snapshot_history", TYPE_INT, 60)
 	_reg_setting("full_snapshot_threshold", TYPE_INT, 12)
 	_reg_setting("broadcast_measured_ping", TYPE_BOOL, true)
 	_reg_setting("use_input_mouse_relative", TYPE_BOOL, false)
@@ -52,6 +53,7 @@ func _exit_tree():
 	# the editor is restarted
 	ProjectSettings.clear(base_path + "compression")
 	ProjectSettings.clear(base_path + "max_snapshot_history")
+	ProjectSettings.clear(base_path + "max_client_snapshot_history")
 	ProjectSettings.clear(base_path + "full_snapshot_threshold")
 	ProjectSettings.clear(base_path + "broadcast_measured_ping")
 	ProjectSettings.clear(base_path + "use_input_mouse_relative")

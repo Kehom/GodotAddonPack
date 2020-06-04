@@ -195,6 +195,9 @@ var _full_snap_threshold: int = 12 setget noset
 # Determines the maximum amount of snapshots within the history
 var _max_history_size: int = 120 setget noset
 
+# On clients the snapshot history container can be smaller
+var _max_client_history_size: int = 60 setget noset
+
 # Key = event code ID
 # Value = instance of the NetEventInfo class
 var _event_info: Dictionary = {} setget noset
@@ -252,6 +255,10 @@ func _ready() -> void:
 #			var w: String = "The desired max snapshot history (%d) is smaller than the full snapshot threshold, so setting it to %d."
 #			push_warning(w % [_max_history_size, _full_snap_threshold + 1])
 #			_max_history_size = _full_snap_threshold + 1
+	
+	# Obtain the preference for maximum client snapshot history size
+	if (ProjectSettings.has_setting("keh_addons/network/max_client_snapshot_history")):
+		_max_client_history_size = ProjectSettings.get_setting("keh_addons/network/max_client_snapshot_history")
 	
 	
 	# Connect to the high level networking signals
@@ -642,21 +649,24 @@ func _on_snapshot_finished(snap: NetSnapshot) -> void:
 	snap.input_sig = player_data.local_player.get_last_input_signature()
 	snapshot_data._history.push_back(snap)
 	
-	var popped: int = 0
 	
-	# Ensure the snapshot container remains with a reasonable amount of data. If this loop
-	# occurs on client, either:
-	# 1 - there was a massive data loss
-	# 2 - input data was not polled
-	while (snapshot_data._history.size() > _max_history_size):
-		snapshot_data._history.pop_front()
-		popped += 1
+	if (has_authority()):
+		# Ensure the snapshot container remains with a reasonable amount of data.
+		while (snapshot_data._history.size() > _max_history_size):
+			snapshot_data._history.pop_front()
 	
-	if (!has_authority()):
-		# On clients update the prediction count for each entity.
+	else:
+		# On clients, if this loop occurs, either:
+		# 1 - there was a massive data loss
+		# 2 - input data was not polled
+		var popped: int = 0
+		while (snapshot_data._history.size() > _max_client_history_size):
+			snapshot_data._history.pop_front()
+		# Update the prediction count for each entity
 		snapshot_data._update_prediction_count(1 - popped)
-		# Also, there is nothing else for clients to do here, so bail
+		# There is nothing else for clients to do here, so bail
 		return
+	
 	
 	# Iterate through remote players and update as required
 	for pid in player_data.remote_player:
