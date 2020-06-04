@@ -34,21 +34,21 @@ As mentioned this addon is meant to contain some "general use" scripts.
 
 #### data/encdecbuffer.gd
 
-Interdependency: none
+Interdependency: none\
 Requires Activation: no
 
 Implements a class (`EncDecBuffer`) that wraps a `PoolByteArray` and provides means to add or extract data into the wrapped array. One of the features is that it allows "short integers" (8 or 16 bits) to be encoded/decoded. The main reason for this buffer to exist is to strip out variant headers (4 bytes per property) from the encoded data, mostly for packing properties to be sent through networks. Although this can be useful for other things, like binary save files.
 
 #### data/quantize.gd
 
-Interdependency: none
+Interdependency: none\
 Requires Activation: no
 
 Provides means to quantize floating point numbers as well as compress rotation quaternions using the *smallest three* method. The entire functionality is provided through static functions, meaning that it's not necessary to create instances of the class (`Quantize`). Although the returned quantized data are still using the full GDScript variant data, the resulting integers can be packed into others through bit masking. Also, this data can be directly used with the encdecbuffer.gd script, meaning the two complement each other rather well.
 
 ### Network
 
-Interdependency: data/encdecbuffer.gd, data/quantize.gd*
+Interdependency: data/encdecbuffer.gd, data/quantize.gd*\
 Requires Activation: yes
 
 This addon was born in order to help create authoritative servers that send replication data to clients through snapshots and events. Most of the process is automated and the internal design is meant to be as "less intrusive as possible". The idea is to not completely change node hierarchy and have minimal impact on game logic code.
@@ -62,7 +62,7 @@ The contents of this addon are meant to be Godot scenes with attached scripts th
 
 #### Cam3d
 
-Interdependency: none
+Interdependency: none\
 Requires Activation: no
 
 Wraps the Camera (3D) node to facilitate with certain tasks. Features:
@@ -75,14 +75,14 @@ Wraps the Camera (3D) node to facilitate with certain tasks. Features:
 
 ### Smooth
 
-Interdependency: none
+Interdependency: none\
 Requires Activation: yes
 
 As mentioned, this addon is largely based on Lawnjelly's work. The addon in this pack is meant to automatically interpolate the transform of the parent node, rather than provide a property to indicate the target object.
 
 ### UI
 
-Interdependency *may* vary according to the implemented control (to that end each control will have this information bellow).
+Interdependency *may* vary according to the implemented control (to that end each control will have this information bellow).\
 Requires Activation: yes
 
 The idea here is to provide custom user interface controls in order to increase the offer given by Godot. Activating this addon will make all of the installed controls available for use.
