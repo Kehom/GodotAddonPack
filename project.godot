@@ -189,6 +189,7 @@ config/icon="res://icon.png"
 [autoload]
 
 network="*res://addons/keh_network/network.gd"
+OverlayDebugInfo="*res://addons/keh_dbghelper/overlayinfo.gd"
 
 [debug]
 
@@ -197,7 +198,7 @@ gdscript/warnings/unused_class_variable=true
 
 [editor_plugins]
 
-enabled=PoolStringArray( "keh_network", "keh_smooth", "keh_ui" )
+enabled=PoolStringArray( "keh_dbghelper", "keh_network", "keh_smooth", "keh_ui" )
 
 [global]
 

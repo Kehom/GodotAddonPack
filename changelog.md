@@ -1,5 +1,9 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Jun 08
+* New addon, "DebugHelper" meant to hold scripts to help with the fun debugging process.
+* overlayinfo.gd DebugHelper "sub-addon" script to help dump text into the screen without the need to create multiple temporary UI controls all over the place.
+
 #### 2020 Jun 04
 * (Network) Maximum snapshot history size can now be configured with a different size for clients and servers. By default 60 and 120, respectively.
 * (Network) Analog input can now be quantized (8-bit precision). It is a project setting that can be enabled (by default it's not used). This creates a new interdependency on the `quantize.gd` script.

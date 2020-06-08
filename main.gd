@@ -11,6 +11,9 @@ onready var btbox: VBoxContainer = $mpnl/demo_list/pnl/vbox
 var _open_net_scene: String = ""
 
 func _ready() -> void:
+	# Make sure the overlay debug info is hidden
+	OverlayDebugInfo.set_visibility(false)
+	
 	_open_net_scene = ""
 	var tcount: int = $mpnl/stabs.get_tab_count()
 	
@@ -25,6 +28,7 @@ func _ready() -> void:
 	set_tab_button("bt_fancyle", "fancyle")
 	set_tab_button("bt_smooth", "smooth")
 	set_tab_button("bt_megademo", "megademo")
+	set_tab_button("bt_dbghelper", "dbghelper")
 	
 	# Connect the networking signals. Those are necessary in order to transition
 	# into the game scene only on success and give the chance to show a message
@@ -162,6 +166,9 @@ func _on_bt_smoothload_pressed():
 func _on_bt_fleload_pressed() -> void:
 	open_scene("res://demos/ui/fancy_le.tscn")
 
+### Debug Helpers
+func _on_bt_dbgload_pressed() -> void:
+	open_scene("res://demos/debughelper/maindbghelper.tscn")
 
 
 func _on_bt_quit_pressed() -> void:

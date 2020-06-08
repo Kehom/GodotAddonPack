@@ -1,0 +1,137 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://demos/debughelper/maindbghelper.gd" type="Script" id=1]
+
+[node name="maindbghelper" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="canvas" type="CanvasLayer" parent="."]
+
+[node name="pnl" type="Panel" parent="canvas"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_overlaytoggle" type="Button" parent="canvas/pnl"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 120.0
+margin_bottom = 28.0
+text = "Toggle Overlay"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_alignleft" type="Button" parent="canvas/pnl"]
+margin_left = 144.0
+margin_top = 8.0
+margin_right = 256.0
+margin_bottom = 28.0
+text = "Align Left"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_aligncenter" type="Button" parent="canvas/pnl"]
+margin_left = 264.0
+margin_top = 8.0
+margin_right = 376.0
+margin_bottom = 28.0
+text = "Align HCenter"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_alignright" type="Button" parent="canvas/pnl"]
+margin_left = 384.0
+margin_top = 8.0
+margin_right = 496.0
+margin_bottom = 28.0
+text = "Align Right"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_aligntop" type="Button" parent="canvas/pnl"]
+margin_left = 144.0
+margin_top = 32.0
+margin_right = 256.0
+margin_bottom = 52.0
+text = "Align Top"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_valigncenter" type="Button" parent="canvas/pnl"]
+margin_left = 264.0
+margin_top = 32.0
+margin_right = 376.0
+margin_bottom = 52.0
+text = "Align VCenter"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_alignbottom" type="Button" parent="canvas/pnl"]
+margin_left = 384.0
+margin_top = 32.0
+margin_right = 496.0
+margin_bottom = 52.0
+text = "Align Bottom"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_vsync" type="Button" parent="canvas/pnl"]
+margin_left = 520.0
+margin_top = 8.0
+margin_right = 632.0
+margin_bottom = 28.0
+text = "VSync"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_engineversion" type="Button" parent="canvas/pnl"]
+margin_left = 520.0
+margin_top = 32.0
+margin_right = 632.0
+margin_bottom = 52.0
+text = "Engine Version"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_back" type="Button" parent="canvas/pnl"]
+margin_left = 904.0
+margin_top = 32.0
+margin_right = 1016.0
+margin_bottom = 52.0
+text = "Back"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="canvas"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 336.0
+margin_bottom = 22.0
+text = "This is a simple text to test how the overlay box will show on top of existing \"HUD\""
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="canvas/pnl/bt_overlaytoggle" to="." method="_on_bt_overlaytoggle_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_alignleft" to="." method="_on_bt_alignleft_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_aligncenter" to="." method="_on_bt_aligncenter_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_alignright" to="." method="_on_bt_alignright_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_aligntop" to="." method="_on_bt_aligntop_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_valigncenter" to="." method="_on_bt_valigncenter_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_alignbottom" to="." method="_on_bt_alignbottom_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_vsync" to="." method="_on_bt_vsync_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_engineversion" to="." method="_on_bt_engineversion_pressed"]
+[connection signal="pressed" from="canvas/pnl/bt_back" to="." method="_on_bt_back_pressed"]

@@ -6,10 +6,11 @@ The addons in this pack require Godot v3.2.x to work.
 
 The following addons are part of this pack:
 
+* DebugHelpers: Some scripts to aid with testing/debugging.
 * General: Contains a few "general use" scripts.
 * Network: Automates most of the networked multiplayer synchronization process, through snapshots. The addon sort of "forces" the creation of an authoritative server system.
 * Nodes: Some Godot scenes with attached scripts that are meant to be used by attaching instances within other scenes.
-* Smooth: Largely based on [Lawnjelly's](https://github.com/lawnjelly/smoothing-addon) Smoothing Addon, automates interpolation calculation of child nodes.
+* Smooth: Largely based on [Lawnjelly's Smoothing Addon](https://github.com/lawnjelly/smoothing-addon), automates interpolation calculation of child nodes.
 * UI: Custom user interface Control nodes.
 
 ## Installation
@@ -26,7 +27,21 @@ On my web page [kehomsforge.com](http://kehomsforge.com/tutorials/multi/GodotAdd
 
 ## The Addons
 
-Bellow is an slightly more detailed list of the addons.
+Bellow is a slightly more detailed list of the addons.
+
+### Debug Helpers
+
+This addon is meant to bring a few additional tools to help debug projects.
+
+#### overlayinfo.gd
+
+Interdependency: none\
+Requires Activation: yes*
+
+I find myself constantly creating temporary UI controls (`Label`) to dump text into screen (specially when trying to debug networked values), which becomes rather tedious after some time. This script offers means to quickly add text into the screen, including timed labels that will be removed after a specified amount of seconds.
+
+\* Activating this plugin only adds the script into the auto-load list (with default name `OverlayDebugInfo`). Alternatively you can manually add the script to your auto-load list, meaning that you can set your preferred name to access the functionality.
+
 
 ### General
 
@@ -48,12 +63,12 @@ Provides means to quantize floating point numbers as well as compress rotation q
 
 ### Network
 
-Interdependency: data/encdecbuffer.gd, data/quantize.gd*\
+Interdependency: `data/encdecbuffer.gd`, `data/quantize.gd*\`
 Requires Activation: yes
 
 This addon was born in order to help create authoritative servers that send replication data to clients through snapshots and events. Most of the process is automated and the internal design is meant to be as "less intrusive as possible". The idea is to not completely change node hierarchy and have minimal impact on game logic code.
 
-*The data/quantize.gd will be required if analog input quantization is enabled within the project settings window.
+\* The `data/quantize.gd` will be required if analog input quantization is enabled within the project settings window.
 
 
 ### Nodes
