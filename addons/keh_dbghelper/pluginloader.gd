@@ -26,8 +26,10 @@ extends EditorPlugin
 func _enter_tree():
 	# Add relevant scripts to the autoload list
 	add_autoload_singleton("OverlayDebugInfo", "res://addons/keh_dbghelper/overlayinfo.gd")
+	add_autoload_singleton("DebugLine3D", "res://addons/keh_dbghelper/line3d.gd")
 
 func _exit_tree():
 	# Remove relevant scripts from the autoload list
 	remove_autoload_singleton("OverlayDebugInfo")
+	remove_autoload_singleton("DebugLine3D")
 

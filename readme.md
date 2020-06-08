@@ -43,6 +43,15 @@ I find myself constantly creating temporary UI controls (`Label`) to dump text i
 \* Activating this plugin only adds the script into the auto-load list (with default name `OverlayDebugInfo`). Alternatively you can manually add the script to your auto-load list, meaning that you can set your preferred name to access the functionality.
 
 
+#### line3d.gd
+
+Interdependency: none\
+Requires Activation: yes*
+
+This little script is meant to make things easier to draw lines in 3D. Using the default `add_line()` function will draw a line that will last for a single frame. There is the option to add lines that will last for the specified amount of seconds (`add_timed_line()`).
+
+\* Activating this plugin only adds the script into the auto-load list (with default name `DebugLine3D`). Alternatively you can manually add the script to your auto-load list, meaning that you can set your preferred name to access the functionality.
+
 ### General
 
 As mentioned this addon is meant to contain some "general use" scripts.

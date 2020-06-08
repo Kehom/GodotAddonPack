@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://demos/debughelper/maindbghelper.gd" type="Script" id=1]
+
+[sub_resource type="SphereMesh" id=1]
+radius = 0.2
+height = 0.2
 
 [node name="maindbghelper" type="Spatial"]
 script = ExtResource( 1 )
@@ -125,6 +129,19 @@ text = "This is a simple text to test how the overlay box will show on top of ex
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="cam" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.86177 )
+
+[node name="point1" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2.5, 0 )
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="point2" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -2.5, 0 )
+mesh = SubResource( 1 )
+material/0 = null
 [connection signal="pressed" from="canvas/pnl/bt_overlaytoggle" to="." method="_on_bt_overlaytoggle_pressed"]
 [connection signal="pressed" from="canvas/pnl/bt_alignleft" to="." method="_on_bt_alignleft_pressed"]
 [connection signal="pressed" from="canvas/pnl/bt_aligncenter" to="." method="_on_bt_aligncenter_pressed"]

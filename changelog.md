@@ -3,6 +3,7 @@ Some smaller commits related to minor fixes (specially comment corrections) are 
 #### 2020 Jun 08
 * New addon, "DebugHelper" meant to hold scripts to help with the fun debugging process.
 * overlayinfo.gd DebugHelper "sub-addon" script to help dump text into the screen without the need to create multiple temporary UI controls all over the place.
+* line3d.gd DebugHelper "sub-addon" script to help draw (debug) lines in 3D.
 
 #### 2020 Jun 04
 * (Network) Maximum snapshot history size can now be configured with a different size for clients and servers. By default 60 and 120, respectively.

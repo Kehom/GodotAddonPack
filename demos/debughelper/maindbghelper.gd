@@ -3,14 +3,19 @@
 # The overlay info has been activated as a plugin, meaning that it's accessed by
 # the default auto-load script name, OverlayDebugInfo
 
-# NOTE: the root node is intentionally spatial (3D).
-
 extends Spatial
 
 # Keep timed texts on screen for three and a half seconds
 const TIMED_TEXT_SECONDS: float = 3.5
 # Save VSync setting so it is restored when going back to the main menu
 onready var _original_vsync: bool = OS.vsync_enabled
+
+### Variables to control the movement of the spheres
+var dir1: Vector3 = Vector3(0.0, -1.0, 0.0)
+var dir2: Vector3 = Vector3(0.0, 1.0, 0.0)
+
+var move_speed: float = 1.5
+
 
 func _ready() -> void:
 	OverlayDebugInfo.set_visibility(true)
@@ -27,6 +32,31 @@ func _physics_process(_dt: float) -> void:
 	OverlayDebugInfo.set_label("winsize", "Window Size: %s" % OS.get_window_size())
 	# Show window position
 	OverlayDebugInfo.set_label("winpos", "Window Position: %s" % OS.get_window_position())
+	
+	# "Animate" the two spheres
+	$point1.global_transform.origin += dir1 * move_speed * _dt
+	$point2.global_transform.origin += dir2 * move_speed * _dt
+	
+	
+	# Obtain the points 0 and 1 (from point1 and point2 nodes)
+	var p0: Vector3 = $point1.global_transform.origin
+	var p1: Vector3 = $point2.global_transform.origin
+	
+	# Connect point 1 to point 2 with a (red) timed line
+	# warning-ignore:return_value_discarded
+	DebugLine3D.add_timed_line(p0, p1, 1.5, Color(0.85, 0.1, 0.1, 1.0))
+	
+	# Flip direction if sphere reached bottom or top
+	if (abs(p0.y) > 2.5):
+		dir1.y = -dir1.y
+	
+	if (abs(p1.y) > 2.5):
+		dir2.y = -dir2.y
+	
+	# Draw non timed lines indicating the direction. One in blue and the other in green
+	DebugLine3D.add_line(p0, p0 + dir1 * move_speed, Color(0.1, 0.85, 0.1, 1.0))
+	DebugLine3D.add_line(p1, p1 + dir2 * move_speed, Color(0.1, 0.1, 0.85, 1.0))
+
 
 
 func _input(evt: InputEvent) -> void:

@@ -539,6 +539,7 @@ __meta__ = {
 }
 
 [node name="dbghelper" type="Panel" parent="mpnl/stabs"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
@@ -566,7 +567,7 @@ This addon is meant to provide a few  scripts to help the debugging process.
 
 Brief feature overview:
 - overlayinfo.gd: Quickly add text labels on screen without the need to create temporary UI controls all over the place. It also allows timed labels to be shown for the specified amount of seconds. Labels are added/removed into/from a container box that expands/shrinks according to the contents.
-
+- line3d.gd: Means to draw lines in 3D. It also allows timed lines to be drawn for the specified amount of seconds.
 
 Demo Overview:
 Press F1 to toggle the overlayinfo script. It contains very basic information that are updated during the physics process.
@@ -574,7 +575,8 @@ Press F2 to set the alignment to the left
 Press F3 to set the alignment to the center
 Press F4 to set the alignment to the right
 A few buttons are there to add timed labels into the list.
-"
+
+To test the line drawer, two spheres are in the scene, which move up and down. Timed lines are used to connect those spheres while the \"ordinary lines\" are drawn to represent the moving direction of those spheres."
 autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false

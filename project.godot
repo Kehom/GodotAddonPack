@@ -190,6 +190,7 @@ config/icon="res://icon.png"
 
 network="*res://addons/keh_network/network.gd"
 OverlayDebugInfo="*res://addons/keh_dbghelper/overlayinfo.gd"
+DebugLine3D="*res://addons/keh_dbghelper/line3d.gd"
 
 [debug]
 
