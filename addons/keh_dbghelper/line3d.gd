@@ -93,12 +93,33 @@ func _physics_process(_dt: float) -> void:
 	_onef_line.clear()
 
 
+func set_enabled(e: bool) -> void:
+	set_physics_process(e)
+	if (!e):
+		# Remove all lines that were drawn
+		clear()
+		# Clear the line containers
+		_onef_line.clear()
+		_timed_line.clear()
+
+func is_enabled() -> bool:
+	return is_physics_processing()
+
+
 func add_line(p0: Vector3, p1: Vector3, color: Color = Color(1.0, 1.0, 1.0, 1.0)) -> void:
+	if (!is_physics_processing()):
+		# Avoid filling the line container when the functionality is disabled
+		return
 	_onef_line.append(Line3D.new(p0, p1, color))
 
 # Adds a timed line. Return the ID of this line. The ID is necessary in case time is set to 0, in which
 # case the line has to be manually deleted, which requires the return value from this function
 func add_timed_line(p0: Vector3, p1: Vector3, time: float, color: Color = Color(1.0, 1.0, 1.0, 1.0)) -> int:
+	# NOTE: is this really necessary?
+	if (!is_physics_processing()):
+		# Avoid filling the line container when the functionality is disabled
+		return 0
+	
 	_primid += 1
 	_timed_line[_primid] = {
 		"line": Line3D.new(p0, p1, color),
