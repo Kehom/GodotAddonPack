@@ -132,6 +132,10 @@ func set_vertical_align_bottom() -> void:
 	_valigner.alignment = BoxContainer.ALIGN_END
 
 
+func set_panel_color(c: Color) -> void:
+	_background.self_modulate = c
+
+
 func clear() -> void:
 	for lid in _label_node:
 		_label_node[lid].queue_free()
