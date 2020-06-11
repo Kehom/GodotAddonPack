@@ -82,6 +82,9 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	# Hide the OverlayDebugInfo
+	OverlayDebugInfo.set_visibility(false)
+	
 	# Ensure the server is closed. If single player or client, nothing will happen.
 	network.close_server()
 	
@@ -135,6 +138,9 @@ func _input(evt: InputEvent) -> void:
 					# Go back to the main menu
 					# warning-ignore:return_value_discarded
 					get_tree().change_scene("res://main.tscn")
+				
+				KEY_F10:
+					OverlayDebugInfo.toggle_visibility()
 				
 				KEY_ESCAPE:
 					# TODO: toggle visibility of a menu - set mouse mode based on that

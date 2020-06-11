@@ -216,7 +216,7 @@ func _init(cname: String, rpath: String) -> void:
 	# Verifies if the resource contains replicable properties and if implements
 	# the required apply_state(node) function.
 	_check_properties(cname, rpath)
-
+	
 	if replicable.size() <= 8:
 		_cmask_size = 1
 	elif replicable.size() <= 16:
@@ -246,11 +246,10 @@ func create_instance(uid: int, chash: int) -> SnapEntityBase:
 
 # Creates a clone of the specified entity.
 func clone_entity(entity: SnapEntityBase) -> SnapEntityBase:
-	var ret: SnapEntityBase = create_instance(entity.id, entity.class_hash)
+	var ret: SnapEntityBase = create_instance(0, 0)
 	
 	for repl in replicable:
-		if (repl.name != "id" && repl.name != "class_hash"):
-			ret.set(repl.name, entity.get(repl.name))
+		ret.set(repl.name, entity.get(repl.name))
 	
 	return ret
 
@@ -307,6 +306,120 @@ func decode_full_entity(from: EncDecBuffer) -> SnapEntityBase:
 	
 	return ret
 
+
+func encode_delta_entity(uid: int, entity: SnapEntityBase, cmask: int, into: EncDecBuffer) -> void:
+	# Write the entity ID first
+	into.write_uint(uid)
+	
+	# First write the change mask - using the cached amount of bits for it
+	# In this case, the minimum amount under the limitations of raw data manipulation
+	# that can be done with GDScript
+	match _cmask_size:
+		1:
+			into.write_byte(cmask)
+		
+		2:
+			into.write_ushort(cmask)
+		
+		4:
+			into.write_uint(cmask)
+		
+		_:
+			# If here something very bad is happening in the code
+			assert(false)
+	
+	if (cmask == 0):
+		# Avoid needless loop iteration
+		return
+	
+	for repl in replicable:
+		# Not ignoring class hash. Although it's not supposed to be changed,
+		# new entities will have the corresponding bit mask set.
+		# ID was already encoded above, before the change mask
+		if (repl.name == "id"):
+			continue
+		
+		if (repl.mask & cmask):
+			# This is a changed property, so encode it
+			_property_writer(repl, entity, into)
+
+
+func get_full_change_mask() -> int:
+	match _cmask_size:
+		1:
+			return 0xFF
+		2:
+			return 0xFFFF
+		4:
+			return 0xFFFFFFFF
+	return 0
+
+
+# This is a helper to extract the change mask from the EncDecBuffer. See the decode_delta_entity
+# comment to understand why the extraction is here instead of being part of the decoding
+func extract_change_mask(from: EncDecBuffer) -> int:
+	match _cmask_size:
+		1:
+			return from.read_byte()
+		
+		2:
+			return from.read_ushort()
+		
+		4:
+			return from.read_uint()
+	
+	# If failing here, then something is not working in the code
+	assert(false)
+	return -1
+
+# This will work a little bit differently than the decode_full_entity. In order to rebuild the
+# entity a reference must be used, which has to be retrieved from local older snapshot. This means
+# that when this is called the UID and the change mask have already been retrieved from the
+# byte array.
+#func decode_delta_entity(istate: SnapEntityBase, cmask: int, from: EncDecBuffer) -> SnapEntityBase:
+#	var ret: SnapEntityBase = create_instance(istate.id, istate.class_hash)
+#
+#	# ID and change mask have already be taken from the byte buffer. So, go into the properties
+#	for repl in replicable:
+#		if (repl.name == "id"):
+#			continue
+#
+#		if (repl.mask & cmask):
+#			_property_reader(repl, from, ret)
+#
+#	return ret
+
+
+func decode_delta_entity(from: EncDecBuffer) -> Dictionary:
+	# Decode entity ID
+	var uid: int = from.read_uint()
+	# Decode change mask
+	var cmask: int = extract_change_mask(from)
+	
+	# Observation here: The returned entity is meant to contain only the changed data. The rest
+	# that does not match in the change mask will be left with defautl values.
+	var entity: SnapEntityBase = create_instance(uid, 0)
+	
+	# Avoid replicable looping if the change mask is 0, as this entity is marked for removal
+	# and does not contain any encoded data
+	if (cmask > 0):
+		for repl in replicable:
+			if (repl.name != "id" && repl.mask & cmask):
+				_property_reader(repl, from, entity)
+	
+	return {
+		"entity": entity,
+		"cmask": cmask,
+	}
+
+
+func match_delta(changed: SnapEntityBase, source: SnapEntityBase, cmask: int) -> void:
+	# changed is meant to have the old values copied into it as it's the entity to be
+	# added into the new snapshot data
+	for repl in replicable:
+		# Only take from old value if the replicable proprety is not marked as changed
+		if (!(repl.mask & cmask)):
+			changed.set(repl.name, source.get(repl.name))
 
 
 

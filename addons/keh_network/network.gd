@@ -248,13 +248,12 @@ func _ready() -> void:
 	# Obtain the preference for maximum snapshot history size
 	if (ProjectSettings.has_setting("keh_addons/network/max_snapshot_history")):
 		_max_history_size = ProjectSettings.get_setting("keh_addons/network/max_snapshot_history")
-		### The commented lines bellow are "leftovers" related to the delta compression, which will be
-		### re-implemented later.
+		
 		# The maximum history size cannot be smaller than the threshold to send full snapshot data
-#		if (_max_history_size < _full_snap_threshold + 1):
-#			var w: String = "The desired max snapshot history (%d) is smaller than the full snapshot threshold, so setting it to %d."
-#			push_warning(w % [_max_history_size, _full_snap_threshold + 1])
-#			_max_history_size = _full_snap_threshold + 1
+		if (_max_history_size < _full_snap_threshold + 1):
+			var w: String = "The desired max snapshot history (%d) is smaller than the full snapshot threshold, so setting it to %d."
+			push_warning(w % [_max_history_size, _full_snap_threshold + 1])
+			_max_history_size = _full_snap_threshold + 1
 	
 	# Obtain the preference for maximum client snapshot history size
 	if (ProjectSettings.has_setting("keh_addons/network/max_client_snapshot_history")):
@@ -675,32 +674,47 @@ func _on_snapshot_finished(snap: NetSnapshot) -> void:
 		if (!player.is_ready()):
 			continue
 		
+		# Assume delta snapshot will be encoded
+		var send_full: bool = false
+		
 		# Obtain the list of non acknowledged snapshots for this client, including the
 		# corresponding input signatures
 		var non_ack_count: int = player.get_non_acked_snap_count()
+		
+		# First check - if number of non acknowledged snapshots is too big, send full data
+		if (non_ack_count >= _full_snap_threshold):
+			send_full = true
+		
+		var refsnap: NetSnapshot = null
+		
+		# Second check - the necessary "reference snapshot" does not exist 
+		if (!send_full):
+			var snapsig: int = player.get_last_acked_snap_sig()
+			refsnap = snapshot_data.get_snapshot(snapsig)
+			if (!refsnap):
+				send_full = true
+		
+		# NOTE: a third check was planned: if client contains snapshots without input, send full data
+		#    however there is a case where client may not have input data but not caused by data loss
+		#    which is basically when client opens a menu or something and stops polling input devices.
+		#    Should some check like this still happen? It's still possible the non acknowldged count
+		#    check may be enough to consider data loss and send full snapshot data.
+		
 		# Ensure the byte array buffer is empty
 		_update_control.edec.buffer = PoolByteArray()
+		
 		
 		# Retrieve input signature used when the snapshot was generated.
 		var isig: int = player.get_used_input_in_snap(snap.signature)
 		
-		snapshot_data.encode_full(snap, _update_control.edec, isig)
-		rpc_unreliable_id(pid, "_client_receive_full_snapshot", _update_control.edec.buffer)
-
-### The commented code bellow is a "left over" of the delta compression. Since reimplementing
-### the delta system is in the TODO, this code will remain until the system is reworked.
-		# if (non_ack_count > _full_snap_threshold || player.has_snap_with_no_input()):
-		# 	# If here, then full snapshot data must be sent to the client. In this
-		# 	# case, send the newest one (the one given as argument here)
-		# 	snapshot_data.encode_full(snap, _update_control.edec, isig)
-		# 	rpc_unreliable_id(pid, "_client_receive_full_snapshot", _update_control.edec.buffer)
 		
-		# else:
-		# 	# func encode_delta(ref: NetSnapshot, snap: NetSnapshot, into: EncDecBuffer, isig: int) -> void:
-		# 	# And here, a delta snapshot must be sent.
-		# 	var refsig: int = player.get_last_acked_snap_sig()
-		# 	if (snapshot_data.encode_delta(refsig, snap, _update_control.edec, isig)):
-		# 		rpc_unreliable_id(pid, "_client_receive_delta_snapshot", _update_control.edec.buffer)
+		if (send_full):
+			snapshot_data.encode_full(snap, _update_control.edec, isig)
+			rpc_unreliable_id(pid, "_client_receive_full_snapshot", _update_control.edec.buffer)
+		
+		else:
+			snapshot_data.encode_delta(snap, refsnap, _update_control.edec, isig)
+			rpc_unreliable_id(pid, "_client_receive_delta_snapshot", _update_control.edec.buffer)
 
 
 
@@ -734,6 +748,23 @@ remote func server_acknowledge_snapshot(sig: int) -> void:
 		player.server_acknowledge_snapshot(sig)
 
 
+# This function is meant to be used only on clients and is mostly used to perform
+# the tasks after decoding snapshot data
+func _handle_snapshot(snap: NetSnapshot) -> void:
+	# Acknowledge to the server the received snapshot
+	rpc_unreliable_id(1, "server_acknowledge_snapshot", snap.signature)
+	
+	# Check this snapshot comparing to the predicted one. This function also
+	# updates the internal _server_state property, which must match the most
+	# recent received data.
+	snapshot_data.client_check_snapshot(snap)
+	
+	# The snapshot may contain input signature, which serves as an acknowledgement
+	# from the server about the input data. So, perform clearing of internal
+	# input cache so this data (and older) doesn't get sent to the server again
+	if (snap.input_sig > 0):
+		player_data.local_player.client_acknowledge_input(snap.input_sig)
+
 
 # Server calls this when sending full snapshot data
 remote func _client_receive_full_snapshot(encoded: PoolByteArray) -> void:
@@ -741,19 +772,18 @@ remote func _client_receive_full_snapshot(encoded: PoolByteArray) -> void:
 	_update_control.edec.buffer = encoded
 	var decoded: NetSnapshot = snapshot_data.decode_full(_update_control.edec)
 	if (decoded):
-		# Acknowledge to the server the received snapshot
-		rpc_unreliable_id(1, "server_acknowledge_snapshot", decoded.signature)
-		
-		# Check this snapshot comparing to the predicted one. This function also
-		# updates the internal _server_state property, which must match the most
-		# recent received data.
-		snapshot_data.client_check_snapshot(decoded)
-		
-		# The snapshot may contain input signature, which serves as an acknowledgement
-		# from the server about the input data. So, perform clearing of internal
-		# input cache so this data (and older) doesn't get sent to the server again
-		if (decoded.input_sig > 0):
-			player_data.local_player.client_acknowledge_input(decoded.input_sig)
+		_handle_snapshot(decoded)
+
+
+
+remote func _client_receive_delta_snapshot(encoded: PoolByteArray) -> void:
+	assert(!has_authority())
+	_update_control.edec.buffer = encoded
+	OverlayDebugInfo.set_label("dbg1", "Received delta snapshot")
+	var decoded: NetSnapshot = snapshot_data.decode_delta(_update_control.edec)
+	if (decoded):
+		_handle_snapshot(decoded)
+
 
 
 

@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Jun 11
+* (Network) It now performs snapshot delta compression. If you want to always use full snapshot data set the `Full Snapshot Threshold` to 0 in the *Project Settings*. There is no need to change your code to use delta compression though. NOTE: rigid bodies are always triggering changes meaning that the savings on the mega-demo are not too great because there are 11 of those objects.
+
 #### 2020 Jun 08
 * New addon, "DebugHelper" meant to hold scripts to help with the fun debugging process.
 * overlayinfo.gd DebugHelper "sub-addon" script to help dump text into the screen without the need to create multiple temporary UI controls all over the place.

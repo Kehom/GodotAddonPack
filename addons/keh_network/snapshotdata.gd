@@ -196,16 +196,15 @@ func encode_full(snap: NetSnapshot, into: EncDecBuffer, isig: int) -> void:
 		var ecount: int = snap.get_entity_count(ehash)
 		if (ecount == 0):
 			continue
-
+		
 		# There is at least one entity to be encoded, so obtain the description
 		# object to help with the entities
 		var einfo: EntityInfo = _entity_info[ehash]
-
-		# Encode the entity hash ID, even if there is no entity of this type within
-		# the snapshot
+		
+		# Encode the entity hash ID
 		into.write_uint(ehash)
 		# Encode the amount of entities of this type
-		into.write_uint(snap.get_entity_count(ehash))
+		into.write_uint(ecount)
 		
 		# Encode the entities of this type
 		for uid in snap._entity_data[ehash]:
@@ -233,14 +232,14 @@ func decode_full(from: EncDecBuffer) -> NetSnapshot:
 	
 	var retval: NetSnapshot = NetSnapshot.new(sig)
 	
-	# Decode the input signature
+	# "Attach" input signature into the snapshot
 	retval.input_sig = isig
-
+	
 	# The snapshot checking algorithm requires that each entity type has its
 	# entry within the snapshot data, so add them
 	for ehash in _entity_info:
 		retval.add_type(ehash)
-
+	
 	
 	# Decode the entities
 	while from.has_read_data():
@@ -264,6 +263,195 @@ func decode_full(from: EncDecBuffer) -> NetSnapshot:
 	
 	return retval
 
+
+func encode_delta(snap: NetSnapshot, oldsnap: NetSnapshot, into: EncDecBuffer, isig: int) -> void:
+	# Scan oldsnap comparing to snap. Encode only the changes. Removed entities must
+	# be explicitly encoded with a "change mask = 0"
+	# Scanning will iterate through entities in the snap object. The same entity will
+	# be retrieved from oldsnap. If not found, then assume iterated entity is new.
+	# A list must be used to keep track of entities that are in the older snapshot but
+	# not on the newer one, indicating removed game object.
+	
+	# Encode snapshot signature
+	into.write_uint(snap.signature)
+	
+	# Encode input signature
+	into.write_uint(isig)
+	
+	# Encode a flag indicating if there is any change at all in this snapshot - assume there isn't
+	into.write_bool(false)
+	# But not for the actual flag here. It's easier to change this to true
+	var has_data: bool = false
+	
+	# During entity scanning, entries from this container will be removed. After the loop,
+	# any remaining entries are entities removed from the game
+	var tracker: Dictionary = oldsnap.build_tracker()
+	
+	# Iterate through the valid entity types
+	for ehash in _entity_info:
+		# Get entity count in the new snapshot
+		var necount: int = snap.get_entity_count(ehash)
+		# Get entity count in the old snapshot
+		var oecount: int = oldsnap.get_entity_count(ehash)
+		
+		# Don't encode entity type + quantity if both are 0
+		if (necount == 0 && oecount == 0):
+			continue
+		
+		# At least one of the snapshots contains entities of this type. Assume every
+		# single entity has been changed
+		var ccount: int = necount
+		
+		var einfo: EntityInfo = _entity_info[ehash]
+		
+		var written_type_header: bool = false
+		
+		# Encode the entity hash ID. If there is no changed entity of this type, must remove
+		# the corresponding 4 bytes later
+#		into.write_uint(ehash)
+		
+		# Get the writing position of the entity count as most likely it will be updated
+		var countpos: int = into.get_current_size() + 4
+		# Encode entity count
+#		into.write_uint(ccount)
+		
+		# Check the entities
+		for uid in snap._entity_data[ehash]:
+			# Retrive old state of this entity - obviously if it exists (if not this will be null)
+			var eold: SnapEntityBase = oldsnap.get_entity(ehash, uid)
+			# Retrieve new state of this entity - it should exist as the iteration is based on the
+			# new snapshot.
+			var enew: SnapEntityBase = snap.get_entity(ehash, uid)
+			
+			# Assume the entity is new
+			var cmask: int = einfo.get_full_change_mask()
+			
+			if (eold && enew):
+				# Ok, entity exist on both snapshots so it's not new. Calculate the "real" change mask
+				cmask = einfo.calculate_change_mask(eold, enew)
+				# Remove this from the tracker so it isn't considered as a removed entity
+				tracker[ehash].erase(uid)
+				
+			
+			if (cmask != 0):
+				if (!written_type_header):
+					# Write the entity type has ID.
+					into.write_uint(ehash)
+					# And the change counter
+					into.write_uint(ccount)
+					# Prevent rewriting the information
+					written_type_header = true
+				
+				# This entity requires encoding
+				einfo.encode_delta_entity(uid, enew, cmask, into)
+				has_data = true
+			
+			else:
+				# The entity was not changed. Update the change counter
+				ccount -= 1
+		
+		# Check the tracker for entities that are in the old snapshot but not in the new one.
+		# In other words, entities that were removed from the game world
+		# Those must be encoded with a change mask set to 0, which will indicate remove entities
+		# when being decoded.
+		for uid in tracker[ehash]:
+			if (!written_type_header):
+				into.write_uint(ehash)
+				into.write_uint(ccount)
+				written_type_header = true
+			
+			einfo.encode_delta_entity(uid, null, 0, into)
+			ccount += 1
+		
+		if (ccount > 0):
+			into.rewrite_uint(ccount, countpos)
+	
+	# Everything iterated through. Check if there is anything at all
+	if (has_data):
+		into.rewrite_bool(true, 8)
+
+
+# In here the "old snapshot" is not needed because it is basically a property in this
+# class (_server_state)
+func decode_delta(from: EncDecBuffer) -> NetSnapshot:
+	# Decode snapshot signature
+	var snapsig: int = from.read_uint()
+	# Decode input signature
+	var isig: int = from.read_uint()
+	
+	# This check is explained in the decode_full() function
+	if (isig > 0 && _history.size() > 0 && isig < _history.front().input_sig):
+		return null
+	
+	var retval: NetSnapshot = NetSnapshot.new(snapsig)
+	
+	retval.input_sig = isig
+	
+	# The snapshot checking algorithm requires that each entity type has its
+	# entry within the snapshot data, so add them
+	for ehash in _entity_info:
+		retval.add_type(ehash)
+	
+	# Check if the flag indicating if there is any data at all
+	var has_data: bool = from.read_bool()
+	
+	# This will be used to track unchaged entities. Basically, when an entity is decoded,
+	# the corresponding entry will be removed from this data. After that, remaining entries
+	# here are indicating entities that didn't change and must be copied into the new snapshot
+	var tracker: Dictionary = _server_state.build_tracker()
+	
+	if (has_data):
+		# Decode the entities
+		while from.has_read_data():
+			# Read entity type ID
+			var ehash: int = from.read_uint()
+			var einfo: EntityInfo = _entity_info.get(ehash)
+			
+			if (!einfo):
+				var e: String = "While decoding delta snapshot data, got an entity type hash %d which doesn't map to any valid registered entity type."
+				push_error(e % ehash)
+				return null
+			
+			# Take number of encoded entities of this type
+			var count: int = from.read_uint()
+			
+			# Decode them
+			for _i in count:
+				var edata: Dictionary = einfo.decode_delta_entity(from)
+				
+				var oldent: SnapEntityBase = _server_state.get_entity(ehash, edata.entity.id)
+				
+				if (oldent):
+					# The entity exists in the old state. Check if it's not marked for removal
+					if (edata.cmask > 0):
+						# It isn't. So, "match" the delta to make the data correct (that is, take unchanged)
+						# data from the old state and apply into the new one.
+						einfo.match_delta(edata.entity, oldent, edata.cmask)
+						# Add the changed entity into the return value
+						retval.add_entity(ehash, edata.entity)
+					
+					# This is a changed entity, so remove it from the tracker
+					tracker[ehash].erase(edata.entity.id)
+				
+				else:
+					# Entity is not in the old state. Add the decoded data into the return value in the
+					# hopes it is holding the entire correct data (this can be checked by comparing the cmask though)
+					# Change mask can be 0 in this case, when the acknowledgement still didn't arrive theren when
+					# server dispatched a new data set.
+					if (edata.cmask > 0):
+						retval.add_entity(ehash, edata.entity)
+	
+	# Check the tracker now
+	for ehash in tracker:
+		var einfo: EntityInfo = _entity_info.get(ehash)
+		for uid in tracker[ehash]:
+			if (ehash == 1306596770):
+				print("Cloning entity %s of type %s as it didn't change" % [uid, ehash])
+			
+			var entity: SnapEntityBase = _server_state.get_entity(ehash, uid)
+			retval.add_entity(ehash, einfo.clone_entity(entity))
+	
+	return retval
 
 
 

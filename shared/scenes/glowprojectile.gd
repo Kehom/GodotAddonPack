@@ -69,7 +69,7 @@ func _physics_process(dt: float) -> void:
 		var sobj: MegaSnapProjectile = MegaSnapProjectile.new(_uid, 0)
 		sobj.position = global_transform.origin
 		#sobj.orientation = Quat(global_transform.basis)
-		sobj.orientation = Quantize.compress_rquat_9bits(Quat(global_transform.basis))
+		sobj.orientation = Quantize.compress_rquat_9bits(global_transform.basis.get_rotation_quat())
 #		sobj.fired_by = 
 		
 		network.snapshot_entity(sobj)
