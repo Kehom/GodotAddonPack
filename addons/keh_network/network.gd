@@ -24,7 +24,6 @@ extends Node
 class_name Network
 
 # TODO:
-# - (Re)Incorporate delta snapshot compression
 # - Method to "cull" objects from snapshots which may lead to *some* bandwidth
 #   savings. One such case would be to eliminate every object that is relatively
 #   far from the client and maybe even impossible to be seen.
@@ -50,19 +49,6 @@ class_name Network
 #   the game will break, forcing a restart to occur periodically.
 # - The replicated event system packs the event code (ID) using 16 bits, meaning
 #   that only 65536 different event types can be used with this sytem.
-
-# One thing to note:
-# Originally this system did include "delta compression", that is, only encode
-# into snapshots what has been changed. However, doing so requires a bunch of
-# extra upkeep (which will probably be noticed across the system as "left-overs")
-# What happened is that dealing with this kind of compression requires a lot
-# more work (and debugging) than anticipated. When the system was "working"
-# (there were some bugs to be solved but mostly working), measuring the bandwidth
-# showed that it was actually using more data than dealing with only full
-# snapshots! Because of that, delta has been removed (but not completely).
-# from the code. At a later date it **may** be reincorporated into the addon,
-# as there is a really high probability that the extra data usage was caused
-# by an error (AKA bug) in the implementation.
 
 
 # When trying to create a server the result is not instant. Because of that,

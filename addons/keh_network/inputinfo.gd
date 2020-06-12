@@ -300,7 +300,6 @@ func decode_from(encdec: EncDecBuffer) -> InputData:
 			var cmask: int = _read_mask(_analog_list.size(), encdec)
 			for a in _analog_list:
 				if (cmask & _analog_list[a].mask):
-					var val: float = 0.0
 					if (_quantize_analog):
 						# Analog quantization is enabled, so extract the quantized value first
 						var quantized: int = encdec.read_byte()

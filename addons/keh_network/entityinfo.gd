@@ -467,7 +467,6 @@ func spawn_node(uid: int, chash: int) -> Node:
 
 
 func despawn_node(uid: int) -> void:
-	var n: Node = null
 	var ge: GameEntity = _entity.get(uid)
 	if (ge):
 		if (!ge.node.is_queued_for_deletion()):

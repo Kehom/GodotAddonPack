@@ -304,16 +304,17 @@ func encode_delta(snap: NetSnapshot, oldsnap: NetSnapshot, into: EncDecBuffer, i
 		
 		var einfo: EntityInfo = _entity_info[ehash]
 		
-		var written_type_header: bool = false
 		
-		# Encode the entity hash ID. If there is no changed entity of this type, must remove
-		# the corresponding 4 bytes later
-#		into.write_uint(ehash)
+		# NOTE: Postponing encoding of typehash plus change count to a moment where it is
+		# sure there is at least one changed entity of this type. Originally trie to do
+		# things normally and remove the relevant bytes from the buffer array but it didn't
+		# work very well.
+		# This flag is used to tell if the typehash plus change count has been encoded or
+		# not, just to prevent multiple encodings of this data
+		var written_type_header: bool = false
 		
 		# Get the writing position of the entity count as most likely it will be updated
 		var countpos: int = into.get_current_size() + 4
-		# Encode entity count
-#		into.write_uint(ccount)
 		
 		# Check the entities
 		for uid in snap._entity_data[ehash]:
