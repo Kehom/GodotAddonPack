@@ -372,23 +372,6 @@ func extract_change_mask(from: EncDecBuffer) -> int:
 	assert(false)
 	return -1
 
-# This will work a little bit differently than the decode_full_entity. In order to rebuild the
-# entity a reference must be used, which has to be retrieved from local older snapshot. This means
-# that when this is called the UID and the change mask have already been retrieved from the
-# byte array.
-#func decode_delta_entity(istate: SnapEntityBase, cmask: int, from: EncDecBuffer) -> SnapEntityBase:
-#	var ret: SnapEntityBase = create_instance(istate.id, istate.class_hash)
-#
-#	# ID and change mask have already be taken from the byte buffer. So, go into the properties
-#	for repl in replicable:
-#		if (repl.name == "id"):
-#			continue
-#
-#		if (repl.mask & cmask):
-#			_property_reader(repl, from, ret)
-#
-#	return ret
-
 
 func decode_delta_entity(from: EncDecBuffer) -> Dictionary:
 	# Decode entity ID
@@ -397,7 +380,7 @@ func decode_delta_entity(from: EncDecBuffer) -> Dictionary:
 	var cmask: int = extract_change_mask(from)
 	
 	# Observation here: The returned entity is meant to contain only the changed data. The rest
-	# that does not match in the change mask will be left with defautl values.
+	# that does not match in the change mask will be left with default values.
 	var entity: SnapEntityBase = create_instance(uid, 0)
 	
 	# Avoid replicable looping if the change mask is 0, as this entity is marked for removal

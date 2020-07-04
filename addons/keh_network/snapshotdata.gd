@@ -446,9 +446,6 @@ func decode_delta(from: EncDecBuffer) -> NetSnapshot:
 	for ehash in tracker:
 		var einfo: EntityInfo = _entity_info.get(ehash)
 		for uid in tracker[ehash]:
-			if (ehash == 1306596770):
-				print("Cloning entity %s of type %s as it didn't change" % [uid, ehash])
-			
 			var entity: SnapEntityBase = _server_state.get_entity(ehash, uid)
 			retval.add_entity(ehash, einfo.clone_entity(entity))
 	

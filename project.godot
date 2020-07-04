@@ -154,7 +154,7 @@ _global_script_class_icons={
 "CharUnitClass": "",
 "EncDecBuffer": "",
 "EntityInfo": "",
-"FancyLineEdit": "res://addons/keh_ui/fancy_line_edit.png",
+"FancyLineEdit": "",
 "InputData": "",
 "MegaSnapClutter": "",
 "MegaSnapPCharacter": "",

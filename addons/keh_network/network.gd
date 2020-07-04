@@ -765,7 +765,6 @@ remote func _client_receive_full_snapshot(encoded: PoolByteArray) -> void:
 remote func _client_receive_delta_snapshot(encoded: PoolByteArray) -> void:
 	assert(!has_authority())
 	_update_control.edec.buffer = encoded
-	OverlayDebugInfo.set_label("dbg1", "Received delta snapshot")
 	var decoded: NetSnapshot = snapshot_data.decode_delta(_update_control.edec)
 	if (decoded):
 		_handle_snapshot(decoded)
