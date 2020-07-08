@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Jul 07
+* (Network) Added means to easily correct local client snapshots once server data has triggered a *re-conciliation*. This should reduce the chance of visual glitches when entities are corrected. The tutorial has been updated to use this, under the *Correcting The Snapshot* topic.
+
 #### 2020 Jun 11
 * (Network) It now performs snapshot delta compression. If you want to always use full snapshot data set the `Full Snapshot Threshold` to 0 in the *Project Settings*. There is no need to change your code to use delta compression though. NOTE: rigid bodies are always triggering changes meaning that the savings on the mega-demo are not too great because there are 11 of those objects.
 

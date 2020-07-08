@@ -608,14 +608,22 @@ func snapshot_entity(entity: SnapEntityBase) -> void:
 # Used to correct the state of an entity within the local snapshot. This may be useful
 # when a player controlled entity is corrected and replayed. The correction is
 # meant to (try to) avoid triggering further corrections.
-func correct_entity(entity: SnapEntityBase, snap_sig: int) -> void:
+#func correct_entity(entity: SnapEntityBase, snap_sig: int) -> void:
+#	assert(snapshot_data._entity_name.has(entity.get_script()))
+#
+#	var snap: NetSnapshot = snapshot_data.get_snapshot(snap_sig)
+#	if (snap):
+#		var ehash: int = snapshot_data._entity_name.get(entity.get_script()).hash
+#		snap.add_entity(ehash, entity)
+
+
+func correct_in_snapshot(entity: SnapEntityBase, input: InputData) -> void:
 	assert(snapshot_data._entity_name.has(entity.get_script()))
 	
-	var snap: NetSnapshot = snapshot_data.get_snapshot(snap_sig)
+	var snap: NetSnapshot = snapshot_data.get_snapshot_by_input(input.signature)
 	if (snap):
 		var ehash: int = snapshot_data._entity_name.get(entity.get_script()).hash
 		snap.add_entity(ehash, entity)
-
 
 
 
@@ -632,24 +640,16 @@ func _on_snapshot_finished(snap: NetSnapshot) -> void:
 	# Although irrelevant on authority machines, it's much easier to just "attach" the
 	# local input signature to the snapshot
 	snap.input_sig = player_data.local_player.get_last_input_signature()
-	snapshot_data._history.push_back(snap)
+	snapshot_data._add_to_history(snap)
 	
 	
 	if (has_authority()):
 		# Ensure the snapshot container remains with a reasonable amount of data.
-		while (snapshot_data._history.size() > _max_history_size):
-			snapshot_data._history.pop_front()
+		snapshot_data._check_history_size(_max_history_size, true)
 	
 	else:
-		# On clients, if this loop occurs, either:
-		# 1 - there was a massive data loss
-		# 2 - input data was not polled
-		var popped: int = 0
-		while (snapshot_data._history.size() > _max_client_history_size):
-			snapshot_data._history.pop_front()
-		# Update the prediction count for each entity
-		snapshot_data._update_prediction_count(1 - popped)
-		# There is nothing else for clients to do here, so bail
+		snapshot_data._check_history_size(_max_client_history_size, false)
+		# Clients don't have anything else to do here, so bail
 		return
 	
 	

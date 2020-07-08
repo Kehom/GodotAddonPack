@@ -66,6 +66,8 @@ var _mouse_sensitivity: Vector2 = Vector2(0.45, 0.5)
 # Keep track of the pitch angle - this will be changed whe moving the mouse
 var _pitch_angle: float = 0.0
 
+# This will be shown within the OverlayDebugInfo. In this demo, pressing F10 will show (unhide) the panel
+var DEBUG_correction_count: int = 0
 
 # When correction that is received, if directly applied, chances are big that
 # the new state will be visually shown before there is any chance to replay the
@@ -110,10 +112,10 @@ func _ready() -> void:
 		"corrected": false,
 	}
 
-
 func _physics_process(_dt: float) -> void:
 	# Verify if there is any correction to be performed
 	if (_correction_data.corrected):
+		DEBUG_correction_count += 1
 		# Reset the flag otherwise this "correction" may be played again
 		# and will result in errors
 		_correction_data.corrected = false
@@ -130,6 +132,8 @@ func _physics_process(_dt: float) -> void:
 			var inlist: Array = network.player_data.local_player.get_cached_input_list()
 			for i in inlist:
 				handle_input(i)
+				network.correct_in_snapshot(create_snapentity_object(), i)
+				OverlayDebugInfo.set_label("correct_count", "Correction Count: %s" % DEBUG_correction_count)
 	
 	
 	var mvisible: bool = Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE

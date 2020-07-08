@@ -130,12 +130,6 @@ func get_game_node(uid: int, snapres: Resource) -> Node:
 	return ret
 
 
-# Internally used, this updates the prediction count of each entity
-func _update_prediction_count(delta: int) -> void:
-	for ehash in _entity_info:
-		var einfo: EntityInfo = _entity_info[ehash]
-		einfo.update_pred_count(delta)
-
 # Retrieve the prediction count for the specified entity
 func get_prediction_count(uid: int, snapres: Resource) -> int:
 	var ret: int = 0
@@ -167,6 +161,13 @@ func add_pre_spawned_node(eclass: Resource, uid: int, node: Node) -> void:
 func get_snapshot(signature: int) -> NetSnapshot:
 	for s in _history:
 		if (s.signature == signature):
+			return s
+	
+	return null
+
+func get_snapshot_by_input(isig: int) -> NetSnapshot:
+	for s in _history:
+		if (s.input_sig == isig):
 			return s
 	
 	return null
@@ -555,3 +556,23 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 	_update_prediction_count(-popcount)
 
 
+func _add_to_history(snap: NetSnapshot) -> void:
+	_history.push_back(snap)
+	
+	pass
+
+func _check_history_size(max_size: int, has_authority: bool) -> void:
+	var popped: int = 0
+	
+	while (_history.size() > max_size):
+		_history.pop_front()
+		popped ++ 1
+	
+	if (!has_authority):
+		_update_prediction_count(1 - popped)
+
+# Internally used, this updates the prediction count of each entity
+func _update_prediction_count(delta: int) -> void:
+	for ehash in _entity_info:
+		var einfo: EntityInfo = _entity_info[ehash]
+		einfo.update_pred_count(delta)
