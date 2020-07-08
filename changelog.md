@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Jul 08
+* (Network) Small correction to the plugin loader, which should make the ProjectSettings window work as intended.
+
 #### 2020 Jul 07
 * (Network) Added means to easily correct local client snapshots once server data has triggered a *re-conciliation*. This should reduce the chance of visual glitches when entities are corrected. The tutorial has been updated to use this, under the *Correcting The Snapshot* topic.
 
