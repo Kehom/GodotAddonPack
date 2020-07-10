@@ -566,7 +566,7 @@ func _check_history_size(max_size: int, has_authority: bool) -> void:
 	
 	while (_history.size() > max_size):
 		_history.pop_front()
-		popped ++ 1
+		popped += 1
 	
 	if (!has_authority):
 		_update_prediction_count(1 - popped)

@@ -194,6 +194,7 @@ DebugLine3D="*res://addons/keh_dbghelper/line3d.gd"
 
 [debug]
 
+gdscript/warnings/exclude_addons=false
 gdscript/completion/autocomplete_setters_and_getters=true
 gdscript/warnings/unused_class_variable=true
 

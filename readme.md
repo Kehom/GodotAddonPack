@@ -13,8 +13,6 @@ The following addons are part of this pack:
 * Smooth: Largely based on [Lawnjelly's Smoothing Addon](https://github.com/lawnjelly/smoothing-addon), automates interpolation calculation of child nodes.
 * UI: Custom user interface Control nodes.
 
-**NOTE**: For some reason Godot is not warning me about unused variables/properties. This is happening only on this project so, if you get a warning, currently the best action would be to either notify me or, if you are entirely sure the variable is indeed not needed, create a pull request with the fix.
-
 ## Installation
 
 Normally speaking, installing an addon into a Godot project consists of copying the addon directory into the project's "addons" subdirectory. As an example, suppose you have a project under the `mygame` directory and want to install the `Network` addon. The process here would be to just copy the contents of the `network` directory (from this repository) into the `mygame/addons/network`.

@@ -278,7 +278,7 @@ func _process(dt: float) -> void:
 
 
 
-func _physics_process(dt: float) -> void:
+func _physics_process(_dt: float) -> void:
 	if (_interpolation):
 		# Deal with the case of multiple physics ticks between "normal frames"
 		if (_interpolation.had_physics):

@@ -56,7 +56,7 @@ func _ready() -> void:
 		_from = _target.global_transform
 		_to = _from
 
-func _process(dt: float) -> void:
+func _process(_dt: float) -> void:
 	if (_had_physics):
 		_cycle()
 		_had_physics = false
@@ -67,7 +67,7 @@ func _process(dt: float) -> void:
 	else:
 		global_transform = _to
 
-func _physics_process(dt: float) -> void:
+func _physics_process(_dt: float) -> void:
 	# If there is any case of the physics being ticked more often than the frame,
 	# the internal data must still be updated
 	if (_had_physics):
