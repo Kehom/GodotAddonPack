@@ -361,6 +361,26 @@ func create_server(port: int, _server_name: String, max_players: int) -> void:
 	
 	# TODO: build server info
 
+func create_websocket_server(port: int, _server_name: String, max_players: int) -> void:
+	var net = WebSocketServer.new()
+  
+  # without this websocket servers sometimes don't close the connection correctly
+	net.connect("client_disconnected", self, "_on_player_disconnected")
+	net.connect("client_close_request", self, "_on_player_close_req")
+	
+	if (net.listen(port, PoolStringArray(), true) != OK):
+		emit_signal("server_creation_failed")
+		return
+	
+	# Assign it into the tree
+	get_tree().set_network_peer(net)
+	# Indicate that the server has been created
+	emit_signal("server_created")
+	# Ensure the local_player variable is holding the correct net_id value
+	player_data.local_player.set_network_id(1)
+
+func _on_player_close_req(p, d, f):
+	_on_player_disconnected(p)
 
 # This should be called whenever the server is about to close, either the player quitting to
 # the main menu or closing the game window
@@ -408,7 +428,10 @@ func _on_player_disconnected(id: int) -> void:
 		# Unregister the player from the server's list
 		_unregister_player(id)
 		# And from everyone else
-		rpc("_unregister_player", id)
+		# rpc("_unregister_player", id)
+    # deferred call otherwise we sometimes get a bug on websocket servers not correctly synchronizing the rpc
+    # sometimes it tries to send the rpc to the player that already left too (which somehow causes every client to ignore the rpc call)
+    call_deferred("rpc", "_unregister_player", id)
 
 
 # Clients call this function to send credentials to servers
@@ -436,6 +459,18 @@ func join_server(_ip: String, _port: int) -> void:
 	net.compression_mode = _compression
 	
 	if (net.create_client(_ip, _port) != OK):
+		emit_signal("join_fail")
+		return
+	
+	# And set the network API
+	get_tree().set_network_peer(net)
+
+func join_websocket_server(_ip: String, _port: int) -> void:
+	var net = WebSocketClient.new();
+
+	var url = "ws://" + _ip + ":" + str(_port) # You use "ws://" at the beginning of the address for WebSocket connections
+
+	if (net.connect_to_url(url, PoolStringArray(), true) != OK):
 		emit_signal("join_fail")
 		return
 	
