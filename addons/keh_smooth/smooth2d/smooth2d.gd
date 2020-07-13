@@ -56,7 +56,7 @@ func _ready() -> void:
 		_to = _from
 
 
-func _process(dt: float) -> void:
+func _process(_dt: float) -> void:
 	if (_had_physics):
 		_cycle()
 		_had_physics = false
@@ -68,7 +68,7 @@ func _process(dt: float) -> void:
 		global_transform = _to
 
 
-func _physics_process(dt: float) -> void:
+func _physics_process(_dt: float) -> void:
 	if (_had_physics):
 		_cycle()
 	

@@ -188,7 +188,8 @@ var _max_client_history_size: int = 60 setget noset
 # Value = instance of the NetEventInfo class
 var _event_info: Dictionary = {} setget noset
 
-var _is_websocket = false
+# If this is set to true then use WebSocket instead of ENet
+var _is_websocket = false setget noset
 
 
 # Most of the unique IDs within the snapshots can be simply incrementing integers.
@@ -201,35 +202,13 @@ var _is_websocket = false
 var _incrementing_id: Dictionary setget noset
 
 func _enter_tree():
-	# placing it on _enter_tree because calling join_server is somehow called before _ready
-	if (ProjectSettings.has_setting("keh_addons/network/use_websocket")):
-		_is_websocket = ProjectSettings.get_setting("keh_addons/network/use_websocket")
-
-func _ready() -> void:
-	# Create the objects
-	player_data = NetPlayerData.new()
-	snapshot_data = NetSnapshotData.new()
-	_update_control = UpdateControl.new()
-	
-	_update_control.sfinished = funcref(self, "_on_snapshot_finished")
-	_update_control.evtdispatch = funcref(self, "_on_dispatch_events")
-	
-	# Set the func refs within the player data - the local player will automatically get the correct refs
-	player_data.ping_signaler = funcref(self, "_ping_signaler")
-	player_data.cprop_signaler = funcref(self, "_custom_property_signaler")
-	player_data.cprop_broadcaster = funcref(self, "_custom_prop_broadcast_requester")
-	
-	# Local player should always be part of the tree - even for single player
-	add_child(player_data.local_player)
-	player_data.local_player.set_network_id(1)
-	
 	### The availability of the project settings must be tested because if they are set to the
 	### default values they will not be present
 	# Obtain compression mode from ProjectSettings
 	if (ProjectSettings.has_setting("keh_addons/network/compression")):
 		_compression = ProjectSettings.get_setting("keh_addons/network/compression")
 	
-	# Obtain the preference for broadcasting measured ping values
+		# Obtain the preference for broadcasting measured ping values
 	if (ProjectSettings.has_setting("keh_addons/network/broadcast_measured_ping")):
 		_broadcast_ping_value = ProjectSettings.get_setting("keh_addons/network/broadcast_measured_ping")
 	
@@ -249,6 +228,29 @@ func _ready() -> void:
 	# Obtain the preference for maximum client snapshot history size
 	if (ProjectSettings.has_setting("keh_addons/network/max_client_snapshot_history")):
 		_max_client_history_size = ProjectSettings.get_setting("keh_addons/network/max_client_snapshot_history")
+	
+	# Obtain the preference for either ENet or WebSocket
+	if (ProjectSettings.has_setting("keh_addons/network/use_websocket")):
+		_is_websocket = ProjectSettings.get_setting("keh_addons/network/use_websocket")
+
+
+func _ready() -> void:
+	# Create the objects
+	player_data = NetPlayerData.new()
+	snapshot_data = NetSnapshotData.new()
+	_update_control = UpdateControl.new()
+	
+	_update_control.sfinished = funcref(self, "_on_snapshot_finished")
+	_update_control.evtdispatch = funcref(self, "_on_dispatch_events")
+	
+	# Set the func refs within the player data - the local player will automatically get the correct refs
+	player_data.ping_signaler = funcref(self, "_ping_signaler")
+	player_data.cprop_signaler = funcref(self, "_custom_property_signaler")
+	player_data.cprop_broadcaster = funcref(self, "_custom_prop_broadcast_requester")
+	
+	# Local player should always be part of the tree - even for single player
+	add_child(player_data.local_player)
+	player_data.local_player.set_network_id(1)
 	
 	
 	# Connect to the high level networking signals
@@ -347,44 +349,40 @@ func get_input(player_id: int) -> InputData:
 
 ### Server...
 func create_server(port: int, _server_name: String, max_players: int) -> void:
-	if _is_websocket:
-		create_websocket_server(port, _server_name, max_players)
-		return
-	# Create the network API object
-	var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
-	net.compression_mode = _compression
+	var netpeer: NetworkedMultiplayerPeer = null
+	if (_is_websocket):
+		var net: WebSocketServer = WebSocketServer.new()
+		
+		if (net.listen(port, PoolStringArray(), true) != OK):
+			emit_signal("server_creation_failed")
+			return
+		
+		netpeer = net
 	
-	# Try to create the server
-	if (net.create_server(port, max_players) != OK):
-		emit_signal("server_creation_failed")
-		return
+	else:
+		var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
+		net.compression_mode = _compression
+		
+		# Try to crate the server
+		if (net.create_server(port, max_players) != OK):
+			emit_signal("server_creation_failed")
+			return
+		
+		netpeer = net
 	
-	# Assign it into the tree
-	get_tree().set_network_peer(net)
+	# Assign the network API object to the tree
+	get_tree().set_network_peer(netpeer)
 	# Indicate that the server has been created
 	emit_signal("server_created")
 	# Ensure the local_player variable is holding the correct net_id value
 	player_data.local_player.set_network_id(1)
-	
 	
 	# TODO: build server info
 
-func create_websocket_server(port: int, _server_name: String, max_players: int) -> void:
-	var net = WebSocketServer.new()
-	
-	if (net.listen(port, PoolStringArray(), true) != OK):
-		emit_signal("server_creation_failed")
-		return
-	
-	# Assign it into the tree
-	get_tree().set_network_peer(net)
-	# Indicate that the server has been created
-	emit_signal("server_created")
-	# Ensure the local_player variable is holding the correct net_id value
-	player_data.local_player.set_network_id(1)
 
-func _on_player_close_req(p, d, f):
-	_on_player_disconnected(p)
+### NOTE: is this function needed? If so, for what? What should be the argument types?
+#func _on_player_close_req(p, d, f):
+#	_on_player_disconnected(p)
 
 # This should be called whenever the server is about to close, either the player quitting to
 # the main menu or closing the game window
@@ -459,31 +457,31 @@ remote func server_receive_credentials(cred: Dictionary) -> void:
 
 ### Client...
 func join_server(_ip: String, _port: int) -> void:
-	if _is_websocket:
-		join_websocket_server(_ip, _port)
-		return
-
-	var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
-	net.compression_mode = _compression
+	var netpeer: NetworkedMultiplayerPeer = null
+	if (_is_websocket):
+		var net = WebSocketClient.new()
+		
+		var url = "ws://" + _ip + ":" + str(_port) # You use "ws://" at the beginning of the address for WebSocket connections
+		
+		if (net.connect_to_url(url, PoolStringArray(), true) != OK):
+			emit_signal("join_fail")
+			return
+		
+		netpeer = net
 	
-	if (net.create_client(_ip, _port) != OK):
-		emit_signal("join_fail")
-		return
+	else:
+		var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
+		net.compression_mode = _compression
+		
+		if (net.create_client(_ip, _port) != OK):
+			emit_signal("join_fail")
+			return
+		
+		netpeer = net
 	
-	# And set the network API
-	get_tree().set_network_peer(net)
+	# Assign the network API into the tree
+	get_tree().set_network_peer(netpeer)
 
-func join_websocket_server(_ip: String, _port: int) -> void:
-	var net = WebSocketClient.new();
-
-	var url = "ws://" + _ip + ":" + str(_port) # You use "ws://" at the beginning of the address for WebSocket connections
-
-	if (net.connect_to_url(url, PoolStringArray(), true) != OK):
-		emit_signal("join_fail")
-		return
-	
-	# And set the network API
-	get_tree().set_network_peer(net)
 
 func _handle_disconnection() -> void:
 	# Clear the remote player list
