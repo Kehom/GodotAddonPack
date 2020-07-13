@@ -33,6 +33,7 @@ func _enter_tree():
 	}
 	
 	_reg_setting("compression", TYPE_INT, NetworkedMultiplayerENet.COMPRESS_RANGE_CODER, compr)
+	_reg_setting("use_websocket", TYPE_BOOL, false)
 	_reg_setting("max_snapshot_history", TYPE_INT, 120)
 	_reg_setting("max_client_snapshot_history", TYPE_INT, 60)
 	_reg_setting("full_snapshot_threshold", TYPE_INT, 12)
@@ -53,6 +54,7 @@ func _exit_tree():
 	# Remove the additional project settings - those will remain on the ProjectSettings window until
 	# the editor is restarted
 	ProjectSettings.clear(base_path + "compression")
+	ProjectSettings.clear(base_path + "server_type")
 	ProjectSettings.clear(base_path + "max_snapshot_history")
 	ProjectSettings.clear(base_path + "max_client_snapshot_history")
 	ProjectSettings.clear(base_path + "full_snapshot_threshold")

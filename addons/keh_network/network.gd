@@ -188,6 +188,8 @@ var _max_client_history_size: int = 60 setget noset
 # Value = instance of the NetEventInfo class
 var _event_info: Dictionary = {} setget noset
 
+var _is_websocket = false
+
 
 # Most of the unique IDs within the snapshots can be simply incrementing integers.
 # Often that can be easily done through an auto-load script. Taking advantage of
@@ -198,6 +200,10 @@ var _event_info: Dictionary = {} setget noset
 # this dictionary so avoid directly using it.
 var _incrementing_id: Dictionary setget noset
 
+func _enter_tree():
+	# placing it on _enter_tree because calling join_server is somehow called before _ready
+	if (ProjectSettings.has_setting("keh_addons/network/use_websocket")):
+		_is_websocket = ProjectSettings.get_setting("keh_addons/network/use_websocket")
 
 func _ready() -> void:
 	# Create the objects
@@ -222,7 +228,6 @@ func _ready() -> void:
 	# Obtain compression mode from ProjectSettings
 	if (ProjectSettings.has_setting("keh_addons/network/compression")):
 		_compression = ProjectSettings.get_setting("keh_addons/network/compression")
-	
 	
 	# Obtain the preference for broadcasting measured ping values
 	if (ProjectSettings.has_setting("keh_addons/network/broadcast_measured_ping")):
@@ -342,6 +347,9 @@ func get_input(player_id: int) -> InputData:
 
 ### Server...
 func create_server(port: int, _server_name: String, max_players: int) -> void:
+	if _is_websocket:
+		create_websocket_server(port, _server_name, max_players)
+		return
 	# Create the network API object
 	var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
 	net.compression_mode = _compression
@@ -361,6 +369,22 @@ func create_server(port: int, _server_name: String, max_players: int) -> void:
 	
 	# TODO: build server info
 
+func create_websocket_server(port: int, _server_name: String, max_players: int) -> void:
+	var net = WebSocketServer.new()
+	
+	if (net.listen(port, PoolStringArray(), true) != OK):
+		emit_signal("server_creation_failed")
+		return
+	
+	# Assign it into the tree
+	get_tree().set_network_peer(net)
+	# Indicate that the server has been created
+	emit_signal("server_created")
+	# Ensure the local_player variable is holding the correct net_id value
+	player_data.local_player.set_network_id(1)
+
+func _on_player_close_req(p, d, f):
+	_on_player_disconnected(p)
 
 # This should be called whenever the server is about to close, either the player quitting to
 # the main menu or closing the game window
@@ -408,7 +432,10 @@ func _on_player_disconnected(id: int) -> void:
 		# Unregister the player from the server's list
 		_unregister_player(id)
 		# And from everyone else
-		rpc("_unregister_player", id)
+		# rpc("_unregister_player", id)
+	# deferred call otherwise we sometimes get a bug on websocket servers not correctly synchronizing the rpc
+	# sometimes it tries to send the rpc to the player that already left too (which somehow causes every client to ignore the rpc call)
+#	call_deferred("rpc", "_unregister_player", id)
 
 
 # Clients call this function to send credentials to servers
@@ -432,10 +459,26 @@ remote func server_receive_credentials(cred: Dictionary) -> void:
 
 ### Client...
 func join_server(_ip: String, _port: int) -> void:
+	if _is_websocket:
+		join_websocket_server(_ip, _port)
+		return
+
 	var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
 	net.compression_mode = _compression
 	
 	if (net.create_client(_ip, _port) != OK):
+		emit_signal("join_fail")
+		return
+	
+	# And set the network API
+	get_tree().set_network_peer(net)
+
+func join_websocket_server(_ip: String, _port: int) -> void:
+	var net = WebSocketClient.new();
+
+	var url = "ws://" + _ip + ":" + str(_port) # You use "ws://" at the beginning of the address for WebSocket connections
+
+	if (net.connect_to_url(url, PoolStringArray(), true) != OK):
 		emit_signal("join_fail")
 		return
 	
@@ -459,8 +502,9 @@ func disconnect_from_server() -> void:
 	if (get_tree().is_network_server()):
 		return
 	
-	# Close the connection
-	get_tree().get_network_peer().close_connection()
+	if not _is_websocket:
+		# Close the connection
+		get_tree().get_network_peer().close_connection()
 	# Perform some cleanup
 	_handle_disconnection()
 
