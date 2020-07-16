@@ -29,13 +29,21 @@
 # work regardless of node hierarchy.
 
 extends Node2D
-# This is needed in order to static type Smooth2D. Unfortunately this also
-# results in a duplication of Smooth2D from the node creation window
+# This is needed in order to static type Smooth2D.
 class_name Smooth2D
+
+enum InterpolationMode {
+	Both,
+	RotationOnly,
+	TranslationOnly,
+	# A "none" would be interesting here to substitute the "enabled" property, but it may break compatibility
+	# so not doing that
+}
 
 # If this is set to false then this node will not smoothly follow the target, but
 # snap into it.
 export var enabled: bool = true
+export(InterpolationMode) var interpolate: int = InterpolationMode.Both
 
 var _target: Node2D = null
 
@@ -63,7 +71,25 @@ func _process(_dt: float) -> void:
 	
 	if (enabled):
 		var alpha = Engine.get_physics_interpolation_fraction()
-		global_transform = _from.interpolate_with(_to, alpha)
+		
+		
+		match interpolate:
+			InterpolationMode.Both:
+				# Interpolate everything
+				global_transform = _from.interpolate_with(_to, alpha)
+			InterpolationMode.RotationOnly:
+				# Snap the position
+				global_transform.origin = _to.origin
+				# And interpolate rotation
+				global_transform.x = _from.x.linear_interpolate(_to.x, alpha)
+				global_transform.y = _from.y.linear_interpolate(_to.y, alpha)
+			InterpolationMode.TranslationOnly:
+				# Interpolate position
+				global_transform.origin = _from.origin.linear_interpolate(_to.origin, alpha)
+				# And snap rotation
+				global_transform.x = _to.x
+				global_transform.y = _to.y
+			
 	else:
 		global_transform = _to
 

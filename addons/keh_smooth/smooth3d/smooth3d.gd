@@ -29,13 +29,21 @@
 # work regardless of node hierarchy.
 
 extends Spatial
-# This is needed in order to static type Smooth3D. Unfortunately this also
-# results in a duplication of Smooth3D from the node creation window
+# This is needed in order to static type Smooth3D.
 class_name Smooth3D
+
+enum InterpolationMode {
+	Both,
+	OrientationOnly,
+	TranslationOnly,
+	# A "None" would be interesting here to substitute the "enabled" property, but it may break compatibility
+	# so not doing that
+}
 
 # If this is set to false then this node will not smoothly follow the target, but
 # snap into it.
 export var enabled: bool = true
+export(InterpolationMode) var interpolate: int = InterpolationMode.Both
 
 var _target: Spatial = null
 onready var _from: Transform
@@ -63,7 +71,21 @@ func _process(_dt: float) -> void:
 	
 	if (enabled):
 		var alpha: float = Engine.get_physics_interpolation_fraction()
-		global_transform = _from.interpolate_with(_to, alpha)
+		
+		match interpolate:
+			InterpolationMode.Both:
+				global_transform = _from.interpolate_with(_to, alpha)
+			InterpolationMode.OrientationOnly:
+				# Snap translation
+				global_transform.origin = _to.origin
+				# And interpolate orientation
+				global_transform.basis = _from.basis.slerp(_to.basis, alpha)
+			InterpolationMode.TranslationOnly:
+				# Interpolate translation
+				global_transform.origin = _from.origin.linear_interpolate(_to.origin, alpha)
+				# And snap orientation
+				global_transform.basis = _to.basis
+		
 	else:
 		global_transform = _to
 
