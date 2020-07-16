@@ -192,6 +192,7 @@ var _event_info: Dictionary = {} setget noset
 var _is_websocket = false setget noset
 
 
+
 # Most of the unique IDs within the snapshots can be simply incrementing integers.
 # Often that can be easily done through an auto-load script. Taking advantage of
 # the fact that this script is already an auto-load one, this dictionary is used
@@ -235,6 +236,10 @@ func _enter_tree():
 
 
 func _ready() -> void:
+	# Regardless of connection type (WebSocket or ENet), disable processing. Only enable it when the server or
+	# client is created and if in WebSocket mode
+	set_process(false)
+	
 	# Create the objects
 	player_data = NetPlayerData.new()
 	snapshot_data = NetSnapshotData.new()
@@ -262,7 +267,16 @@ func _ready() -> void:
 	# warning-ignore:return_value_discarded
 	get_tree().connect("connection_failed", self, "_on_connection_failed")
 	# warning-ignore:return_value_discarded
-	get_tree().connect("server_disconnected", self, "_on_disconnected")
+	get_tree().connect("server_disconnected", self, "_on_disconnected")     # This is for ENet
+
+
+
+# Polling is necessary for WebSockets to work and emit signals. That said, processing will be enabled
+# only when necessary - that is, creating/joining WebSocket server.
+func _process(_dt: float) -> void:
+	get_tree().network_peer.poll()
+
+
 
 
 func reset_system() -> void:
@@ -358,6 +372,7 @@ func create_server(port: int, _server_name: String, max_players: int) -> void:
 			return
 		
 		netpeer = net
+		set_process(true)
 	
 	else:
 		var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
@@ -399,6 +414,9 @@ func close_server(_message: String = "Server is closing") -> void:
 	for k in keys:
 		kick_player(k, _message)
 	
+	# It doesn't "hurt" to call this even on ENet mode
+	set_process(false)
+	
 	# Cleanup the network object through a deferred call just to ensure all remote
 	# calls get processed.
 	get_tree().call_deferred("set_network_peer", null)
@@ -406,10 +424,18 @@ func close_server(_message: String = "Server is closing") -> void:
 
 
 func kick_player(id: int, reason: String) -> void:
-	# First remote call the function that will give the reason to the kicked player
-	rpc_id(id, "kicked", reason)
-	# Then remove the player
-	get_tree().network_peer.disconnect_peer(id)
+	if (_is_websocket):
+		# When in WebSocket mode, first notifying the client through RPC will not work as it will
+		# arrive after the client disconnects. However, the client will still get an extra signal,
+		# the "server_close_request" before, meaning that it will be used to give the "reason"
+		get_tree().network_peer.disconnect_peer(id, 1000, reason)
+	
+	else:
+		# On ENet mode first remote call the function that will give the reason to the kicked player
+		rpc_id(id, "kicked", reason)
+		# Then remove the player
+		get_tree().network_peer.disconnect_peer(id)
+	
 	# Ensure internal remote player container is properly cleared
 	_unregister_player(id)
 
@@ -430,10 +456,13 @@ func _on_player_disconnected(id: int) -> void:
 		# Unregister the player from the server's list
 		_unregister_player(id)
 		# And from everyone else
-		# rpc("_unregister_player", id)
-	# deferred call otherwise we sometimes get a bug on websocket servers not correctly synchronizing the rpc
-	# sometimes it tries to send the rpc to the player that already left too (which somehow causes every client to ignore the rpc call)
-#	call_deferred("rpc", "_unregister_player", id)
+		if (_is_websocket):
+			# Deferred call otherwise we sometimes get a bug on websocket servers not correctly synchronizing the rpc
+			# sometimes it tries to send the rpc to the player that already left too (which somehow causes every client to ignore the rpc call)
+			call_deferred("rpc", "_unregister_player", id)
+		else:
+			rpc("_unregister_player", id)
+
 
 
 # Clients call this function to send credentials to servers
@@ -460,6 +489,10 @@ func join_server(_ip: String, _port: int) -> void:
 	var netpeer: NetworkedMultiplayerPeer = null
 	if (_is_websocket):
 		var net = WebSocketClient.new()
+		
+		# Must listen to this signal because it will arrive before the actual disconnection.
+		# warning-ignore:return_value_discarded
+		net.connect("server_close_request", self, "_on_websocket_close_request")
 		
 		var url = "ws://" + _ip + ":" + str(_port) # You use "ws://" at the beginning of the address for WebSocket connections
 		
@@ -488,6 +521,8 @@ func _handle_disconnection() -> void:
 	player_data.clear_remote()
 	# Ensure the local player is holding the correct data (Network ID = 1)
 	player_data.local_player.set_network_id(1)
+	# It doesn't "hurt" to call this even on ENet mode
+	set_process(false)
 	# As of Godot 3.2 beta (from one of the release candidates) directly setting
 	# the peer network to null (reset) results in error (object being destroyed
 	# while emitting a signal), so deferring the call to avoid that.
@@ -500,19 +535,34 @@ func disconnect_from_server() -> void:
 	if (get_tree().is_network_server()):
 		return
 	
-	if not _is_websocket:
+	if (!_is_websocket):
 		# Close the connection
 		get_tree().get_network_peer().close_connection()
+	
 	# Perform some cleanup
 	_handle_disconnection()
 
 
 func _on_connection_failed() -> void:
-	emit_signal("join_fail")
+	if (_is_websocket && is_processing()):
+		# If here then connection was previously established but it was lost. Problem is, for some reason
+		# when server calls disconnect_peer() the signal "server_close_request" is given as docummented but
+		# instead of the "connection_closed" being given later, the connection failed comes in. Returning
+		# from here and continuing to poll data (as described in the documentation) will not work so emit
+		# the "disconnected" signal from here
+		emit_signal("disconnected")
+		
+	else:
+		# Hopefully the previous check is enough to handle only the "server kicked client" and all other cases
+		# in which the code reaches this function is because the connection as actually failed.
+		emit_signal("join_fail")
+	
+	
 	# At this point local data is most likely still intact, but clean it up anyways.
 	# The _handle_disconnection() will still perform the ENet object reset, which must
 	# be done regardless.
 	_handle_disconnection()
+
 
 
 func _on_disconnected() -> void:
@@ -539,6 +589,10 @@ func dispatch_credentials(cred: Dictionary) -> void:
 
 
 remote func on_join_accepted() -> void:
+	# Enable the processing - which will poll network data if in WebSocket mode
+	if (_is_websocket):
+		set_process(true)
+	
 	# This will be called by the server if the connection attempt is allowed
 	# Notify the local machine about the success
 	emit_signal("join_accepted")
@@ -567,6 +621,12 @@ remote func on_join_rejected(reason: String) -> void:
 # Server call this before forcefully disconnecting a client
 remote func kicked(reason: String) -> void:
 	# Tell outside code about this
+	emit_signal("kicked", reason)
+
+func _on_websocket_close_request(_code: int, reason: String) -> void:
+	# The kick system has to work on a different way when using WebSockets. The problem is that the RPC telling
+	# about the kick always arrive after the client has already dealt with the disconnection. But since this function
+	# is called before the actuall disconnection, use this to indicate the "kick"
 	emit_signal("kicked", reason)
 
 

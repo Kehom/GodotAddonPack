@@ -142,6 +142,15 @@ func _input(evt: InputEvent) -> void:
 				KEY_F10:
 					OverlayDebugInfo.toggle_visibility()
 				
+				KEY_F12:
+					# This is only for debugging the kicking system
+					if (!network.has_authority()):
+						return
+					
+					for pid in network.player_data.remote_player:
+						network.kick_player(pid, "Just testing")
+				
+				
 				KEY_ESCAPE:
 					# TODO: toggle visibility of a menu - set mouse mode based on that
 					# For now just toggle mouse mode
@@ -296,7 +305,6 @@ func on_disconnected() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
 	var err_diag: AcceptDialog = AcceptDialog.new()
-	#err_diag.dialog_text = "Disconnected from server, going back to the main menu."
 	err_diag.dialog_text = _disconnected_message
 	err_diag.window_title = "Disconnected"
 	err_diag.popup_exclusive = true
