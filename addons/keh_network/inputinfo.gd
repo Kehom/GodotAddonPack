@@ -249,7 +249,7 @@ func encode_to(encdec: EncDecBuffer, input: InputData) -> void:
 			
 			for v in _vec2_list:
 				var vec2: Vector2 = input.get_custom_vec2(v)
-				if (vec2.x != 0.0 && vec2.y != 0.0):
+				if (vec2.x != 0.0 || vec2.y != 0.0):
 					mask |= _vec2_list[v].mask
 					encdec.write_vector2(vec2)
 			
@@ -264,7 +264,7 @@ func encode_to(encdec: EncDecBuffer, input: InputData) -> void:
 			
 			for v in _vec3_list:
 				var vec3: Vector3 = input.get_custom_vec3(v)
-				if (vec3.x != 0.0 && vec3.y != 0.0 && vec3.z != 0.0):
+				if (vec3.x != 0.0 || vec3.y != 0.0 || vec3.z != 0.0):
 					mask |= _vec3_list[v].mask
 					encdec.write_vector3(vec3)
 			
