@@ -32,73 +32,59 @@ extends Node2D
 # This is needed in order to static type Smooth2D.
 class_name Smooth2D
 
-enum InterpolationMode {
-	Both,
-	RotationOnly,
-	TranslationOnly,
-	# A "none" would be interesting here to substitute the "enabled" property, but it may break compatibility
-	# so not doing that
-}
 
 # If this is set to false then this node will not smoothly follow the target, but
-# snap into it.
+# snap into it. It will take priority over the interpolate flags - which will serve as
+# another method to disable interpolation if all flags are set to 0
 export var enabled: bool = true
-export(InterpolationMode) var interpolate: int = InterpolationMode.Both
+# This property could easily substitute the enabled property, however if "enabled" is removed it may break compatibility
+export(int, FLAGS, "Translation", "Orientation", "Scale") var interpolate: int = _SmoothCore.FI_ALL
 
-var _target: Node2D = null
 
-var _from: Transform2D
-var _to: Transform2D
+var _interp_data: _SmoothCore.IData2D
 
-var _had_physics: bool = false
+
+func set_interpolate_translation(enable: bool) -> void:
+	interpolate = _SmoothCore.set_bits(interpolate, _SmoothCore.FI_TRANSLATION, enable)
+
+func is_interpolating_translation() -> bool:
+	return _SmoothCore.is_enabled(interpolate, _SmoothCore.FI_TRANSLATION)
+
+
+func set_interpolate_orientation(enable: bool) -> void:
+	interpolate = _SmoothCore.set_bits(interpolate, _SmoothCore.FI_ORIENTATION, enable)
+
+func is_interpolating_orientation() -> bool:
+	return _SmoothCore.is_enabled(interpolate, _SmoothCore.FI_ORIENTATION)
+
+
+func set_interpolate_scale(enable: bool) -> void:
+	interpolate = _SmoothCore.set_bits(interpolate, _SmoothCore.FI_SCALE, enable)
+
+func is_interpolating_scale() -> bool:
+	return _SmoothCore.is_enabled(interpolate, _SmoothCore.FI_SCALE)
+
 
 func _ready() -> void:
 	# If node is initially hidden, must ensure processing is disabled
 	set_process(is_visible_in_tree())
 	set_physics_process(is_visible_in_tree())
 	
-	_target = get_parent()
-	
-	if (_target):
-		_from = _target.global_transform
-		_to = _from
+	_interp_data = _SmoothCore.IData2D.new(get_parent())
 
 
 func _process(_dt: float) -> void:
-	if (_had_physics):
-		_cycle()
-		_had_physics = false
+	_interp_data.cycle(false)
 	
 	if (enabled):
-		var alpha = Engine.get_physics_interpolation_fraction()
-		
-		
-		match interpolate:
-			InterpolationMode.Both:
-				# Interpolate everything
-				global_transform = _from.interpolate_with(_to, alpha)
-			InterpolationMode.RotationOnly:
-				# Snap the position
-				global_transform.origin = _to.origin
-				# And interpolate rotation
-				global_transform.x = _from.x.linear_interpolate(_to.x, alpha)
-				global_transform.y = _from.y.linear_interpolate(_to.y, alpha)
-			InterpolationMode.TranslationOnly:
-				# Interpolate position
-				global_transform.origin = _from.origin.linear_interpolate(_to.origin, alpha)
-				# And snap rotation
-				global_transform.x = _to.x
-				global_transform.y = _to.y
-			
+		global_transform = _interp_data.calculate(interpolate)
+	
 	else:
-		global_transform = _to
+		global_transform = _interp_data.to
 
 
 func _physics_process(_dt: float) -> void:
-	if (_had_physics):
-		_cycle()
-	
-	_had_physics = true
+	_interp_data.cycle(true)
 
 
 
@@ -108,23 +94,12 @@ func _notification(what: int) -> void:
 			set_process(is_visible_in_tree())
 			set_physics_process(is_visible_in_tree())
 
+
 # Teleport/snap to the specified transform
 func teleport_to(t: Transform2D) -> void:
-	_from = t
-	_to = t
+	_interp_data.setft(t, t)
+
 
 
 func snap_to_target() -> void:
-	if (!_target):
-		return
-	
-	teleport_to(_target.global_transform)
-
-
-func _cycle() -> void:
-	if (!_target):
-		return
-	
-	_from = _to
-	_to = _target.global_transform
-
+	_interp_data.snap_to_target()

@@ -32,24 +32,13 @@ extends Spatial
 # This is needed in order to static type Smooth3D.
 class_name Smooth3D
 
-enum InterpolationMode {
-	Both,
-	OrientationOnly,
-	TranslationOnly,
-	# A "None" would be interesting here to substitute the "enabled" property, but it may break compatibility
-	# so not doing that
-}
 
 # If this is set to false then this node will not smoothly follow the target, but
 # snap into it.
 export var enabled: bool = true
-export(InterpolationMode) var interpolate: int = InterpolationMode.Both
+export(int, FLAGS, "Translation", "Orientation", "Scale") var interpolate: int = _SmoothCore.FI_ALL
 
-var _target: Spatial = null
-onready var _from: Transform
-onready var _to: Transform
-
-var _had_physics: bool = false
+var _interp_data: _SmoothCore.IData3D
 
 
 func _ready() -> void:
@@ -57,46 +46,20 @@ func _ready() -> void:
 	set_process(is_visible_in_tree())
 	set_physics_process(is_visible_in_tree())
 	
-	_target = get_parent_spatial()
-	
-	
-	if (_target):
-		_from = _target.global_transform
-		_to = _from
+	_interp_data = _SmoothCore.IData3D.new(get_parent_spatial())
+
 
 func _process(_dt: float) -> void:
-	if (_had_physics):
-		_cycle()
-		_had_physics = false
+	_interp_data.cycle(false)
 	
 	if (enabled):
-		var alpha: float = Engine.get_physics_interpolation_fraction()
-		
-		match interpolate:
-			InterpolationMode.Both:
-				global_transform = _from.interpolate_with(_to, alpha)
-			InterpolationMode.OrientationOnly:
-				# Snap translation
-				global_transform.origin = _to.origin
-				# And interpolate orientation
-				global_transform.basis = _from.basis.slerp(_to.basis, alpha)
-			InterpolationMode.TranslationOnly:
-				# Interpolate translation
-				global_transform.origin = _from.origin.linear_interpolate(_to.origin, alpha)
-				# And snap orientation
-				global_transform.basis = _to.basis
+		global_transform = _interp_data.calculate(interpolate)
 		
 	else:
-		global_transform = _to
+		global_transform = _interp_data.to
 
 func _physics_process(_dt: float) -> void:
-	# If there is any case of the physics being ticked more often than the frame,
-	# the internal data must still be updated
-	if (_had_physics):
-		_cycle()
-	
-	_had_physics = true
-
+	_interp_data.cycle(true)
 
 
 func _notification(what: int) -> void:
@@ -106,24 +69,12 @@ func _notification(what: int) -> void:
 			set_process(process)
 			set_physics_process(process)
 
+
 func teleport_to(t: Transform) -> void:
-	_from = t
-	_to = t
+	_interp_data.setft(t, t)
 
 
 
 func snap_to_target() -> void:
-	if (!_target):
-		return
-	
-	teleport_to(_target.global_transform)
-
-
-func _cycle() -> void:
-	if (!_target):
-		return
-	
-	_from = _to
-	_to = _target.global_transform
-
+	_interp_data.snap_to_target()
 

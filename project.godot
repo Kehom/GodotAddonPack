@@ -148,6 +148,11 @@ _global_script_classes=[ {
 "class": "UnitSelectionData",
 "language": "GDScript",
 "path": "res://demos/network/scripts/selectiondata.gd"
+}, {
+"base": "Reference",
+"class": "_SmoothCore",
+"language": "GDScript",
+"path": "res://addons/keh_smooth/smoothcore.gd"
 } ]
 _global_script_class_icons={
 "Cam3D": "",
@@ -177,7 +182,8 @@ _global_script_class_icons={
 "Smooth2D": "",
 "Smooth3D": "",
 "SnapEntityBase": "",
-"UnitSelectionData": ""
+"UnitSelectionData": "",
+"_SmoothCore": ""
 }
 
 [application]
