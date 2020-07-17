@@ -994,10 +994,16 @@ remote func _server_broadcast_custom_prop(pname: String, value) -> void:
 	if (!has_authority()):
 		return
 	
+	# Obtain the ID of the player requesting to broadcast custom property
 	var caller: int = get_tree().get_rpc_sender_id()
+	
+	# Then broadcast to everyone else
 	for pid in player_data.remote_player:
 		if (pid != caller):
 			player_data.remote_player[pid].rpc_id(pid, "_rem_set_custom_property", pname, value)
+		else:
+			# For the caller, just update the value
+			player_data.remote_player[pid]._rem_set_custom_property(pname, value)
 
 # When a property is changed within the player node, it may require to broadcast
 # the value through the server. To make things easier, each player node will hold a

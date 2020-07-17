@@ -84,6 +84,9 @@ func setup_megademo() -> void:
 	SharedUtils.connector($mpnl/stabs/megademo/bt_charcapsule, "pressed", self, "_on_character_clicked", [caps_hash])
 	SharedUtils.connector($mpnl/stabs/megademo/bt_charcylinder, "pressed", self, "_on_character_clicked", [cyl_hash])
 	SharedUtils.connector($mpnl/stabs/megademo/bt_charcube, "pressed", self, "_on_character_clicked", [cube_hash])
+	
+	
+	network.player_data.add_custom_property("testing_broadcast", 5, NetCustomProperty.ReplicationMode.ServerBroadcast)
 
 
 
@@ -93,6 +96,7 @@ func _on_server_created() -> void:
 
 
 func _on_join_success() -> void:
+	network.player_data.local_player.set_custom_property("testing_broadcast", rand_range(0, 9))
 	open_scene(_open_net_scene)
 
 
