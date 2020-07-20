@@ -11,6 +11,8 @@ onready var btbox: VBoxContainer = $mpnl/demo_list/pnl/vbox
 var _open_net_scene: String = ""
 
 func _ready() -> void:
+	randomize()
+	
 	# Make sure the overlay debug info is hidden
 	OverlayDebugInfo.set_visibility(false)
 	

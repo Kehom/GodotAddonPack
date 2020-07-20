@@ -305,6 +305,10 @@ func is_single_player() -> bool:
 	return !get_tree().has_network_peer()
 
 
+func get_local_id() -> int:
+	return player_data.local_player.net_id
+
+
 # Returns true if the provided ID corresponds to the local player
 func is_id_local(pid: int) -> bool:
 	return player_data.local_player.net_id == pid
@@ -395,9 +399,6 @@ func create_server(port: int, _server_name: String, max_players: int) -> void:
 	# TODO: build server info
 
 
-### NOTE: is this function needed? If so, for what? What should be the argument types?
-#func _on_player_close_req(p, d, f):
-#	_on_player_disconnected(p)
 
 # This should be called whenever the server is about to close, either the player quitting to
 # the main menu or closing the game window
@@ -521,6 +522,8 @@ func _handle_disconnection() -> void:
 	player_data.clear_remote()
 	# Ensure the local player is holding the correct data (Network ID = 1)
 	player_data.local_player.set_network_id(1)
+	# Reset node name to "1"
+	player_data.local_player.set_name("player_1")
 	# It doesn't "hurt" to call this even on ENet mode
 	set_process(false)
 	# As of Godot 3.2 beta (from one of the release candidates) directly setting
@@ -600,6 +603,7 @@ remote func on_join_accepted() -> void:
 	# assigned network id
 	var new_id: int = get_tree().get_network_unique_id()
 	player_data.local_player.set_network_id(new_id)
+	player_data.local_player.set_name("player_" + str(new_id))
 	# Register the server within the remote player list
 	_register_player(1)
 	# Request the server to register the new player within everyone's list
@@ -637,12 +641,18 @@ remote func _register_player(pid: int) -> void:
 	# Create the player node - it's not registered (within the container) yet
 	var player: NetPlayerNode = player_data.create_player(pid)
 	
+	player.set_name("player_" + str(pid))
+	
 	# The player node must be part of the tree
 	add_child(player)
 	
 	if (is_server):
 		# Start the "ping/pong" loop
 		player.start_ping()
+		
+		# Send server's custom properties to the new player
+		player_data.local_player.sync_custom_with(pid)
+		
 		
 		# Server only section is meant to "distribute players" to the new player as well as the new
 		# player to the already connected ones
@@ -706,17 +716,6 @@ func snapshot_entity(entity: SnapEntityBase) -> void:
 	var ehash: int = snapshot_data._entity_name.get(entity.get_script()).hash
 	_update_control.snap.add_entity(ehash, entity)
 
-
-# Used to correct the state of an entity within the local snapshot. This may be useful
-# when a player controlled entity is corrected and replayed. The correction is
-# meant to (try to) avoid triggering further corrections.
-#func correct_entity(entity: SnapEntityBase, snap_sig: int) -> void:
-#	assert(snapshot_data._entity_name.has(entity.get_script()))
-#
-#	var snap: NetSnapshot = snapshot_data.get_snapshot(snap_sig)
-#	if (snap):
-#		var ehash: int = snapshot_data._entity_name.get(entity.get_script()).hash
-#		snap.add_entity(ehash, entity)
 
 
 func correct_in_snapshot(entity: SnapEntityBase, input: InputData) -> void:
@@ -999,18 +998,24 @@ remote func _server_broadcast_custom_prop(pname: String, value) -> void:
 	# Obtain the ID of the player requesting to broadcast custom property
 	var caller: int = get_tree().get_rpc_sender_id()
 	
-	# Then broadcast to everyone else
-	for pid in player_data.remote_player:
-		if (pid != caller):
-			player_data.remote_player[pid].rpc_id(pid, "_rem_set_custom_property", pname, value)
-		else:
-			# For the caller, just update the value
-			player_data.remote_player[pid]._rem_set_custom_property(pname, value)
+	# Get its node
+	var pnode: NetPlayerNode = player_data.get_pnode(caller)
+	
+	if (pnode):
+		# First set the property locally - the node within the server
+		pnode._rem_set_custom_property(pname, value)
+		
+		# Then broadcast to every other player
+		for pid in player_data.remote_player:
+			pnode.rpc_id(pid, "_rem_set_custom_property", pname, value)
+
 
 # When a property is changed within the player node, it may require to broadcast
 # the value through the server. To make things easier, each player node will hold a
 # FuncRef pointing to this function, which in turn remotely calls the server's
 # 'server_broadcast_custom_prop()' function.
+# This extra setup is necessary because this script has access to all connected players
+# but the player node does not.
 func _custom_prop_broadcast_requester(pname: String, value) -> void:
 	if (has_authority()):
 		return

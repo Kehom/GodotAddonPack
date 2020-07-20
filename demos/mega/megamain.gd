@@ -122,7 +122,11 @@ func _physics_process(_dt: float) -> void:
 		for pid in network.player_data.remote_player:
 			create_player_character(network.player_data.remote_player[pid])
 	
-	OverlayDebugInfo.set_label("test_broadself", "Custom value (owned): %s" % network.player_data.local_player.get_custom_property("testing_broadcast"))
+	# Owned custom property and own network ID
+	var owned_cprop: float = network.player_data.local_player.get_custom_property("testing_broadcast")
+	var owned_id: int = network.get_local_id()
+	
+	OverlayDebugInfo.set_label("test_broadself", "Owned Custom Value (%s): %s" % [owned_id, owned_cprop])
 	
 	for pid in network.player_data.remote_player:
 		var cprop: float = network.player_data.remote_player[pid].get_custom_property("testing_broadcast")
