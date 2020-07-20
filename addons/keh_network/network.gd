@@ -751,6 +751,8 @@ func _on_snapshot_finished(snap: NetSnapshot) -> void:
 	
 	else:
 		snapshot_data._check_history_size(_max_client_history_size, false)
+		# Dispatch input data to the server
+		player_data.local_player._dispatch_input_data()
 		# Clients don't have anything else to do here, so bail
 		return
 	

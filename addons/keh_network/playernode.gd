@@ -278,8 +278,8 @@ func get_input(snap_sig: int) -> InputData:
 			# First, cache the new input object
 			_input_cache.cbuffer.push_back(retval)
 			
-			# Send input data to the server
-			_dispatch_input_data()
+			# Input will be sent to the server when the snapshot is finished just so it give a
+			# chance for custom input to be correctly set before dispatching
 	
 	else:
 		# In theory if here it's authority machine as the assert above should
