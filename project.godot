@@ -270,6 +270,7 @@ multiselect={
 
 network/quantize_analog_input=true
 network/compression=3
+network/print_debug_info=true
 
 [physics]
 

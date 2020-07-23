@@ -25,6 +25,8 @@ extends EditorPlugin
 
 const base_path: String = "keh_addons/network/"
 
+var _extra_settings: Array = []
+
 func _enter_tree():
 	# Add project settings if they are not present
 	var compr: Dictionary = {
@@ -41,7 +43,7 @@ func _enter_tree():
 	_reg_setting("use_input_mouse_relative", TYPE_BOOL, false)
 	_reg_setting("use_input_mouse_speed", TYPE_BOOL, false)
 	_reg_setting("quantize_analog_input", TYPE_BOOL, false)
-	
+	_reg_setting("print_debug_info", TYPE_BOOL, false)
 	
 	# Automatically add the network class as a singleton (autoload)
 	add_autoload_singleton("network", "res://addons/keh_network/network.gd")
@@ -53,15 +55,11 @@ func _exit_tree():
 	
 	# Remove the additional project settings - those will remain on the ProjectSettings window until
 	# the editor is restarted
-	ProjectSettings.clear(base_path + "compression")
-	ProjectSettings.clear(base_path + "server_type")
-	ProjectSettings.clear(base_path + "max_snapshot_history")
-	ProjectSettings.clear(base_path + "max_client_snapshot_history")
-	ProjectSettings.clear(base_path + "full_snapshot_threshold")
-	ProjectSettings.clear(base_path + "broadcast_measured_ping")
-	ProjectSettings.clear(base_path + "use_input_mouse_relative")
-	ProjectSettings.clear(base_path + "use_input_mouse_speed")
-	ProjectSettings.clear(base_path + "quantize_analog_input")
+	for es in _extra_settings:
+		ProjectSettings.clear(es)
+	
+	_extra_settings.clear()
+
 
 
 # def_val is relying on the variant, thus no static typing
@@ -69,7 +67,9 @@ func _reg_setting(sname: String, type: int, def_val, info: Dictionary = {}) -> v
 	var fpath: String = base_path + sname
 	if (!ProjectSettings.has_setting(fpath)):
 		ProjectSettings.set(fpath, def_val)
-
+	
+	_extra_settings.append(fpath)
+	
 	# Those must be done regardless if the setting existed before or not, otherwise the ProjectSettings window
 	# will not work correctly (yeah, the default value as well as the hints must be provided)
 	ProjectSettings.set_initial_value(fpath, def_val)

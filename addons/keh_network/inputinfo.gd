@@ -59,6 +59,9 @@ var _vec3_list: Dictionary = {}
 var _has_custom_data: bool = false
 
 
+var _print_debug: bool = false
+
+
 func _init() -> void:
 	# Obtain the options from ProjectSettings
 	if (ProjectSettings.has_setting("keh_addons/network/use_input_mouse_relative")):
@@ -69,6 +72,9 @@ func _init() -> void:
 	
 	if (ProjectSettings.has_setting("keh_addons/network/quantize_analog_input")):
 		_quantize_analog = ProjectSettings.get_setting("keh_addons/network/quantize_analog_input")
+	
+	if (ProjectSettings.has_setting("keh_addons/network/print_debug_info")):
+		_print_debug = ProjectSettings.get_setting("keh_addons/network/print_debug_info")
 
 
 func has_custom_data() -> bool:
@@ -88,7 +94,8 @@ func _register_data(container: Dictionary, n: String, c: bool) -> void:
 
 # Register either a boolean or analog input data.
 func register_action(map: String, is_analog: bool, custom: bool) -> void:
-	print_debug("Registering%snetwork input '%s' | analog: %s" % [" custom " if custom else " ", map, is_analog])
+	if (_print_debug):
+		print_debug("Registering%snetwork input '%s' | analog: %s" % [" custom " if custom else " ", map, is_analog])
 	if (is_analog):
 		_register_data(_analog_list, map, custom)
 	else:
@@ -96,12 +103,14 @@ func register_action(map: String, is_analog: bool, custom: bool) -> void:
 
 # Register vector2 data, which is necessarily custom data
 func register_vec2(map: String) -> void:
-	print_debug("Registering custom vector2 network input data %s" % map)
+	if (_print_debug):
+		print_debug("Registering custom vector2 network input data %s" % map)
 	_register_data(_vec2_list, map, true)
 
 # Register vector3 data, which is necessarily custom data
 func register_vec3(map: String) -> void:
-	print_debug("Registering custom vector3 network input data %s" % map)
+	if (_print_debug):
+		print_debug("Registering custom vector3 network input data %s" % map)
 	_register_data(_vec3_list, map, true)
 
 

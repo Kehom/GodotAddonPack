@@ -62,6 +62,8 @@ func register_entity_types() -> void:
 	# base, class, language, path
 	var clist: Array = ProjectSettings.get_setting("_global_script_classes") if ProjectSettings.has_setting("_global_script_classes") else []
 	
+	var pdebug: bool = ProjectSettings.get_setting("keh_addons/network/print_debug_info") if ProjectSettings.has_setting("keh_addons/network/print_debug_info") else false
+	
 	for c in clist:
 		# Only interested in classes derived from SnapEntityBase
 		if (c.base == "SnapEntityBase"):
@@ -72,7 +74,8 @@ func register_entity_types() -> void:
 				push_warning(msg % [c.class, edata._name_hash, edata.error])
 			
 			else:
-				print_debug("Registering snapshot object type ", c.class, " with hash ", edata._name_hash)
+				if (pdebug):
+					print_debug("Registering snapshot object type ", c.class, " with hash ", edata._name_hash)
 				
 				# This is the actual registration of the object type
 				_entity_info[edata._name_hash] = edata
