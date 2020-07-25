@@ -364,6 +364,9 @@ func get_input(player_id: int) -> InputData:
 	
 	return retval
 
+func set_local_input_enabled(enabled: bool) -> void:
+	player_data.local_player._local_input_enabled = enabled
+
 
 ### Server...
 func create_server(port: int, _server_name: String, max_players: int) -> void:

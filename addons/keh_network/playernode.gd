@@ -148,6 +148,9 @@ var _custom_data: Dictionary
 var _mrelative: Vector2 = Vector2()
 var _mspeed: Vector2 = Vector2()
 
+# When set to false it will disable polling input for local player
+var _local_input_enabled: bool = true
+
 ### Options retrieved from project settings
 var _broadcast_ping: bool = false
 
@@ -191,18 +194,18 @@ func _poll_input() -> InputData:
 	_input_cache.last_sig += 1
 	var retval: InputData = InputData.new(_input_cache.last_sig)
 	
-	if (_input_info.use_mouse_relative()):
+	if (_input_info.use_mouse_relative() && _local_input_enabled):
 		retval.set_mouse_relative(_mrelative)
 		# Must reset the cache otherwise motion will still be sent even if there is none
 		_mrelative = Vector2()
 	
-	if (_input_info.use_mouse_speed()):
+	if (_input_info.use_mouse_speed() && _local_input_enabled):
 		retval.set_mouse_speed(_mspeed)
 		_mspeed = Vector2()
 	
 	# Gather the analog data
 	for a in _input_info._analog_list:
-		if (!_input_info._analog_list[a].custom):
+		if (!_input_info._analog_list[a].custom && _local_input_enabled):
 			retval.set_analog(a, Input.get_action_strength(a))
 		else:
 			# Assume this analog data is "neutral". Doing this to ensure the data
@@ -210,7 +213,7 @@ func _poll_input() -> InputData:
 			retval.set_analog(a, 0.0)
 		
 	for b in _input_info._bool_list:
-		if (!_input_info._bool_list[b].custom):
+		if (!_input_info._bool_list[b].custom && _local_input_enabled):
 			retval.set_pressed(b, Input.is_action_pressed(b))
 		else:
 			# Assume this custom boolean is not pressed. Doing this to ensure the
