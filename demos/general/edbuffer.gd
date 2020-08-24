@@ -66,17 +66,17 @@ func _ready() -> void:
 	lv_rec2_py = str($srv_panel/txt_rec2py.text)
 	lv_rec2_sx = str($srv_panel/txt_rec2sx.text)
 	lv_rec2_sy = str($srv_panel/txt_rec2sy.text)
-	lv_vec3x = str($srv_panel/txt_vec3x.text)
-	lv_vec3y = str($srv_panel/txt_vec3y.text)
-	lv_vec3z = str($srv_panel/txt_vec3z.text)
-	lv_quatx = str($srv_panel/txt_quatx.text)
-	lv_quaty = str($srv_panel/txt_quaty.text)
-	lv_quatz = str($srv_panel/txt_quatz.text)
-	lv_quatw = str($srv_panel/txt_quatw.text)
-	lv_colr = str($srv_panel/txt_colr.text)
-	lv_colg = str($srv_panel/txt_colg.text)
-	lv_colb = str($srv_panel/txt_colb.text)
-	lv_cola = str($srv_panel/txt_cola.text)
+	lv_vec3x = str($srv_panel/hboxvec3/txt_vec3x.text)
+	lv_vec3y = str($srv_panel/hboxvec3/txt_vec3y.text)
+	lv_vec3z = str($srv_panel/hboxvec3/txt_vec3z.text)
+	lv_quatx = str($srv_panel/hboxquat/txt_quatx.text)
+	lv_quaty = str($srv_panel/hboxquat/txt_quaty.text)
+	lv_quatz = str($srv_panel/hboxquat/txt_quatz.text)
+	lv_quatw = str($srv_panel/hboxquat/txt_quatw.text)
+	lv_colr = str($srv_panel/hboxcolor/txt_colr.text)
+	lv_colg = str($srv_panel/hboxcolor/txt_colg.text)
+	lv_colb = str($srv_panel/hboxcolor/txt_colb.text)
+	lv_cola = str($srv_panel/hboxcolor/txt_cola.text)
 	
 	encoder = EncDecBuffer.new()
 	decoder = EncDecBuffer.new()
@@ -103,29 +103,29 @@ func _ready() -> void:
 	$srv_panel/txt_rec2sy.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_rec2sy, "lv_rec2_sy"])
 	
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_vec3x.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_vec3x, "lv_vec3x"])
+	$srv_panel/hboxvec3/txt_vec3x.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxvec3/txt_vec3x, "lv_vec3x"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_vec3y.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_vec3y, "lv_vec3y"])
+	$srv_panel/hboxvec3/txt_vec3y.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxvec3/txt_vec3y, "lv_vec3y"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_vec3z.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_vec3z, "lv_vec3z"])
+	$srv_panel/hboxvec3/txt_vec3z.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxvec3/txt_vec3z, "lv_vec3z"])
 	
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_quatx.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_quatx, "lv_quatx"])
+	$srv_panel/hboxquat/txt_quatx.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxquat/txt_quatx, "lv_quatx"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_quaty.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_quaty, "lv_quaty"])
+	$srv_panel/hboxquat/txt_quaty.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxquat/txt_quaty, "lv_quaty"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_quatz.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_quatz, "lv_quatz"])
+	$srv_panel/hboxquat/txt_quatz.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxquat/txt_quatz, "lv_quatz"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_quatw.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_quatw, "lv_quatw"])
+	$srv_panel/hboxquat/txt_quatw.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxquat/txt_quatw, "lv_quatw"])
 	
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_colr.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_colr, "lv_colr"])
+	$srv_panel/hboxcolor/txt_colr.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxcolor/txt_colr, "lv_colr"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_colg.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_colg, "lv_colg"])
+	$srv_panel/hboxcolor/txt_colg.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxcolor/txt_colg, "lv_colg"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_colb.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_colb, "lv_colb"])
+	$srv_panel/hboxcolor/txt_colb.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxcolor/txt_colb, "lv_colb"])
 	#warning-ignore:return_value_discarded
-	$srv_panel/txt_cola.connect("text_changed", self, "_on_text_changed", [$srv_panel/txt_cola, "lv_cola"])
+	$srv_panel/hboxcolor/txt_cola.connect("text_changed", self, "_on_text_changed", [$srv_panel/hboxcolor/txt_cola, "lv_cola"])
 
 
 
@@ -175,27 +175,32 @@ func encode_data() -> void:
 	comparer.append_array(var2bytes(rec2))
 	
 	# Encode vector3
-	var vec3: Vector3 = Vector3($srv_panel/txt_vec3x.text.to_float(), $srv_panel/txt_vec3y.text.to_float(), $srv_panel/txt_vec3z.text.to_float())
+	var vec3: Vector3 = Vector3($srv_panel/hboxvec3/txt_vec3x.text.to_float(), $srv_panel/hboxvec3/txt_vec3y.text.to_float(), $srv_panel/hboxvec3/txt_vec3z.text.to_float())
 	encoder.write_vector3(vec3)
 	comparer.append_array(var2bytes(vec3))
 	
 	# Encode quaternion
-	var qx: float = $srv_panel/txt_quatx.text.to_float()
-	var qy: float = $srv_panel/txt_quaty.text.to_float()
-	var qz: float = $srv_panel/txt_quatz.text.to_float()
-	var qw: float = $srv_panel/txt_quatw.text.to_float()
+	var qx: float = $srv_panel/hboxquat/txt_quatx.text.to_float()
+	var qy: float = $srv_panel/hboxquat/txt_quaty.text.to_float()
+	var qz: float = $srv_panel/hboxquat/txt_quatz.text.to_float()
+	var qw: float = $srv_panel/hboxquat/txt_quatw.text.to_float()
 	var quat: Quat = Quat(qx, qy, qz, qw)
 	encoder.write_quat(quat)
 	comparer.append_array(var2bytes(quat))
 	
 	# Encode color
-	var cr: float = $srv_panel/txt_colr.text.to_float()
-	var cg: float = $srv_panel/txt_colg.text.to_float()
-	var cb: float = $srv_panel/txt_colb.text.to_float()
-	var ca: float = $srv_panel/txt_cola.text.to_float()
+	var cr: float = $srv_panel/hboxcolor/txt_colr.text.to_float()
+	var cg: float = $srv_panel/hboxcolor/txt_colg.text.to_float()
+	var cb: float = $srv_panel/hboxcolor/txt_colb.text.to_float()
+	var ca: float = $srv_panel/hboxcolor/txt_cola.text.to_float()
 	var col: Color = Color(cr, cg, cb, ca)
 	encoder.write_color(col)
 	comparer.append_array(var2bytes(col))
+	
+	# Encode string
+	var thestr: String = $srv_panel/txt_str.text
+	encoder.write_string(thestr)
+	comparer.append_array(var2bytes(thestr))
 
 
 
@@ -219,6 +224,7 @@ func decode_data(incoming: PoolByteArray) -> void:
 	dt += "Vector3: %s\n"
 	dt += "Quat: %s\n"
 	dt += "Color: %s\n"
+	dt += "String: %s\n"
 	
 	dt = dt % [
 		decoder.read_byte(),
@@ -231,7 +237,8 @@ func decode_data(incoming: PoolByteArray) -> void:
 		decoder.read_rect2(),
 		decoder.read_vector3(),
 		decoder.read_quat(),
-		decoder.read_color()
+		decoder.read_color(),
+		decoder.read_string(),
 	]
 	
 	# Update the text box

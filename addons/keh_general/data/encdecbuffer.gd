@@ -108,7 +108,7 @@ func _init() -> void:
 	fill_2bytes.append(0)
 	fill_2bytes.append(0)
 	
-	
+	# NOTE: Strings are recovered in a different way so caching the "header" is not necessary
 	property_header[TYPE_BOOL] = {
 		header = PoolByteArray(var2bytes(bool(false)).subarray(0, 3)),
 		size = 1
@@ -145,6 +145,7 @@ func _init() -> void:
 		header = PoolByteArray(var2bytes(int(MAX_UINT)).subarray(0, 3)),
 		size = 4
 	}
+
 
 
 # Obtain number of bytes used by a property of the specified type
@@ -268,6 +269,13 @@ func rewrite_ushort(val: int, at: int) -> void:
 	_rewrite_bytes(val, at, 2, 6 if is_big else 4)
 
 
+func write_string(val: String) -> void:
+	var ba: PoolByteArray = val.to_utf8()
+	write_uint(ba.size())
+	buffer.append_array(ba)
+# NOTE: Because strings may have different sizes rewriting them is not supported
+
+
 # This relies on the variant so no static typing here. This is a generic
 # function meant to extract a property from the internal PoolByteArray
 func read_by_type(tp: int):
@@ -346,6 +354,14 @@ func read_ushort() -> int:
 		return bytes2var(property_header[TYPE_INT].header + fill_2bytes + buffer.subarray(r, r + 1))
 	else:
 		return bytes2var(property_header[TYPE_INT].header + buffer.subarray(r, r + 1) + fill_2bytes)
+
+
+func read_string() -> String:
+	var s: int = read_uint()
+	var ba: PoolByteArray = buffer.subarray(rindex, rindex + s - 1)
+	rindex += s
+	return ba.get_string_from_utf8()
+
 
 
 ### Setters/getters

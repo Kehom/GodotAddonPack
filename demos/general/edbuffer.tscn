@@ -33,6 +33,7 @@ margin_top = 10.0
 margin_right = 214.0
 margin_bottom = 34.0
 max_value = 255.0
+value = 17.0
 
 [node name="chk_bool1" type="CheckBox" parent="srv_panel"]
 margin_left = 10.0
@@ -64,6 +65,7 @@ margin_right = 249.0
 margin_bottom = 104.0
 min_value = -2.14748e+09
 max_value = 2.14748e+09
+value = -1234.0
 
 [node name="Label11" type="Label" parent="srv_panel"]
 margin_left = 10.0
@@ -175,26 +177,38 @@ margin_right = 83.0
 margin_bottom = 294.0
 text = "Vector3:"
 
-[node name="txt_vec3x" type="LineEdit" parent="srv_panel"]
+[node name="hboxvec3" type="HBoxContainer" parent="srv_panel"]
 margin_left = 10.0
-margin_top = 300.0
-margin_right = 83.0
-margin_bottom = 324.0
+margin_top = 294.0
+margin_right = 192.0
+margin_bottom = 318.0
+__meta__ = {
+"_edit_group_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="txt_vec3x" type="LineEdit" parent="srv_panel/hboxvec3"]
+margin_right = 58.0
+margin_bottom = 24.0
 text = "1.1"
 
-[node name="txt_vec3y" type="LineEdit" parent="srv_panel"]
-margin_left = 90.0
-margin_top = 300.0
-margin_right = 163.0
-margin_bottom = 324.0
+[node name="txt_vec3y" type="LineEdit" parent="srv_panel/hboxvec3"]
+margin_left = 62.0
+margin_right = 120.0
+margin_bottom = 24.0
 text = "2.2"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="txt_vec3z" type="LineEdit" parent="srv_panel"]
-margin_left = 170.0
-margin_top = 300.0
-margin_right = 243.0
-margin_bottom = 324.0
+[node name="txt_vec3z" type="LineEdit" parent="srv_panel/hboxvec3"]
+margin_left = 124.0
+margin_right = 182.0
+margin_bottom = 24.0
 text = "3.3"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Label9" type="Label" parent="srv_panel"]
 margin_left = 30.0
@@ -203,68 +217,119 @@ margin_right = 102.0
 margin_bottom = 344.0
 text = "Quaternion"
 
-[node name="txt_quatx" type="LineEdit" parent="srv_panel"]
-margin_left = 50.0
-margin_top = 350.0
-margin_right = 123.0
-margin_bottom = 374.0
+[node name="hboxquat" type="HBoxContainer" parent="srv_panel"]
+margin_left = 10.0
+margin_top = 348.0
+margin_right = 254.0
+margin_bottom = 372.0
+__meta__ = {
+"_edit_group_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="txt_quatx" type="LineEdit" parent="srv_panel/hboxquat"]
+margin_right = 58.0
+margin_bottom = 24.0
 text = "0"
 
-[node name="txt_quaty" type="LineEdit" parent="srv_panel"]
-margin_left = 130.0
-margin_top = 350.0
-margin_right = 203.0
-margin_bottom = 374.0
+[node name="txt_quaty" type="LineEdit" parent="srv_panel/hboxquat"]
+margin_left = 62.0
+margin_right = 120.0
+margin_bottom = 24.0
+text = "0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txt_quatz" type="LineEdit" parent="srv_panel/hboxquat"]
+margin_left = 124.0
+margin_right = 182.0
+margin_bottom = 24.0
 text = "0"
 
-[node name="txt_quatz" type="LineEdit" parent="srv_panel"]
-margin_left = 50.0
-margin_top = 374.0
-margin_right = 123.0
-margin_bottom = 398.0
-text = "0"
-
-[node name="txt_quatw" type="LineEdit" parent="srv_panel"]
-margin_left = 130.0
-margin_top = 374.0
-margin_right = 203.0
-margin_bottom = 398.0
+[node name="txt_quatw" type="LineEdit" parent="srv_panel/hboxquat"]
+margin_left = 186.0
+margin_right = 244.0
+margin_bottom = 24.0
 text = "1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Label10" type="Label" parent="srv_panel"]
 margin_left = 30.0
-margin_top = 410.0
+margin_top = 382.0
 margin_right = 70.0
-margin_bottom = 424.0
+margin_bottom = 396.0
 text = "Color"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="txt_colr" type="LineEdit" parent="srv_panel"]
-margin_left = 50.0
-margin_top = 428.0
-margin_right = 123.0
-margin_bottom = 452.0
+[node name="hboxcolor" type="HBoxContainer" parent="srv_panel"]
+margin_left = 10.0
+margin_top = 398.0
+margin_right = 50.0
+margin_bottom = 414.0
+__meta__ = {
+"_edit_group_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="txt_colr" type="LineEdit" parent="srv_panel/hboxcolor"]
+margin_right = 58.0
+margin_bottom = 24.0
 text = "0.15"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="txt_colg" type="LineEdit" parent="srv_panel"]
-margin_left = 130.0
-margin_top = 428.0
-margin_right = 203.0
-margin_bottom = 452.0
+[node name="txt_colg" type="LineEdit" parent="srv_panel/hboxcolor"]
+margin_left = 62.0
+margin_right = 120.0
+margin_bottom = 24.0
 text = "0.25"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="txt_colb" type="LineEdit" parent="srv_panel"]
-margin_left = 50.0
-margin_top = 452.0
-margin_right = 123.0
-margin_bottom = 476.0
+[node name="txt_colb" type="LineEdit" parent="srv_panel/hboxcolor"]
+margin_left = 124.0
+margin_right = 182.0
+margin_bottom = 24.0
 text = "0.35"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="txt_cola" type="LineEdit" parent="srv_panel"]
-margin_left = 130.0
-margin_top = 452.0
-margin_right = 203.0
-margin_bottom = 476.0
+[node name="txt_cola" type="LineEdit" parent="srv_panel/hboxcolor"]
+margin_left = 186.0
+margin_right = 244.0
+margin_bottom = 24.0
 text = "1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label12" type="Label" parent="srv_panel"]
+margin_left = 10.0
+margin_top = 434.755
+margin_right = 50.0
+margin_bottom = 448.755
+text = "String"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txt_str" type="LineEdit" parent="srv_panel"]
+margin_left = 54.0
+margin_top = 430.0
+margin_right = 249.0
+margin_bottom = 454.0
+text = "Just some \"text\""
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="bt_test" type="Button" parent="srv_panel"]
 margin_left = 170.0
