@@ -12,6 +12,7 @@ var orientation: Quat
 var vertical_vel: float
 var pitch_angle: float
 var stamina: float
+var effects: PoolByteArray
 
 
 func _init(uid: int, h: int).(uid, h) -> void:
@@ -21,6 +22,7 @@ func _init(uid: int, h: int).(uid, h) -> void:
 	vertical_vel = 0.0
 	pitch_angle = 0.0
 	stamina = 0.0
+	effects = PoolByteArray()
 	
 	# Set so position, orientation and vertical velocity are compared with is_equal_approx(),
 	# which incorporates a tolerance.
@@ -38,8 +40,10 @@ func apply_state(to_node: Node) -> void:
 		"vertical_vel": vertical_vel,
 		"angle": pitch_angle,
 		"stamina": stamina,
+		"effects": effects,
 	})
 
 
 func set_orientation(q: Quat) -> void:
 	orientation = q
+

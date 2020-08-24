@@ -81,6 +81,8 @@ var _correction_data: Dictionary
 var _uid: int = 0
 
 
+var _effects: PoolByteArray = PoolByteArray()
+
 func _ready() -> void:
 	# If meta is not present assume this belongs to the server
 	_uid = get_meta("uid") if has_meta("uid") else 1
@@ -125,6 +127,7 @@ func _physics_process(_dt: float) -> void:
 		_velocity = _correction_data.velocity
 		_pitch_angle = _correction_data.angle
 		current_stamina = _correction_data.stamina
+		_effects = _correction_data.effects
 		
 		# Replay the input objects within internal history if this character belongs
 		# to the local player
@@ -159,6 +162,13 @@ func _physics_process(_dt: float) -> void:
 	
 	# Even if the value hasn't changed this will ensure the HUD can stay updated
 	emit_signal("stamina_changed", _uid, current_stamina)
+	
+	
+	# Output to the overlay the effects
+	var msg: String = "Player %s, effects:" % _uid
+	for e in _effects:
+		msg += " " + str(e)
+	OverlayDebugInfo.set_label("p%s_effects" % _uid, msg)
 
 
 
@@ -170,6 +180,7 @@ func apply_state(state: Dictionary) -> void:
 	_correction_data.velocity.y = state.vertical_vel
 	_correction_data.angle = state.angle
 	_correction_data.stamina = state.stamina
+	_correction_data.effects = state.effects
 
 
 
@@ -290,6 +301,13 @@ func shoot() -> void:
 	bullet.init(position_node.global_transform)
 	# Apply the correct pitch
 	bullet.rotation.x = deg2rad(_pitch_angle)
+	
+	# Set a random number of effects (between 0 and 5). Please note that in here the effects array will be
+	# completely rewritten just to test the replication of the arrays.
+	var ne: int = randi() % 6
+	_effects = PoolByteArray()
+	for _i in ne:
+		_effects.append(randi() % 51)
 
 
 
@@ -313,6 +331,7 @@ func create_snapentity_object() -> MegaSnapPCharacter:
 	e.vertical_vel = _velocity.y
 	e.pitch_angle = _pitch_angle
 	e.stamina = current_stamina
+	e.effects = _effects
 	
 	return e
 

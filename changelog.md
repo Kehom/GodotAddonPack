@@ -1,5 +1,9 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Aug 24
+* (EncDecBuffer) Added support to encode/decode Strings.
+* (Network) String, PoolByteArray, PoolIntArray and PoolRealArray can now be replicated within the Snapshot entities. However, limiting to 255 elements in each array.
+
 #### 2020 Jul 08
 * (Network) Small correction to the plugin loader, which should make the ProjectSettings window work as intended.
 

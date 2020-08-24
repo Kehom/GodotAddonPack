@@ -38,6 +38,9 @@ const CTYPE_UINT: int = SnapEntityBase.CTYPE_UINT
 const CTYPE_USHORT: int = SnapEntityBase.CTYPE_USHORT
 const CTYPE_BYTE: int = SnapEntityBase.CTYPE_BYTE
 
+# Maximum amount of array elements (PoolByteArray, PoolRealArray and PoolIntArray)
+const MAX_ARRAY_SIZE: int = 0xFF
+
 # During the registration of snapshot entity objects, supported properties
 # that can be replicated through this system must have some internal data
 # necessary to help with the tasks. Each one will have an instance of this
@@ -551,6 +554,26 @@ func _property_reader(repl: ReplicableProperty, from: EncDecBuffer, into: SnapEn
 			into.set(repl.name, from.read_byte())
 		CTYPE_USHORT:
 			into.set(repl.name, from.read_ushort())
+		TYPE_STRING:
+			into.set(repl.name, from.read_string())
+		TYPE_RAW_ARRAY:
+			var s: int = from.read_byte()
+			var a: PoolByteArray = PoolByteArray()
+			for _i in s:
+				a.append(from.read_byte())
+			into.set(repl.name, a)
+		TYPE_INT_ARRAY:
+			var s: int = from.read_byte()
+			var a: PoolIntArray = PoolIntArray()
+			for _i in s:
+				a.append(from.read_int())
+			into.set(repl.name, a)
+		TYPE_REAL_ARRAY:
+			var s: int = from.read_byte()
+			var a: PoolRealArray = PoolRealArray()
+			for _i in s:
+				a.append(from.read_float())
+			into.set(repl.name, a)
 
 # Based on the given instance of ReplicableProperty, writes a property from the
 # instance of snapshot entity object into the specified byte array
@@ -581,6 +604,38 @@ func _property_writer(repl: ReplicableProperty, entity: SnapEntityBase, into: En
 			into.write_byte(val)
 		CTYPE_USHORT:
 			into.write_ushort(val)
+		TYPE_STRING:
+			into.write_string(val)
+		TYPE_RAW_ARRAY:
+			# This is, in theory, PoolByteArray
+			assert(val is PoolByteArray)
+			# Ensure amount of elements can be encoded within a single byte
+			assert(val.size() <= MAX_ARRAY_SIZE)
+			# First write number of bytes
+			into.write_byte(val.size())
+			# Then the actual bytes
+			for b in val:
+				into.write_byte(b)
+		TYPE_INT_ARRAY:
+			# This is, in theory, PoolIntArray
+			assert(val is PoolIntArray)
+			# Ensure amount of elements can be encoded within a single byte
+			assert(val.size() <= MAX_ARRAY_SIZE)
+			# First write number of ints
+			into.write_byte(val.size())
+			# Then the integers
+			for i in val:
+				into.write_int(i)
+		TYPE_REAL_ARRAY:
+			# This is, in theory, PoolRealArray
+			assert(val is PoolRealArray)
+			# Ensure amount of elements can be encoded within a single byte
+			assert(val.size() <= MAX_ARRAY_SIZE)
+			# First write number of floats
+			into.write_uint(val.size())
+			# Then the floats
+			for f in val:
+				into.write_float(f)
 
 
 
@@ -607,7 +662,7 @@ func _build_replicable_prop(name: String, tp: int, mask: int, obj: Object) -> Re
 				# use the default replicable property class
 				ret = ReplicableProperty.new(name, tp, mask)
 		
-		TYPE_BOOL:
+		TYPE_BOOL, TYPE_STRING, TYPE_RAW_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
 			ret = ReplicableProperty.new(name, tp, mask)
 		
 		_:
