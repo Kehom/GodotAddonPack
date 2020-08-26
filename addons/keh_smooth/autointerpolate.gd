@@ -326,11 +326,9 @@ func _check_target() -> void:
 	if (tnode):
 		if (tnode is Node2D):
 			_target = tnode
-			# FIXME: perform necessary setup for 2D mode
 		
 		elif (tnode is Spatial):
 			_target = tnode
-			# FIXME: perform necessary setup for 3D mode
 	
 	if (!_target):
 		target = ""

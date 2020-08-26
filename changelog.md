@@ -1,6 +1,6 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
-### 2020 Aug 26
+#### 2020 Aug 26
 * (Smooth) There is a new node, `AutoInterpolate`, that will detect the target node type (2D or 3D) and apply the transform accordingly to a list of selected nodes that match the target type.
 
 #### 2020 Aug 24
