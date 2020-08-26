@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://demos/nodes/testsmooth.gd" type="Script" id=1]
 [ext_resource path="res://shared/scenes/check_plane_floor.tscn" type="PackedScene" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://shared/scenes/rigidb2d.tscn" type="PackedScene" id=5]
 [ext_resource path="res://icon.png" type="Texture" id=6]
 [ext_resource path="res://addons/keh_smooth/smooth2d/smooth2d.gd" type="Script" id=7]
+[ext_resource path="res://addons/keh_smooth/autointerpolate.gd" type="Script" id=8]
 
 [sub_resource type="BoxShape" id=1]
 
@@ -33,13 +34,23 @@ params_cull_mode = 2
 albedo_color = Color( 0.317647, 0.301961, 0.301961, 1 )
 roughness = 0.0
 
-[sub_resource type="RectangleShape2D" id=9]
+[sub_resource type="BoxShape" id=9]
+
+[sub_resource type="CubeMesh" id=10]
+
+[sub_resource type="SpatialMaterial" id=11]
+albedo_color = Color( 0.901961, 0.815686, 0.0980392, 1 )
+
+[sub_resource type="RectangleShape2D" id=12]
 extents = Vector2( 380, 10 )
 
-[sub_resource type="RectangleShape2D" id=10]
+[sub_resource type="RectangleShape2D" id=13]
 extents = Vector2( 32, 32 )
 
-[sub_resource type="RectangleShape2D" id=11]
+[sub_resource type="RectangleShape2D" id=14]
+extents = Vector2( 32, 32 )
+
+[sub_resource type="RectangleShape2D" id=15]
 extents = Vector2( 32, 32 )
 
 [node name="testsmooth" type="Spatial"]
@@ -202,7 +213,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5 )
 transform = Transform( 1, 0, 0, 0, 0.866908, 0.498467, 0, -0.498467, 0.866908, 0.243227, 9.89787, 14.763 )
 
 [node name="non_smooth" type="RigidBody" parent="s3d"]
-transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.178606, 0.383022, 0.906308, -2.0131, 11.5, 0 )
+transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.178606, 0.383022, 0.906308, -3.65564, 11.5, 0 )
 can_sleep = false
 
 [node name="CollisionShape" type="CollisionShape" parent="s3d/non_smooth"]
@@ -214,7 +225,7 @@ mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
 
 [node name="smoothed" type="RigidBody" parent="s3d"]
-transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.178606, 0.383022, 0.906308, 1.9869, 11.5, 0 )
+transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.178606, 0.383022, 0.906308, 0.344356, 11.5, 0 )
 can_sleep = false
 
 [node name="CollisionShape" type="CollisionShape" parent="s3d/smoothed"]
@@ -232,6 +243,23 @@ visible = false
 mesh = SubResource( 7 )
 material/0 = SubResource( 8 )
 
+[node name="autosmoothed" type="RigidBody" parent="s3d"]
+transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.178606, 0.383022, 0.906308, 4.61, 11.5, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="s3d/autosmoothed"]
+shape = SubResource( 9 )
+
+[node name="mesh" type="MeshInstance" parent="s3d/autosmoothed"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 10 )
+material/0 = SubResource( 11 )
+
+[node name="AutoInterpolate" type="Node" parent="s3d"]
+script = ExtResource( 8 )
+target = NodePath("../autosmoothed")
+"Interpolate 1" = NodePath("../autosmoothed/mesh")
+"Interpolate 2" = null
+
 [node name="s2d" type="Node2D" parent="."]
 
 [node name="floor2d" type="StaticBody2D" parent="s2d"]
@@ -242,27 +270,27 @@ __meta__ = {
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="s2d/floor2d"]
 position = Vector2( -1.08075, 0 )
-shape = SubResource( 9 )
+shape = SubResource( 12 )
 
 [node name="Sprite" type="Sprite" parent="s2d/floor2d/CollisionShape2D"]
 texture = ExtResource( 4 )
 
 [node name="non_smooth" parent="s2d" instance=ExtResource( 5 )]
-position = Vector2( 550, 310 )
+position = Vector2( 471, 310 )
 rotation = 0.610865
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="s2d/non_smooth"]
-shape = SubResource( 10 )
+shape = SubResource( 13 )
 
 [node name="Sprite" type="Sprite" parent="s2d/non_smooth"]
 texture = ExtResource( 6 )
 
 [node name="smoothed" parent="s2d" instance=ExtResource( 5 )]
-position = Vector2( 697, 310 )
+position = Vector2( 618, 310 )
 rotation = 0.610865
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="s2d/smoothed"]
-shape = SubResource( 11 )
+shape = SubResource( 14 )
 
 [node name="Smooth2D" type="Node2D" parent="s2d/smoothed"]
 script = ExtResource( 7 )
@@ -272,6 +300,26 @@ self_modulate = Color( 1, 0.00784314, 0.00784314, 1 )
 texture = ExtResource( 6 )
 
 [node name="refsprite" type="Sprite" parent="s2d/smoothed"]
+visible = false
+self_modulate = Color( 0.290196, 0.278431, 0.278431, 0.478431 )
+texture = ExtResource( 6 )
+
+[node name="autosmoothed" parent="s2d" instance=ExtResource( 5 )]
+position = Vector2( 762.001, 310 )
+rotation = 0.610865
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="s2d/autosmoothed"]
+shape = SubResource( 15 )
+
+[node name="AutoInterpolate" type="Node" parent="s2d/autosmoothed"]
+script = ExtResource( 8 )
+"Interpolate 1" = null
+
+[node name="smoth_sprite" type="Sprite" parent="s2d/autosmoothed"]
+self_modulate = Color( 0.890196, 0.827451, 0.176471, 1 )
+texture = ExtResource( 6 )
+
+[node name="refsprite" type="Sprite" parent="s2d/autosmoothed"]
 visible = false
 self_modulate = Color( 0.290196, 0.278431, 0.278431, 0.478431 )
 texture = ExtResource( 6 )

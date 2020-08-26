@@ -41,6 +41,27 @@ export(int, FLAGS, "Translation", "Orientation", "Scale") var interpolate: int =
 var _interp_data: _SmoothCore.IData3D
 
 
+func set_interpolate_translation(enable: bool) -> void:
+	interpolate = _SmoothCore.set_bits(interpolate, _SmoothCore.FI_TRANSLATION, enable)
+
+func is_interpolating_translation() -> bool:
+	return _SmoothCore.is_enabled(interpolate, _SmoothCore.FI_TRANSLATION)
+
+
+func set_interpolate_orientation(enable: bool) -> void:
+	interpolate = _SmoothCore.set_bits(interpolate, _SmoothCore.FI_ORIENTATION, enable)
+
+func is_interpolating_orientation() -> bool:
+	return _SmoothCore.is_enabled(interpolate, _SmoothCore.FI_ORIENTATION)
+
+
+func set_interpolate_scale(enable: bool) -> void:
+	interpolate = _SmoothCore.set_bits(interpolate, _SmoothCore.FI_SCALE, enable)
+
+func is_interpolating_scale() -> bool:
+	return _SmoothCore.is_enabled(interpolate, _SmoothCore.FI_SCALE)
+
+
 func _ready() -> void:
 	# If node is initially hidden, must ensure processing is disabled
 	set_process(is_visible_in_tree())
@@ -57,6 +78,7 @@ func _process(_dt: float) -> void:
 		
 	else:
 		global_transform = _interp_data.to
+
 
 func _physics_process(_dt: float) -> void:
 	_interp_data.cycle(true)

@@ -60,6 +60,9 @@ class InterpData:
 	
 	func _cycle() -> void:
 		pass
+	
+	func snap_to_target() -> void:
+		pass
 
 
 class IData2D extends InterpData:

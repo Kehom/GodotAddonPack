@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+### 2020 Aug 26
+* (Smooth) There is a new node, `AutoInterpolate`, that will detect the target node type (2D or 3D) and apply the transform accordingly to a list of selected nodes that match the target type.
+
 #### 2020 Aug 24
 * (EncDecBuffer) Added support to encode/decode Strings.
 * (Network) String, PoolByteArray, PoolIntArray and PoolRealArray can now be replicated within the Snapshot entities. However, limiting to 255 elements in each array.
