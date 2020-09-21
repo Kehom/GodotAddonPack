@@ -1,0 +1,42 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "/* This is a very simple shader that basically changes the scale using time, so the shaded canvas item has an
+ * effect similar to a \"pulsating\" thing.
+ *
+ * The basic idea here is to map the sin range from [-1..1] into the scaling range. An important thing to note
+ * is that scaling the given UV increases when the scale is smaller. So, to reduce the scanvas item size the
+ * scale factor has to be smaller than 1.0
+ * As a result of this, the mapping here changes the sin range to [1 .. (1/minimum_scale)]
+ * The generic formula to perform this conversion is:
+ * value = (((original_value - original_min) * target_range) / original_range) + target_min
+ * In this case:
+ * -> original_value = sin(angle)
+ * -> original_min = -1
+ * -> original_range = 1 - (-1) = 2
+ * -> target_range = (1 / minimum_scale) - 1
+ * -> target_min = 1
+ */
+
+shader_type canvas_item;
+
+uniform float minimum_scale = 0.85;
+uniform float speed = 3.5;
+
+void fragment()
+{
+	// Calculate the target range
+	float trange = (1.0 / minimum_scale) - 1.0;
+	// Take the sin() value already mapped into the new range
+	float value = (((sin(TIME * speed) + 1.0) * trange) / 2.0) + 1.0;
+	// Scale the UV coordinate
+	vec2 sample = (UV - 0.5) * value + 0.5;
+	// Apply to the pixel
+	COLOR = texture(TEXTURE, sample);
+}
+"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/minimum_scale = 0.85
+shader_param/speed = 3.5

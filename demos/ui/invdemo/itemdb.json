@@ -1,0 +1,157 @@
+{
+   "item_type": {
+      "gem": { "index": 0, "weight": 0.8 },
+      "ring": { "index": 1, "weight": 0.8 },
+      "potion": { "index": 2, "weight": 5.5 },
+      "shield": { "index": 3, "weight": 1.0 },
+      "onehand": { "index": 4, "weight": 1.0 },
+      "twohand": { "index": 5, "weight": 1.0 }
+   },
+
+   "socket_type": {
+      "blue": { "mask": 1, "weight": 1.0, "image": "res://shared/textures/socket_blue_32x32.png" },
+      "red": { "mask": 2, "weight": 1.0 , "image": "res://shared/textures/socket_red_32x32.png" },
+      "green": { "mask": 4, "weight": 1.0, "image": "res://shared/textures/socket_green_32x32.png" },
+      "yellow": { "mask": 8, "weight": 1.0, "image": "res://shared/textures/socket_yellow_32x32.png" },
+
+      "generic": { "mask": 15, "weight": 0.2, "image": "res://shared/textures/socket_neutral_32x32.png" }
+   },
+
+   "gem": {
+      "blue": {
+         "name": "Blue Gem",
+         "icon": "res://shared/textures/gem_blue_32x32.png",
+         "weight": 1.0,
+         "max_stack": 10,
+         "socket_mask": "blue",
+         "description": "This can be inserted into a blue or generic (grey) socket.",
+         "effects": [
+
+         ]
+      },
+
+      "green": {
+         "name": "Green Gem",
+         "icon": "res://shared/textures/gem_green_32x32.png",
+         "weight": 1.0,
+         "max_stack": 10,
+         "socket_mask": "green",
+         "description": "This can be inserted into a green or generic (grey) socket.",
+         "effects": [
+
+         ]
+      },
+
+      "red": {
+         "name": "Red Gem",
+         "icon": "res://shared/textures/gem_red_32x32.png",
+         "weight": 1.0,
+         "max_stack": 10,
+         "socket_mask": "red",
+         "description": "This can be inserted into a red or generic (grey) socket.",
+         "effects": [
+
+         ]
+      },
+
+      "yellow": {
+         "name": "Yellow Gem",
+         "icon": "res://shared/textures/gem_yellow_32x32.png",
+         "weight": 1.0,
+         "max_stack": 10,
+         "socket_mask": "yellow",
+         "description": "This can be inserted into an yellow or generic (grey) socket.",
+         "effects": [
+
+         ]
+      }
+   },
+
+   "ring": {
+      "ordinary": {
+         "name": "Just a Ring",
+         "icon": "res://shared/textures/ring01_32x32.png",
+         "weight": 1.0,
+         "max_sockets": 1,
+         "description": "An ordinary looking ring."
+      },
+
+      "jeweled": {
+         "name": "Jeweled Ring",
+         "icon": "res://shared/textures/ring02_32x32.png",
+         "weight": 0.5,
+         "max_sockets": 0,
+         "description": "There is a jewel incrusted in this rather weird looking ring."
+      }
+   },
+
+   "potion": {
+      "blue": {
+         "name": "Magical Power Restoration",
+         "icon": "res://shared/textures/potion_blue_32x32.png",
+         "weight": 1.5,
+         "max_stack": 25,
+         "description": "Some say that this liquid restores the capabilities of casting spells."
+      },
+
+      "green": {
+         "name": "Low Light Vision",
+         "icon": "res://shared/textures/potion_green_32x32.png",
+         "weight": 0.5,
+         "max_stack": 10,
+         "description": "Greatly improves vision on low light conditions."
+      },
+
+      "yellow": {
+         "name": "Friendly Potion",
+         "icon": "res://shared/textures/potion_yellow_32x32.png",
+         "weight": 1.0,
+         "max_stack": 15,
+         "description": "Apparently improves the look and friendliness of everyone around at the cost of completely impairing judgement."
+      }
+   },
+
+   "shield": {
+      "common_shield": {
+         "name": "Common Shield",
+         "icon": "res://shared/textures/shield01_64x64.png",
+         "weight": 1.0,
+         "column_span": 2,
+         "row_span": 2,
+         "description": "It's just a shield!",
+         "max_sockets": 3
+      }
+   },
+
+   "onehand": {
+      "dagger": {
+         "name": "Dagger",
+         "icon": "res://shared/textures/dagger01_32x64.png",
+         "weight": 1.0,
+         "row_span": 2,
+         "description": "Some use this for stealthy operations.",
+         "max_sockets": 2
+      },
+
+      "sword": {
+         "name": "Sword",
+         "icon": "res://shared/textures/sword01_32x96.png",
+         "weight": 1.0,
+         "row_span": 3,
+         "description": "This is sharp and pointy.",
+         "max_sockets": 2
+      }
+   },
+
+   "twohand": {
+      "fstick": {
+         "name": "Fighting Stick",
+         "icon": "res://shared/textures/staff01_64x96.png",
+         "weight": 1.0,
+         "column_span": 2,
+         "row_span": 3,
+         "description": "Some people are capable of using this to their advantage on combat.",
+         "max_sockets": 6
+      }
+   }
+}

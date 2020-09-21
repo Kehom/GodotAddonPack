@@ -117,7 +117,10 @@ As mentioned, this addon is largely based on Lawnjelly's work. The addon in this
 ### UI
 
 Interdependency *may* vary according to the implemented control (to that end each control will have this information bellow).\
-Requires Activation: yes
+
+Needs Activation |
+-|
+yes
 
 The idea here is to provide custom user interface controls in order to increase the offer given by Godot. Activating this addon will make all of the installed controls available for use.
 
@@ -129,3 +132,21 @@ none | no
 
 Implements most of the functionality of the `LineEditControl` but provides means to "register" rules that will affect how the entered text is rendered. As an example, ":)" can be set to render an image rather than the two characters. Images will be automatically scaled in order to fit the input box, based on the font height. The main idea of this control is to be used as input for consoles and/or chat boxes.
 
+#### Inventory
+
+Interdependency | Extra Settings
+-|-
+none | yes
+
+Two new Control widgets, `InventoryBag` and `InventorySpecialSlots` are used to allow the creation of several styles of inventories. Some of the features:
+
+* Bags automatically handle multiple slots and items. The amount of columns and rows can be specified from the *Inspector*.
+* Items can span across multiple rows and columns.
+* Special slots can be linked in order to easily manage "two handed weapons".
+* Special slots use internal filters to automatically *allow* or *deny* specified items.
+* A completely custom drag & drop system in order to allow for a finer control over when and how to start/end the process.
+* Items can have sockets.
+* Items on a bag can be automatically sorted.
+* Saving/loading inventory state into/from JSON data (binary support is in the TODO).
+* Inventory bag can be expanded or shrinked without affecting item placement.
+* Special slots can override maximum stack sizes to create specialized storing systems.

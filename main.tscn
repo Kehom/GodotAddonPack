@@ -95,31 +95,39 @@ toggle_mode = true
 group = ExtResource( 2 )
 text = "Fancy Line Edit"
 
-[node name="bt_network" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+[node name="bt_inventory" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 150.0
 margin_right = 206.0
 margin_bottom = 170.0
 toggle_mode = true
 group = ExtResource( 2 )
-text = "Network"
+text = "Inventory"
 
-[node name="bt_dbghelper" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+[node name="bt_network" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 180.0
 margin_right = 206.0
 margin_bottom = 200.0
 toggle_mode = true
 group = ExtResource( 2 )
+text = "Network"
+
+[node name="bt_dbghelper" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 210.0
+margin_right = 206.0
+margin_bottom = 230.0
+toggle_mode = true
+group = ExtResource( 2 )
 text = "Debug Helpers"
 
 [node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 210.0
-margin_right = 206.0
-margin_bottom = 214.0
-
-[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 224.0
+margin_top = 240.0
 margin_right = 206.0
 margin_bottom = 244.0
+
+[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 254.0
+margin_right = 206.0
+margin_bottom = 274.0
 toggle_mode = true
 group = ExtResource( 2 )
 text = "Complete"
@@ -581,6 +589,60 @@ autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="inventory" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_invdemoload" type="Button" parent="mpnl/stabs/inventory"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 122.0
+margin_bottom = 31.0
+text = "Load"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="description" type="Label" parent="mpnl/stabs/inventory"]
+margin_left = 14.0
+margin_top = 43.0
+margin_right = 744.0
+margin_bottom = 582.0
+text = "Interdependency: None
+
+The inventory addon brings two major new Control widgets, InventoryBag and InventorySpecialSlot. The features provided by those two controls allow the creation of a multitude of different inventory styles. Bellow are the feature highlights:
+
+- The inventory bag provides two properties to define amount of columns and rows of slots.
+- Items can span through multiple slots.
+- Special slots can be \"linked\" one to another in order to provide easier means to equip items that would use both slots, like two handed weapons for example.
+- A custom drag & drop system to allow a finer control over when and how to start/end the process.
+- Items can have sockets. Adding/removing an item into/from a socket can be automatically handled by the custom drag & drop system if desired.
+- Saving/loading inventory bag state into/from JSON data (binary support is in the TODO).
+- Inventory bag can be expanded/shrinked without affecting item placement.
+- Inventory bag can auto-sort items.
+- Special slots can override maximum stack sizes to create specialized storing systems, like stash tabs for example.
+
+This demo provides a lot of use case examples, including:
+
+- Using several special slots to work as the character equipped items.
+- Stash tab which includes specialized slots for specific items.
+- A search box that highlight items matching the search criteria.
+- Saving and loading the inventory state.
+- Randomly generating items.
+- A rudimentary Item database file.
+- A special slot being used to simulate a crafting system.
+- Inventory bag with some disabled slots added to stylebox that results in odd shaped bag.
+- Inventory bag with some disabled slots to simulate a \"buy extra slots\" feature."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="mpnl/demo_list/pnl/bt_quit" to="." method="_on_bt_quit_pressed"]
 [connection signal="pressed" from="mpnl/stabs/encdecbuffer/bt_encdecload" to="." method="_on_bt_encdecload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/quantize/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]
@@ -594,3 +656,4 @@ __meta__ = {
 [connection signal="pressed" from="mpnl/stabs/megademo/bt_megajoin" to="." method="_on_megabt_join_pressed"]
 [connection signal="pressed" from="mpnl/stabs/fancyle/bt_fleload" to="." method="_on_bt_fleload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/dbghelper/bt_dbgload" to="." method="_on_bt_dbgload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/inventory/bt_invdemoload" to="." method="_on_bt_invdemoload_pressed"]

@@ -28,6 +28,7 @@ func _ready() -> void:
 	set_tab_button("bt_network", "network")
 	set_tab_button("bt_cam3d", "cam3d")
 	set_tab_button("bt_fancyle", "fancyle")
+	set_tab_button("bt_inventory", "inventory")
 	set_tab_button("bt_smooth", "smooth")
 	set_tab_button("bt_megademo", "megademo")
 	set_tab_button("bt_dbghelper", "dbghelper")
@@ -172,6 +173,10 @@ func _on_bt_smoothload_pressed():
 func _on_bt_fleload_pressed() -> void:
 	open_scene("res://demos/ui/fancy_le.tscn")
 
+### Inventory demo
+func _on_bt_invdemoload_pressed() -> void:
+	open_scene("res://demos/ui/invdemo.tscn")
+
 ### Debug Helpers
 func _on_bt_dbgload_pressed() -> void:
 	open_scene("res://demos/debughelper/maindbghelper.tscn")
@@ -179,4 +184,5 @@ func _on_bt_dbgload_pressed() -> void:
 
 func _on_bt_quit_pressed() -> void:
 	get_tree().quit()
+
 
