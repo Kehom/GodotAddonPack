@@ -161,7 +161,7 @@ func _input(evt: InputEvent) -> void:
 						network.kick_player(pid, "Just testing")
 				
 				KEY_MINUS:
-					network.player_data.local_player.set_custom_property("testing_broadcast", rand_range(0, 9))
+					network.player_data.local_player.set_custom_property("testing_broadcast", randi() % 10)
 				
 				
 				KEY_ESCAPE:

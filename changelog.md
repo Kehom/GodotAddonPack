@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2020 Sep 25
+* (Network) Custom properties of types supported by the `EncDecBuffer` addon that are changed get accumulated to be sent at the end of the game loop in a single RPC. Note that the initial value of a custom property is used to determine the expected type during encoding and decoding, meaning that if the type is changed errors will occur. Also, any other value types will be sent as soon as they are changed.
+
 #### 2020 Sep 21
 * New addon, UI Controls bringing an inventory system.
 

@@ -103,7 +103,8 @@ class UpdateControl:
 	var sig: int              # The signature of the snapshot being built. Probably redundant property
 	var snap: NetSnapshot     # Snapshot being built
 	var events: Array         # Accumulate events in this array
-	var edec: EncDecBuffer    # To encode/decode network data (snapshots and events)
+	var edec: EncDecBuffer    # To encode/decode network data (snapshots, events...)
+	var cpropcheck: FuncRef   # Will be called during the finish() function and is meant to combine (encode) custom properties into a single RPC
 	var sfinished: FuncRef    # Will be called during the finish() function, meant to perform the snapshot finished actions
 	var evtdispatch: FuncRef  # Will be called during finish(), meant to dispatch accumulated events
 	
@@ -130,6 +131,8 @@ class UpdateControl:
 		if (!snap):
 			return
 		
+		# Custom properties are sent through the reliable channel so send them first
+		cpropcheck.call_func()
 		# Call the finish snapshot function
 		sfinished.call_func(snap)
 		# Dispatch events
@@ -245,6 +248,7 @@ func _ready() -> void:
 	snapshot_data = NetSnapshotData.new()
 	_update_control = UpdateControl.new()
 	
+	_update_control.cpropcheck = funcref(self, "_on_check_custom_properties")
 	_update_control.sfinished = funcref(self, "_on_snapshot_finished")
 	_update_control.evtdispatch = funcref(self, "_on_dispatch_events")
 	
@@ -612,10 +616,7 @@ remote func on_join_accepted() -> void:
 	# Request the server to register the new player within everyone's list
 	# This will also make the server send everyone's data to this new player
 	rpc_id(1, "_register_player", new_id)
-	
-	# Some custom properties may have been modified before connecting to the server.
-	# Must ensure the correct values are given to the server
-	player_data.local_player.initial_custom_sync()
+
 
 
 
@@ -991,6 +992,26 @@ func send_chat_message(msg: String, send_to: int = 0) -> void:
 
 
 ### Custom player property system
+# Certain custom properties (depending on the value type) will be accumulated and sent in a single packet if
+# multiple ones are changed before the update tick. For this to work, when data is ready to be encoded this
+# function will be called to verify if there is any custom property that must be encoded and sent for replication.
+func _on_check_custom_properties() -> void:
+	if (!player_data.local_player.has_dirty_custom_prop()):
+		return
+	
+	if (player_data.local_player._encode_custom_props(_update_control.edec, player_data.custom_property)):
+		# There is at least one encoded custom property. Send the data.
+		if (has_authority()):
+			# If here the data is meant to be broadcast to all clients
+			for pid in player_data.remote_player:
+				rpc_id(pid, "_receive_custom_prop_batch", _update_control.edec.buffer)
+		
+		else:
+			# This is a client and data was encoded. The entire data must go through the server first.
+			rpc_id(1, "_receive_custom_prop_batch", _update_control.edec.buffer)
+
+
+
 # This function is meant to be called by clients and only run on the server. It should
 # broadcast the specified property to all connected clients skipping the one that
 # called it.
@@ -1010,7 +1031,35 @@ remote func _server_broadcast_custom_prop(pname: String, value) -> void:
 		
 		# Then broadcast to every other player
 		for pid in player_data.remote_player:
-			pnode.rpc_id(pid, "_rem_set_custom_property", pname, value)
+			if (caller != pid):
+				pnode.rpc_id(pid, "_rem_set_custom_property", pname, value)
+
+
+# Custom properties that are supported by the EncDecBuffer will use this function to perform the synchronization
+# Basically when this is called there is incoming data. On the server the properties must first be decoded and
+# applied to the node corresponding to the remote player. Then the data must be encoded again but exluding any
+# property that is set to "ServerOnly"
+remote func _receive_custom_prop_batch(encoded: PoolByteArray) -> void:
+	_update_control.edec.buffer = encoded
+	var belong_to: int = _update_control.edec.read_uint()
+	var pnode: NetPlayerNode = player_data.get_pnode(belong_to)
+	if (!pnode):
+		return
+	
+	
+	var authority: bool = has_authority()
+	
+	pnode._decode_custom_props(_update_control.edec, player_data.custom_property, authority)
+	
+	if (authority):
+		if (pnode._encode_custom_props(_update_control.edec, player_data.custom_property)):
+			# If here, there is encoded data that must be broadcast to clients
+			var caller: int = get_tree().get_rpc_sender_id()
+			
+			# Send the encoded data to remote players, skipping the caller
+			for pid in player_data.remote_player:
+				if (caller != pid):
+					rpc_id(pid, "_receive_custom_prop_batch", _update_control.edec.buffer)
 
 
 # When a property is changed within the player node, it may require to broadcast

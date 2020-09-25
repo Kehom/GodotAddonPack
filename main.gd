@@ -99,7 +99,7 @@ func _on_server_created() -> void:
 
 
 func _on_join_success() -> void:
-	network.player_data.local_player.set_custom_property("testing_broadcast", rand_range(0, 9))
+	network.player_data.local_player.set_custom_property("testing_broadcast", randi() % 10)
 	open_scene(_open_net_scene)
 
 

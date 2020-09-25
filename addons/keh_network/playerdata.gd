@@ -42,6 +42,8 @@ var remote_player: Dictionary
 # Holds the list of registered custom properties. When a player node is created, a copy of
 # this dictionary must be attached into that node. Note that it must be a copy and not a
 # reference since the custom properties are potentially different on each player.
+# This also have a secondary use: since it will always hold the initial value it will serve to
+# determine the expected value type when encoding and decoding.
 var custom_property: Dictionary
 
 # The FuncRefs that are used within each NetPlayerNode

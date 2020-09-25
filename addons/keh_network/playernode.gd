@@ -142,6 +142,9 @@ var _ping: NetPingInfo
 # Value = instance of NetCustomProperty
 var _custom_data: Dictionary
 
+# Counts how many custom properties have been changed and not replicated yet.
+var _custom_prop_dirty_count: int = 0
+
 # These vectors will be used to cache mouse data from the _input function
 # Obviously those will only be used on the local machine
 #var _mposition: Vector2 = Vector2()       # Should mouse position be used?
@@ -429,6 +432,81 @@ remote func _client_ping_broadcast(value: float) -> void:
 func _add_custom_property(pname: String, prop: NetCustomProperty) -> void:
 	_custom_data[pname] = NetCustomProperty.new(prop.value, prop.replicate)
 
+func has_dirty_custom_prop() -> bool:
+	return _custom_prop_dirty_count > 0
+
+# Encode the "dirty" supported custom properties into the given EncDecBuffer. If a non supported property is
+# found then it will be directly sent through the "_check_replication()" function.
+# the prop_ref argument here is the the dicitonary that holds the list of properties with their initial values,
+# which are then used to determine the expected value type.
+# Retruns true if at least one of the "dirty properties" is supported by the EncDecBuffer.
+func _encode_custom_props(edec: EncDecBuffer, prop_ref: Dictionary) -> bool:
+	if (!has_dirty_custom_prop()):
+		return false
+	
+	var is_authority: bool = (!get_tree().has_network_peer() || get_tree().is_network_server())
+	
+	edec.buffer = PoolByteArray()
+	edec.write_uint(net_id)
+	
+	# Yes, this limits to 255 custom properties that can be encoded into a single packet.
+	# This should be way more than enough! Regardless, the writing loop will end at 255 encoded properties.
+	# On the next loop iteration the remaining dirty properties will be encoded.
+	edec.write_byte(0)
+	var encoded_props: int = 0
+	
+	for pname in _custom_data:
+		var prop: NetCustomProperty = _custom_data[pname]
+		if (prop.replicate == NetCustomProperty.ReplicationMode.ServerOnly && is_authority):
+			# This property is meant to be "server only" and code is running on the server. Ensure the prop is
+			# not dirty and don't encode it.
+			prop.dirty = false
+			continue
+		
+		# In here it doesn't matter if the code is running on srever or client. The property has to be checked
+		# and if dirty it must be sent through network regardless.
+		if (prop.encode_to(edec, pname, typeof(prop_ref[pname].value))):
+			# The property was encoded - that means, it is of supported type AND is dirty. Update the encoded
+			# counter.
+			encoded_props += 1
+		elif (prop.dirty):
+			# This property is dirty but it couldn't be encoded. Most likely because it's is not supported by the
+			# EncDecBuffer. Because of that, individually send this property
+			_check_replication(pname, prop)
+		
+		if (encoded_props == 255):
+			# Do not allow encoding go past 255 properties. Yet, with this system any property that still need
+			# to be synchronized will be dispatched at a later moment
+			break
+	
+	if (encoded_props > 0):
+		# Rewrite the custom property header which is basically the number of encoded properties.
+		edec.rewrite_byte(encoded_props, 4)
+	
+	return encoded_props > 0
+
+
+func _decode_custom_props(from: EncDecBuffer, prop_ref: Dictionary, isauthority: bool) -> void:
+	var ecount: int = from.read_byte()
+	
+	for _i in ecount:
+		var pname: String = from.read_string()
+		var pref: NetCustomProperty = prop_ref.get(pname, null)
+		if (!pref):
+			return
+		
+		var prop: NetCustomProperty = _custom_data[pname]
+		if (!prop.decode_from(from, typeof(pref.value), isauthority)):
+			return
+		else:
+			# Allow the "core" of the networking system to emit a signal indicating that a custom property has
+			# been changed through synchronization
+			custom_prop_signaler.call_func(net_id, pname, prop.value)
+		
+		if (prop.dirty):
+			_custom_prop_dirty_count += 1
+
+
 
 func _check_replication(pname: String, prop: NetCustomProperty) -> void:
 	var is_authority: bool = (!get_tree().has_network_peer() || get_tree().is_network_server())
@@ -449,6 +527,8 @@ func _check_replication(pname: String, prop: NetCustomProperty) -> void:
 			
 			else:
 				custom_prop_broadcast_requester.call_func(pname, prop.value)
+	
+	prop.dirty = false
 
 
 
@@ -456,18 +536,19 @@ func set_custom_property(pname: String, value) -> void:
 	assert(_custom_data.has(pname))
 	
 	var prop: NetCustomProperty = _custom_data[pname]
+	# This line automatically marks the property as "dirty" if necessary. Dirty properties will be synchronized
+	# at a later moment.
 	prop.value = value
-	_check_replication(pname, prop)
+	if (prop.dirty):
+		_custom_prop_dirty_count += 1
 
-# This function is meant to be called by (and in) client machines in order to perform the
-# initial synchronization of the custom properties
-func initial_custom_sync() -> void:
-	if (get_tree().is_network_server()):
-		return
-	
-	for pname in _custom_data:
-		var prop: NetCustomProperty = _custom_data[pname]
-		_check_replication(pname, prop)
+
+
+# This is used to retrieve the value of a custom property
+func get_custom_property(pname: String, defval = null):
+	var prop: NetCustomProperty = _custom_data.get(pname, null)
+	return prop.value if prop else defval
+
 
 
 # This function is meant to be called by (and in) the server in order to send all properties
@@ -482,10 +563,6 @@ func sync_custom_with(pid: int) -> void:
 		if (prop.replicate == NetCustomProperty.ReplicationMode.ServerBroadcast):
 			rpc_id(pid, "_rem_set_custom_property", pname, prop.value)
 
-
-func get_custom_property(pname: String, defval = null):
-	var prop: NetCustomProperty = _custom_data.get(pname, null)
-	return prop.value if prop else defval
 
 # This is meant to set the custom property but by using remote calls. This should be
 # automatically called based on the replication setting. One thing to note is that
