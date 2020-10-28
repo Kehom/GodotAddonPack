@@ -1,6 +1,7 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
 #### 2020 Oct 28
+* (Network) It's is now possible to disable local player node processing by calling `network.set_dedicated_server_mode(true)`. Note that it will not verify if local node is indeed for server so be careful with this call.
 * (Network) Changed the plugin loader so the `network` singleton is added when activating instead of when it enters tree. This should prevent the automatic singleton from being added if it was changed or even removed from the AutoLoad list.
 
 

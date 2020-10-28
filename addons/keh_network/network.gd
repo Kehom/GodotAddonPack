@@ -318,6 +318,22 @@ func is_id_local(pid: int) -> bool:
 	return player_data.local_player.net_id == pid
 
 
+# Enable/Disabled any kind of extra processing (including Input) for the local player node. Be very careful
+# with this call because it will not make any kind of check if the local player actually corresponds to the
+# server or not. This should be called only when it's absolutely sure the instance is a dedicated server
+# meaning that the local player node will never be used as an actual player.
+func set_dedicated_server_mode(enable: bool) -> void:
+	# Although the node is currently not directly using any processing besides Input, explicitly disabling the
+	# others should not be harmful. Actually, it may help in case a future update adds some of those process.
+	player_data.local_player.set_physics_process(!enable)
+	player_data.local_player.set_physics_process_internal(!enable)
+	player_data.local_player.set_process(!enable)
+	player_data.local_player.set_process_input(!enable)
+	player_data.local_player.set_process_internal(!enable)
+	player_data.local_player.set_process_unhandled_input(!enable)
+	player_data.local_player.set_process_unhandled_key_input(!enable)
+
+
 
 # Allows to registration of input within the system. One thing to note is that the specified
 # action must be part of the input settings (check the ProjectSettings -> Input Map tab). This
