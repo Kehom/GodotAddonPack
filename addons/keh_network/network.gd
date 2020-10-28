@@ -192,8 +192,12 @@ var _max_client_history_size: int = 60 setget noset
 var _event_info: Dictionary = {} setget noset
 
 # If this is set to true then use WebSocket instead of ENet
-var _is_websocket = false setget noset
+var _is_websocket: bool = false setget noset
 
+# This is relevant only on clients and will be "automatically" changed based on the calls to `notify_ready()`
+# and `notify_not_ready()` functions. Basically, when this property is false then incoming snapshots will be
+# ignored.
+var _is_ready: bool = false setget noset
 
 
 # Most of the unique IDs within the snapshots can be simply incrementing integers.
@@ -831,19 +835,37 @@ func _on_snapshot_finished(snap: NetSnapshot) -> void:
 # ready to receive snapshot data.
 func notify_ready() -> void:
 	if (!has_authority()):
+		_is_ready = true
 		rpc_id(1, "server_client_is_ready")
+
+
+# If a client needs to pause snaphots for some time (maybe because of a scene transition), then this function
+# requests the server to do so. Note that some stray snapshots may still be arriving. Because of that the
+# time this function is called an internal flag is set, which will basically ignore any incoming snapshots.
+func _notify_not_ready() -> void:
+	if (!has_authority()):
+		_is_ready = true
+		rpc_id(1, "server_client_not_ready")
+
+
+# Helper node that will by called by server and run only on servers to change the ready state of a remote player
+func _set_ready_state(pid: int, r: bool) -> void:
+	assert(has_authority())
+	
+	var player: NetPlayerNode = player_data.remote_player.get(pid)
+	if (player):
+		player.set_ready(r)
 
 
 # Server will only send snapshot data to a client when this function is called
 # by that peer.
 remote func server_client_is_ready() -> void:
 	assert(has_authority())
-	
-	# Retrieve the unique ID of the player that called this
-	var pid: int = get_tree().get_rpc_sender_id()
-	var player: NetPlayerNode = player_data.remote_player.get(pid)
-	if (player):
-		player.set_ready(true)
+	_set_ready_state(get_tree().get_rpc_sender_id(), true)
+
+remote func server_client_not_ready() -> void:
+	assert(has_authority())
+	_set_ready_state(get_tree().get_rpc_sender_id(), false)
 
 
 # This is called by the client in order to acknowledge that snapshot
@@ -878,6 +900,9 @@ func _handle_snapshot(snap: NetSnapshot) -> void:
 # Server calls this when sending full snapshot data
 remote func _client_receive_full_snapshot(encoded: PoolByteArray) -> void:
 	assert(!has_authority())
+	if (!_is_ready):
+		# Ignore this snapshot if not ready
+		return
 	_update_control.edec.buffer = encoded
 	var decoded: NetSnapshot = snapshot_data.decode_full(_update_control.edec)
 	if (decoded):
@@ -887,6 +912,9 @@ remote func _client_receive_full_snapshot(encoded: PoolByteArray) -> void:
 
 remote func _client_receive_delta_snapshot(encoded: PoolByteArray) -> void:
 	assert(!has_authority())
+	if (!_is_ready):
+		# Ignore this snapshot if not ready
+		return
 	_update_control.edec.buffer = encoded
 	var decoded: NetSnapshot = snapshot_data.decode_delta(_update_control.edec)
 	if (decoded):
