@@ -27,6 +27,20 @@ const base_path: String = "keh_addons/network/"
 
 var _extra_settings: Array = []
 
+
+# This will be called by the engine whenever the plugin is activated
+func enable_plugin() -> void:
+	# Automatically add the network class as a singleton (autoload)
+	add_autoload_singleton("network", "res://addons/keh_network/network.gd")
+
+# This will be called by the engine whenever the plugin is deactivated
+func disable_plugin() -> void:
+	# Remove the network class from the singleton (autoload) list. But must check if it exists
+	# AutoLoad scripts are added into the ProjectSettings under "autoload/[singleton_name]" path
+	if (ProjectSettings.has_setting("autoload/network")):
+		remove_autoload_singleton("network")
+
+
 func _enter_tree():
 	# Add project settings if they are not present
 	var compr: Dictionary = {
@@ -44,22 +58,16 @@ func _enter_tree():
 	_reg_setting("use_input_mouse_speed", TYPE_BOOL, false)
 	_reg_setting("quantize_analog_input", TYPE_BOOL, false)
 	_reg_setting("print_debug_info", TYPE_BOOL, false)
-	
-	# Automatically add the network class as a singleton (autoload)
-	add_autoload_singleton("network", "res://addons/keh_network/network.gd")
+
 
 
 func _exit_tree():
-	# And remove the network class from the singleton (autoload) list
-	remove_autoload_singleton("network")
-	
 	# Remove the additional project settings - those will remain on the ProjectSettings window until
 	# the editor is restarted
 	for es in _extra_settings:
 		ProjectSettings.clear(es)
 	
 	_extra_settings.clear()
-
 
 
 # def_val is relying on the variant, thus no static typing

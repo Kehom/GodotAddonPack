@@ -326,12 +326,6 @@ multiselect={
  ]
 }
 
-[keh_addons]
-
-network/quantize_analog_input=true
-network/compression=3
-network/print_debug_info=true
-
 [physics]
 
 common/physics_fps=30
