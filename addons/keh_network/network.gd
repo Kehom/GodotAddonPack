@@ -209,7 +209,27 @@ var _is_ready: bool = false setget noset
 # this dictionary so avoid directly using it.
 var _incrementing_id: Dictionary setget noset
 
-func _enter_tree():
+
+func _init() -> void:
+	# Create internal objects. Nodes will be addded to the tree within _ready()
+	player_data = NetPlayerData.new()
+	snapshot_data = NetSnapshotData.new()
+	_update_control = UpdateControl.new()
+	
+	_update_control.cpropcheck = funcref(self, "_on_check_custom_properties")
+	_update_control.sfinished = funcref(self, "_on_snapshot_finished")
+	_update_control.evtdispatch = funcref(self, "_on_dispatch_events")
+	
+	# Set the func refs within the player data - the local player will automatically get the correct refs
+	player_data.ping_signaler = funcref(self, "_ping_signaler")
+	player_data.cprop_signaler = funcref(self, "_custom_property_signaler")
+	player_data.cprop_broadcaster = funcref(self, "_custom_prop_broadcast_requester")
+	
+	# Ensure local player node is holding correct net id.
+	player_data.local_player.set_network_id(1)
+
+
+func _enter_tree() -> void:
 	### The availability of the project settings must be tested because if they are set to the
 	### default values they will not be present
 	# Obtain compression mode from ProjectSettings
@@ -247,24 +267,8 @@ func _ready() -> void:
 	# client is created and if in WebSocket mode
 	set_process(false)
 	
-	# Create the objects
-	player_data = NetPlayerData.new()
-	snapshot_data = NetSnapshotData.new()
-	_update_control = UpdateControl.new()
-	
-	_update_control.cpropcheck = funcref(self, "_on_check_custom_properties")
-	_update_control.sfinished = funcref(self, "_on_snapshot_finished")
-	_update_control.evtdispatch = funcref(self, "_on_dispatch_events")
-	
-	# Set the func refs within the player data - the local player will automatically get the correct refs
-	player_data.ping_signaler = funcref(self, "_ping_signaler")
-	player_data.cprop_signaler = funcref(self, "_custom_property_signaler")
-	player_data.cprop_broadcaster = funcref(self, "_custom_prop_broadcast_requester")
-	
 	# Local player should always be part of the tree - even for single player
 	add_child(player_data.local_player)
-	player_data.local_player.set_network_id(1)
-	
 	
 	# Connect to the high level networking signals
 	# warning-ignore:return_value_discarded
