@@ -87,6 +87,7 @@ This addon was born in order to help create authoritative servers that send repl
 
 \* The `data/quantize.gd` will be required if analog input quantization is enabled within the project settings window.
 
+I now have a [tutorial](http://www.kehomsforge.com/tutorials/single/gdDedicatedServer) on how to create dedicated servers, which does use this addon to perform synchronization.
 
 ### Nodes
 
