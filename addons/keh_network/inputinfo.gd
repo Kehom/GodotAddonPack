@@ -88,6 +88,7 @@ func _register_data(container: Dictionary, n: String, c: bool) -> void:
 		container[n] = {
 			"mask": 1 << container.size(),
 			"custom": c,
+			"enabled": true
 		}
 	_has_custom_data = _has_custom_data || c
 
@@ -121,6 +122,16 @@ func reset_actions() -> void:
 	_vec2_list.clear()
 	_vec3_list.clear()
 	_has_custom_data = false
+
+
+# Set enabled state of action
+func set_action_enabled(map: String, enabled: bool) -> void:
+	if _analog_list.has(map):
+		_analog_list[map].enabled = enabled
+	elif _bool_list.has(map):
+		_bool_list[map].enabled = enabled
+	else:
+		push_warning("Trying to set action enabled state on non-existent action '%s'." % map)
 
 
 # Allow overriding the project setting related to the mouse relative
