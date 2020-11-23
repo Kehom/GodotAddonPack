@@ -354,6 +354,11 @@ func register_action(action: String, is_analog: bool) -> void:
 		var w: String = "Trying to register %s input action but it's not mapped. Please check Project Settings -> Input Map tab."
 		push_warning(w % action)
 
+
+func set_action_enabled(action: String, enabled: bool) -> void:
+	player_data.input_info.set_action_enabled(action, enabled)
+
+
 # Allows registration of custom input data within the input system. This will register either
 # a custom analog (is_analog = true) or a custom boolean state (is_analog = false)
 func register_custom_action(action: String, is_analog: bool) -> void:

@@ -208,7 +208,7 @@ func _poll_input() -> InputData:
 	
 	# Gather the analog data
 	for a in _input_info._analog_list:
-		if (!_input_info._analog_list[a].custom && _local_input_enabled):
+		if (!_input_info._analog_list[a].custom && (_local_input_enabled && _input_info._analog_list[a].enabled)):
 			retval.set_analog(a, Input.get_action_strength(a))
 		else:
 			# Assume this analog data is "neutral". Doing this to ensure the data
@@ -216,7 +216,7 @@ func _poll_input() -> InputData:
 			retval.set_analog(a, 0.0)
 		
 	for b in _input_info._bool_list:
-		if (!_input_info._bool_list[b].custom && _local_input_enabled):
+		if (!_input_info._bool_list[b].custom && (_local_input_enabled && _input_info._bool_list[b].enabled)):
 			retval.set_pressed(b, Input.is_action_pressed(b))
 		else:
 			# Assume this custom boolean is not pressed. Doing this to ensure the
