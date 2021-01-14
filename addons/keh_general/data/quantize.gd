@@ -243,7 +243,7 @@ static func compress_rquat_15bits(q: Quat) -> PoolIntArray:
 								(c.a & MASK_A_15BIT) )
 	
 	# Pack the second element of the array - contains signal and C element
-	var packed1: int = (((c.sig & MASK_SIGNAL_15BIT) << 15) | (c.c & MASK_C_15BIT))
+	var packed1: int = (((c.sig << 15) & MASK_SIGNAL_15BIT) | (c.c & MASK_C_15BIT))
 	
 	return PoolIntArray([packed0, packed1])
 
