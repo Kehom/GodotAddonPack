@@ -41,6 +41,12 @@ var _entity_name: Dictionary = {}
 # Holds the history of snapshots
 var _history: Array = []
 
+# These two dictionaries are used to perform easier queries to locate specific
+# snapshots. The first one is from snapshot signature into snapshot and the
+# second one is from input signature into snapshot.
+var _ssig_to_snap: Dictionary = {}
+var _isig_to_snap: Dictionary = {}
+
 # This object will hold the most recent snapshot data received from the server.
 # When delta snapshot is received, a reference must be used in order to rebuild
 # the full snapshot, which will be exactly the contents of this object.
@@ -162,18 +168,12 @@ func add_pre_spawned_node(eclass: Resource, uid: int, node: Node) -> void:
 
 # Locate the snapshot given its signature and return it, null if not found
 func get_snapshot(signature: int) -> NetSnapshot:
-	for s in _history:
-		if (s.signature == signature):
-			return s
-	
-	return null
+	return _ssig_to_snap.get(signature, null)
+
 
 func get_snapshot_by_input(isig: int) -> NetSnapshot:
-	for s in _history:
-		if (s.input_sig == isig):
-			return s
-	
-	return null
+	return _isig_to_snap.get(isig, null)
+
 
 
 func reset() -> void:
@@ -182,6 +182,8 @@ func reset() -> void:
 	
 	_server_state = null
 	_history.clear()
+	_ssig_to_snap.clear()
+	_isig_to_snap.clear()
 
 
 func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> SnapEntityBase:
@@ -493,20 +495,27 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 	var local: NetSnapshot = null
 	var popcount: int = 0
 	if (snap.input_sig > 0):
+		var findings: NetSnapshot = null
 		
-		# Locate the local snapshot with corresponding input signature. Remove it and all
-		# older than that from the internal history
-		while (_history.size() > 0 && _history.front().input_sig <= snap.input_sig):
-			local = _history.pop_front()
+		while (_history.size() > 0 && _history[0].input_sig <= snap.input_sig):
+			findings = _history[0]
+			# warning-ignore:return_value_discarded
+			_ssig_to_snap.erase(findings.signature)
+			# warning-ignore:return_value_discarded
+			_isig_to_snap.erase(findings.input_sig)
+			_history.pop_front()
 			popcount += 1
 		
-		if (local.input_sig != snap.input_sig):
-			_update_prediction_count(-popcount)
-			# This should not occur!
-			return
+		if (findings):
+			if (findings.input_sig != snap.input_sig):
+				_update_prediction_count(-popcount)
+				# This should not occur!
+				return;
+			
+			local = findings
 	
 	else:
-		local = _history.front() if _history.size() > 0 else null
+		local = _history.back() if _history.size() > 0 else null
 	
 	
 	if (!local):
@@ -571,18 +580,24 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 
 func _add_to_history(snap: NetSnapshot) -> void:
 	_history.push_back(snap)
-	
-	pass
+	_ssig_to_snap[snap.signature] = snap
+	_isig_to_snap[snap.input_sig] = snap
+
 
 func _check_history_size(max_size: int, has_authority: bool) -> void:
 	var popped: int = 0
 	
 	while (_history.size() > max_size):
+		# warning-ignore:return_value_discarded
+		_ssig_to_snap.erase(_history[0].signature)
+		# warning-ignore:return_value_discarded
+		_isig_to_snap.erase(_history[0].input_sig)
 		_history.pop_front()
 		popped += 1
 	
 	if (!has_authority):
 		_update_prediction_count(1 - popped)
+
 
 # Internally used, this updates the prediction count of each entity
 func _update_prediction_count(delta: int) -> void:
