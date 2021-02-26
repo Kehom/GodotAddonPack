@@ -184,6 +184,16 @@ func reset() -> void:
 	_history.clear()
 
 
+func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> SnapEntityBase:
+	var ret: SnapEntityBase = null
+	
+	var einfo: EntityInfo = _get_entity_info(eclass)
+	if (einfo):
+		ret = einfo.create_instance(uid, chash)
+	
+	return ret
+
+
 # Encode the provided snapshot into the given EncDecBuffer, "attaching" the given
 # input signature as part of the data. This function encodes the entire snapshot
 func encode_full(snap: NetSnapshot, into: EncDecBuffer, isig: int) -> void:

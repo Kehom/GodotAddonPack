@@ -2,6 +2,7 @@ Some smaller commits related to minor fixes (specially comment corrections) are 
 
 #### 2021 Feb 26
 * (Network) Warn (and skip) `SnapEntity` classes that contains more than 32 replicable properties.
+* (Network) Added `network.create_snap_entity()` function, to keep more in line with the upcoming C++ module version of this addon.
 
 #### 2020 Oct 28
 * (Network) Client can notify server that it's not ready anymore to receive snapshots (`network.notify_not_ready()`). This may be useful depending on how scene transition is handled.

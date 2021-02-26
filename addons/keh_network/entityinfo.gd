@@ -252,6 +252,9 @@ func create_instance(uid: int, chash: int) -> SnapEntityBase:
 
 # Creates a clone of the specified entity.
 func clone_entity(entity: SnapEntityBase) -> SnapEntityBase:
+	# If failing here, then provided entity is of different type than the one described by this info
+	assert(entity.get_script() == _resource)
+	
 	var ret: SnapEntityBase = create_instance(0, 0)
 	
 	for repl in replicable:

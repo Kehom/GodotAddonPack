@@ -741,6 +741,11 @@ func get_snap_building_signature() -> int:
 	return _update_control.get_signature()
 
 
+# Create an instance of the given snapshot entity class.
+func create_snap_entity(eclass: Script, uid: int, class_hash: int) -> SnapEntityBase:
+	return snapshot_data._instantiate_snap_entity(eclass, uid, class_hash)
+
+
 # Add the provided entity into the snapshot that is being built
 func snapshot_entity(entity: SnapEntityBase) -> void:
 	assert(_update_control.snap)
