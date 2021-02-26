@@ -1,10 +1,12 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2021 Feb 26
+* (Network) Warn (and skip) `SnapEntity` classes that contains more than 32 replicable properties.
+
 #### 2020 Oct 28
 * (Network) Client can notify server that it's not ready anymore to receive snapshots (`network.notify_not_ready()`). This may be useful depending on how scene transition is handled.
 * (Network) It's is now possible to disable local player node processing by calling `network.set_dedicated_server_mode(true)`. Note that it will not verify if local node is indeed corresponds to server so be careful with this call.
 * (Network) Changed the plugin loader so the `network` singleton is added when activating instead of when it enters tree. This should prevent the automatic singleton from being added if it was changed or even removed from the AutoLoad list.
-
 
 #### 2020 Sep 25
 * (Network) Custom properties of types supported by the `EncDecBuffer` addon that are changed get accumulated to be sent at the end of the game loop in a single RPC. Note that the initial value of a custom property is used to determine the expected type during encoding and decoding, meaning that if the type is changed errors will occur. Also, any other value types will be sent as soon as they are changed.

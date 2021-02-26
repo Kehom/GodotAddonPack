@@ -224,8 +224,11 @@ func _init(cname: String, rpath: String) -> void:
 		_cmask_size = 1
 	elif replicable.size() <= 16:
 		_cmask_size = 2
-	else:
+	elif replicable.size() <= 32:
 		_cmask_size = 4
+	else:
+		error = "There are more than 32 replicable properties, which is not supported by this system."
+
 
 
 # Spawners (classes derived from NetNodeSpawner) are necessary in order to automate the
