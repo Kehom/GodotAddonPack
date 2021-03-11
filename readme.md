@@ -1,6 +1,6 @@
 # Kehom's Godot Addon Pack
 
-This repository contains not only a collection of Godot addons, it's also a demo project using those "plugins".
+This repository contains not only a collection of Godot addons, it's also a demo project using those "plugins". Now there is a C++ module version of this pack that can be found [here]().
 
 The addons in this pack require Godot v3.2.x to work.
 
@@ -29,7 +29,7 @@ On my web page [kehomsforge.com](http://kehomsforge.com/tutorials/multi/GodotAdd
 
 ## The Addons
 
-Bellow is a slightly more detailed list of the addons, including information regarding if the addon (or "sub-addon") has intendependency, needs activation and if it adds additional settings.
+Bellow is a slightly more detailed list of the addons, including information regarding if the addon (or "sub-addon") has interdependency, needs activation and if it adds additional settings.
 
 ### Debug Helpers
 
