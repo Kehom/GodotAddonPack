@@ -39,6 +39,13 @@ func disable_plugin() -> void:
 	# AutoLoad scripts are added into the ProjectSettings under "autoload/[singleton_name]" path
 	if (ProjectSettings.has_setting("autoload/network")):
 		remove_autoload_singleton("network")
+	
+	# Remove the additional project settings - those will remain on the ProjectSettings window until
+	# the editor is restarted
+	for es in _extra_settings:
+		ProjectSettings.clear(es)
+	
+	_extra_settings.clear()
 
 
 func _enter_tree():
@@ -60,14 +67,6 @@ func _enter_tree():
 	_reg_setting("print_debug_info", TYPE_BOOL, false)
 
 
-
-func _exit_tree():
-	# Remove the additional project settings - those will remain on the ProjectSettings window until
-	# the editor is restarted
-	for es in _extra_settings:
-		ProjectSettings.clear(es)
-	
-	_extra_settings.clear()
 
 
 # def_val is relying on the variant, thus no static typing

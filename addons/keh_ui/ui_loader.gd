@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019-2020 Yuri Sarudiansky
+# Copyright (c) 2019-2021 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -43,11 +43,14 @@ func _enter_tree():
 
 
 
-func _exit_tree():
+
+# Automatically called by the editor when plugin is deactivated. Cleanup the additional project settings
+func disable_plugin() -> void:
 	for es in _extra_settings:
 		ProjectSettings.clear(es)
 	
 	_extra_settings.clear()
+
 
 
 func _init_inventory() -> void:
