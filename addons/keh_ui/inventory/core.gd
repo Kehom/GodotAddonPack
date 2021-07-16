@@ -50,7 +50,7 @@
 # - Allow custom sorting functions to be used
 # - Save/Load inventory bag state into/from binary data.
 # - Strip out some unnecessary (default values) data from "saved state"
-# - Different socket layouts besides just equaly spaced right-to-left them top-to-bottom
+# - Different socket layouts besides just equally spaced right-to-left then top-to-bottom
 
 
 extends Reference

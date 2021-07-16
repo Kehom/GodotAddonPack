@@ -67,6 +67,13 @@ func _enter_tree():
 	_reg_setting("print_debug_info", TYPE_BOOL, false)
 
 
+func _exit_tree() -> void:
+	var root: Node = get_tree().get_root()
+	var net: Node = root.get_node_or_null("network")
+	
+	if (net):
+		net.queue_free()
+
 
 
 # def_val is relying on the variant, thus no static typing
