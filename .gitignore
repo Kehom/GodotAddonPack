@@ -2,7 +2,7 @@
 
 # Godot-specific ignores
 .vscode/*
-*.import
+.import/
 export.cfg
 export_presets.cfg
 
