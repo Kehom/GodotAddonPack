@@ -84,6 +84,16 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/keh_ui/inventory/invsocketmevent.gd"
 }, {
+"base": "Reference",
+"class": "InventoryHighlight",
+"language": "GDScript",
+"path": "res://addons/keh_ui/inventory/highlight.gd"
+}, {
+"base": "Reference",
+"class": "InventorySlot",
+"language": "GDScript",
+"path": "res://addons/keh_ui/inventory/slot.gd"
+}, {
 "base": "InventoryBase",
 "class": "InventorySpecialSlot",
 "language": "GDScript",
@@ -220,6 +230,8 @@ _global_script_class_icons={
 "InventoryEventMouse": "",
 "InventoryEventSocket": "",
 "InventoryEventSocketMouse": "",
+"InventoryHighlight": "",
+"InventorySlot": "",
 "InventorySpecialSlot": "res://addons/keh_ui/inventory/specialslot.png",
 "MegaSnapClutter": "",
 "MegaSnapPCharacter": "",

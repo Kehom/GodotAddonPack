@@ -1,5 +1,4 @@
-###############################################################################
-# Copyright (c) 2020 Yuri Sarudiansky
+# Copyright (c) 2021 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,110 +17,34 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-###############################################################################
-
-# The bag is meant to contain multiple rows and columns of slots. Items can span
-# multiple "cells" if so desired.
 
 tool
 extends InventoryBase
 class_name InventoryBag, "bag.png"
 
+# The bag is meant to contain multiple rows and columns of slots. Items can span
+# multiple "cells" if so desired.
 
+#######################################################################################################################
+### Signals and definitions
+
+
+#######################################################################################################################
+### "Public" properties
 export var column_count: int = 10 setget set_column_count
 export var row_count: int = 4 setget set_row_count
 
 export var cell_spacing: int = 0 setget set_cell_spacing
 
-
-### Internal stuff
-# This will be used to sort items within the inventory
-class _ItemSorter:
-	# "Generic" function to compare magnitudes. The order in which those are given determine the priority. The "l"
-	# prefix indicate left side while "r" right side.
-	static func check_mags(lmag1: int, rmag1: int, lmag2: int, rmag2: int, lmag3: int, rmag3: int, lmag4: String, rmag4: String) -> bool:
-		if (lmag1 != rmag1):
-			return lmag1 < rmag1
-		
-		if (lmag2 != rmag2):
-			return lmag2 < rmag2
-		
-		if (lmag3 != rmag3):
-			return lmag3 < rmag3
-		
-		return lmag4 < rmag4
-	
-	# The "Horizontal sort" will place items left-to-right, top-to-bottom
-	# Give priority to the height when defining "bigger items". Otherwise compare
-	# the total amount of used cells
-	static func horiz_bigger_first(a: Dictionary, b: Dictionary) -> bool:
-		# The generic function returns smaller first, so inverting "left size vs right side" here
-		var aheight: int = b.row_span
-		var bheight: int = a.row_span
-		var asize: int = aheight * b.column_span
-		var bsize: int = bheight * a.column_span
-		
-		return check_mags(aheight, bheight, asize, bsize, b.type, a.type, b.id, a.id)
-	
-	
-	# In here the same logic as before, giving priority to heights. However, this time
-	# the smaller items come first
-	static func horiz_smaller_first(a: Dictionary, b: Dictionary) -> bool:
-		var aheight: int = a.row_span
-		var bheight: int = b.row_span
-		var asize: int = aheight * a.column_span
-		var bsize: int = bheight * b.column_span
-		
-		return check_mags(aheight, bheight, asize, bsize, a.type, b.type, a.id, b.id)
-	
-	
-	# The "vertical sort" will place items top-to-bottom, "left-to-right"
-	# In this case width has priority when considering "bigger"
-	static func vert_bigger_first(a: Dictionary, b: Dictionary) -> bool:
-		# The generic function returns smaller first, so inverting "left size vs right side" here
-		var awidth: int = b.column_span
-		var bwidth: int = a.column_span
-		var asize: int = awidth * b.row_span
-		var bsize: int = bwidth * a.row_span
-		
-		return check_mags(awidth, bwidth, asize, bsize, b.type, a.type, b.id, a.id)
-	
-	
-	# Same logic as before, but prioritizing widths
-	static func vert_smaller_first(a: Dictionary, b: Dictionary) -> bool:
-		var awidth: int = a.column_span
-		var bwidth: int = b.column_span
-		var asize: int = awidth * a.row_span
-		var bsize: int = bwidth * b.row_span
-		
-		return check_mags(awidth, bwidth, asize, bsize, a.type, b.type, a.id, b.id)
-
-
-
-### "Private" properties
-# The size of the bag, slots + spacing between them
-var _total_size: Vector2 = Vector2()
-
-# Holds instances of InventoryCore.Slot
-var _slot_container: Array = []
-
-# Each entry in this array is an instance of InventoryCore.Item
-var _item_container: Array = []
-
-## Holds mouse hovering data
-var _hovering: int = -1
-
-
-
-
-#### "Public" functions
+#######################################################################################################################
+### "Public" functions
 # If res_as_path is set to true then resources (textures, materials...) will be given as paths (Strings)
 func get_item_data(atcol: int, atrow: int, res_as_path: bool = true) -> Dictionary:
 	var retval: Dictionary = {}
 	
-	var item: Item = _get_item(_get_slot_index(atcol, atrow))
+	var item: Control = _get_item(_get_slot_index(atcol, atrow))
 	if (item):
-		retval = Helper.item_to_dictionary(item, res_as_path)
+		retval = InventoryCore.item_to_dictionary(item, res_as_path)
 	
 	return retval
 
@@ -221,7 +144,7 @@ func remove_item_from(column: int, row: int, amount: int = -1) -> void:
 		return
 	
 	var sloti: int = _get_slot_index(column, row)
-	var item: Item = _get_item(sloti)
+	var item: Control = _get_item(sloti)
 	if (item):
 		_remove_item(item, amount)
 
@@ -229,7 +152,7 @@ func remove_item_from(column: int, row: int, amount: int = -1) -> void:
 
 func pick_item_from(column: int, row: int, amount: int = -1) -> void:
 	var sloti: int = _get_slot_index(column, row)
-	var item: Item = _get_item(sloti)
+	var item: Control = _get_item(sloti)
 	if (!item):
 		return
 	
@@ -238,32 +161,32 @@ func pick_item_from(column: int, row: int, amount: int = -1) -> void:
 
 
 func set_item_datacode(column: int, row: int, dcode: String) -> void:
-	var item: Item = _get_item(_get_slot_index(column, row))
+	var item: Control = _get_item(_get_slot_index(column, row))
 	if (item):
 		item.set_datacode(dcode)
 
 
 func set_item_enabled(column: int, row: int, enabled: bool) -> void:
-	var item: Item = _get_item(_get_slot_index(column, row))
+	var item: Control = _get_item(_get_slot_index(column, row))
 	if (item):
 		item.set_enabled(enabled)
 
 
 func set_item_background(atcolumn: int, atrow: int, back: Texture) -> void:
-	var item: Item = _get_item(_get_slot_index(atcolumn, atrow))
+	var item: Control = _get_item(_get_slot_index(atcolumn, atrow))
 	if (item):
 		item.set_background(back)
 
 
 func set_item_material(atcolumn: int, atrow: int, mat: Material) -> void:
 	assert(!mat || mat is CanvasItemMaterial || mat is ShaderMaterial)
-	var item: Item = _get_item(_get_slot_index(atcolumn, atrow))
+	var item: Control = _get_item(_get_slot_index(atcolumn, atrow))
 	if (item):
 		item.set_mat(mat)
 
 
 func set_item_sockets(atcol: int, atrow: int, socket_data: Array, columns: int = -1, block_if_socketed: bool = false, preserve_existing: bool = false) -> void:
-	var item: Item = _get_item(_get_slot_index(atcol, atrow))
+	var item: Control = _get_item(_get_slot_index(atcol, atrow))
 	if (!item):
 		return
 	
@@ -276,7 +199,7 @@ func set_item_sockets(atcol: int, atrow: int, socket_data: Array, columns: int =
 
 
 func morph_item_socket(atcol: int, atrow: int, socket_index: int, socket_data: Dictionary, block_if_socketed: bool = false) -> void:
-	var item: Item = _get_item(_get_slot_index(atcol, atrow))
+	var item: Control = _get_item(_get_slot_index(atcol, atrow))
 	if (!item):
 		return
 	
@@ -294,15 +217,15 @@ func morph_item_socket(atcol: int, atrow: int, socket_index: int, socket_data: D
 func socket_into(atcol: int, atrow: int, socketi: int, idata: Dictionary) -> int:
 	var checked: Dictionary = _check_item_data(idata)
 	
-	var item: Item = _get_item(_get_slot_index(atcol, atrow))
+	var item: Control = _get_item(_get_slot_index(atcol, atrow))
 	if (!item):
 		return checked.stack
 	
 	if (socketi < 0 || socketi >= item.get_socket_count()):
 		return checked.stack
 	
-	var isocket: ItemSocket = item.get_socket(socketi)
-	return isocket.socket_idata(checked, _use_theme)
+	var isocket: Control = item.get_socket(socketi)
+	return isocket.socket_idata(checked)
 
 
 
@@ -314,7 +237,7 @@ func set_slot_highlight(col: int, row: int, hltype: int) -> void:
 	if (hltype > InventoryCore.HighlightType.Disabled):
 		hltype = InventoryCore.HighlightType.None
 	
-	var islot: Slot = _slot_container[sloti]
+	var islot: InventorySlot = _slot_container[sloti]
 	islot.set_highlight(hltype, true)
 	update()
 
@@ -327,14 +250,13 @@ func set_item_highlight(atcol: int, atrow: int, hltype: int) -> void:
 	if (hltype > InventoryCore.HighlightType.Deny):
 		hltype = InventoryCore.HighlightType.None
 	
-	var islot: Slot = _slot_container[sloti]
+	var islot: InventorySlot = _slot_container[sloti]
 	if (islot.item):
 		islot.item.set_highlight(hltype, true)
 
 
-
 # This will call the given function reference for each stored item, providing the item data as argument. The
-# function must returhn a dictionary containing information related to how the item and used slots must be
+# function must return a dictionary containing information related to how the item and used slots must be
 # changed. Fields are optional and if not given will set everything to "default" rendering state. The options
 # are:
 # - item_highlight -> Which item highlight type should be applied to the item. By default "None"
@@ -346,8 +268,8 @@ func mass_highlight(apply_filter: FuncRef, res_as_path: bool = true) -> void:
 		return
 	
 	for i in _item_container.size():
-		var item: Item = _item_container[i]
-		var idata: Dictionary = Helper.item_to_dictionary(item, res_as_path)
+		var item: Control = _item_container[i]
+		var idata: Dictionary = InventoryCore.item_to_dictionary(item, res_as_path)
 		var afres = apply_filter.call_func(idata)
 		if (afres is Dictionary):
 			item.set_highlight(afres.get("item_highlight", InventoryCore.HighlightType.None), true)
@@ -463,10 +385,10 @@ func get_items_of_type(type: int, include_position: bool = true, resource_as_pat
 	var retval: Array = []
 	
 	for i in _item_container:
-		var item: Item = i
+		var item: Control = i
 		
 		if (item.get_type() == type):
-			var idict: Dictionary = Helper.item_to_dictionary(item, resource_as_path)
+			var idict: Dictionary = InventoryCore.item_to_dictionary(item, resource_as_path)
 			if (include_position):
 				var crow: Dictionary = _get_column_row(item.get_slot())
 				idict["column"] = crow.column
@@ -483,9 +405,9 @@ func get_contents_as_dictionaries(include_position: bool = true, resource_as_pat
 	var retval: Array = []
 	
 	for i in _item_container:
-		var item: Item = i
+		var item: Control = i
 		
-		var idict: Dictionary = Helper.item_to_dictionary(item, resource_as_path)
+		var idict: Dictionary = InventoryCore.item_to_dictionary(item, resource_as_path)
 		if (include_position):
 			var crow: Dictionary = _get_column_row(item.get_slot())
 			idict["column"] = crow.column
@@ -512,7 +434,7 @@ func load_from_parsed_json(parsed: Array) -> void:
 	_clear_contents()
 	
 	for rdata in parsed:
-		Helper.load_resources(rdata)
+		InventoryCore.load_resources(rdata)
 		var idata: Dictionary = _check_item_data(rdata)
 		idata.column = rdata.column
 		idata.row = rdata.row
@@ -520,7 +442,7 @@ func load_from_parsed_json(parsed: Array) -> void:
 		for i in idata.socket_data.size():
 			var isocketed: Dictionary = idata.socket_data[i].get("item", {})
 			if (!isocketed.empty()):
-				Helper.load_resources(isocketed)
+				InventoryCore.load_resources(isocketed)
 				idata.socket_data[i].item = _check_item_data(isocketed)
 		
 		# warning-ignore:return_value_discarded
@@ -641,28 +563,312 @@ func remove_rows(amount: int) -> void:
 	set_row_count(new_rowcount)
 
 
+func set_column_count(v: int) -> void:
+	column_count = _intclamp(v, 0, InventoryCore.MAX16-1)
+	_calculate_layout()
 
-##############################################################################################################
-### "Internal" stuff
+func set_row_count(v: int) -> void:
+	row_count = _intclamp(v, 0, InventoryCore.MAX16-1)
+	_calculate_layout()
+
+func set_cell_spacing(v: int) -> void:
+	cell_spacing = v if v >= 0 else 0
+	_calculate_layout()
+
+#######################################################################################################################
+### "Private" definitions
+# This will be used to sort items within the inventory
+class _ItemSorter:
+	# "Generic" function to compare magnitudes. The order in which those are given determine the priority. The "l"
+	# prefix indicate left side while "r" right side.
+	static func check_mags(lmag1: int, rmag1: int, lmag2: int, rmag2: int, lmag3: int, rmag3: int, lmag4: String, rmag4: String) -> bool:
+		if (lmag1 != rmag1):
+			return lmag1 < rmag1
+		
+		if (lmag2 != rmag2):
+			return lmag2 < rmag2
+		
+		if (lmag3 != rmag3):
+			return lmag3 < rmag3
+		
+		return lmag4 < rmag4
+	
+	# The "Horizontal sort" will place items left-to-right, top-to-bottom
+	# Give priority to the height when defining "bigger items". Otherwise compare
+	# the total amount of used cells
+	static func horiz_bigger_first(a: Dictionary, b: Dictionary) -> bool:
+		# The generic function returns smaller first, so inverting "left size vs right side" here
+		var aheight: int = b.row_span
+		var bheight: int = a.row_span
+		var asize: int = aheight * b.column_span
+		var bsize: int = bheight * a.column_span
+		
+		return check_mags(aheight, bheight, asize, bsize, b.type, a.type, b.id, a.id)
+	
+	
+	# In here the same logic as before, giving priority to heights. However, this time
+	# the smaller items come first
+	static func horiz_smaller_first(a: Dictionary, b: Dictionary) -> bool:
+		var aheight: int = a.row_span
+		var bheight: int = b.row_span
+		var asize: int = aheight * a.column_span
+		var bsize: int = bheight * b.column_span
+		
+		return check_mags(aheight, bheight, asize, bsize, a.type, b.type, a.id, b.id)
+	
+	
+	# The "vertical sort" will place items top-to-bottom, "left-to-right"
+	# In this case width has priority when considering "bigger"
+	static func vert_bigger_first(a: Dictionary, b: Dictionary) -> bool:
+		# The generic function returns smaller first, so inverting "left size vs right side" here
+		var awidth: int = b.column_span
+		var bwidth: int = a.column_span
+		var asize: int = awidth * b.row_span
+		var bsize: int = bwidth * a.row_span
+		
+		return check_mags(awidth, bwidth, asize, bsize, b.type, a.type, b.id, a.id)
+	
+	
+	# Same logic as before, but prioritizing widths
+	static func vert_smaller_first(a: Dictionary, b: Dictionary) -> bool:
+		var awidth: int = a.column_span
+		var bwidth: int = b.column_span
+		var asize: int = awidth * a.row_span
+		var bsize: int = bwidth * b.row_span
+		
+		return check_mags(awidth, bwidth, asize, bsize, a.type, b.type, a.id, b.id)
 
 
-### Control overrides - those are not meant for direct use
-func _draw() -> void:
-	var size: Vector2 = Vector2(cell_width, cell_height)
+#######################################################################################################################
+### "Private" properties
+# The size of the bag, slots + spacing between them
+var _total_size: Vector2 = Vector2()
+
+# Holds instances of InventoryCore.Slot
+var _slot_container: Array = []
+
+# Each entry in this array is an instance of InventoryCore.Item
+var _item_container: Array = []
+
+## Holds mouse hovering data
+var _hovering: int = -1
+
+#######################################################################################################################
+### "Private" functions
+# Given column and row indices, return the slot array index
+func _get_slot_index(col: int, row: int) -> int:
+	return column_count * row + col
+
+
+func _get_item(sloti: int) -> Control:
+	if (sloti < 0 || sloti >= _slot_container.size()):
+		return null
+	
+	var islot: InventorySlot = _slot_container[sloti]
+	return islot.item
+
+
+# Test "collision" between items.
+func _get_colliding_data(col: int, row: int, iid: String, itype: int, dcode: String, cspan: int, rspan: int) -> Dictionary:
+	var retval: Dictionary = {
+		"overflows": false,
+		"collision_count": 0,
+		"matching": {},
+		"non_matching": {},
+		"disabled_slot": {},
+	}
+	
+	if (col + cspan > column_count || row + rspan > row_count):
+		retval.overflows = true
+	
+	if (!retval.overflows):
+		var sloti: int = _get_slot_index(col, row)
+		var rowstep: int = column_count - cspan
+	
+		for _y in rspan:
+			for _x in cspan:
+				if (_shared_data.disabled_slots_occupied() && !_slot_container[sloti].is_enabled()):
+					# Assign whatever as this inner dictionary is meant to be used as a set rather than map
+					retval.disabled_slot[sloti] = 1
+				else:
+					var item: Control = _slot_container[sloti].item
+					if (item):
+						# Assign whatever because the inner dictionaries are meant to be used as sets rather than maps
+						if (item.is_equal(iid, itype, dcode) && (!item.is_stack_full() || _shared_data.drop_mode() == InventoryCore.DropMode.FillOnly)):
+							retval.matching[item] = 1
+						else:
+							retval.non_matching[item] = 1
+				
+				sloti += 1
+			sloti += rowstep
+	
+	retval.collision_count = retval.matching.size() + retval.non_matching.size()
+	
+	return retval
+
+
+# Find any item that matches the specified one that is not at full stack
+func _find_matching(iid: String, itype: int, dcode: String, vscan: bool) -> Dictionary:
+	var retval: Dictionary = {
+		"column": -1,
+		"row": -1,
+	}
+	
+	if (vscan):
+		# Vertical scan. That is, top-to-bottom, left-to-right
+		var col: int = 0
+		var row: int = 0
+		var done: bool = false
+		var index: int = 0
+		while (!done):
+			var item: Control = _slot_container[index].item
+			if (item && item.is_equal(iid, itype, dcode) && !item.is_stack_full()):
+				retval.column = col
+				retval.row = row
+				done = true
+			
+			if (!done):
+				row += 1
+				
+				if (row >= row_count):
+					row = 0
+					col += 1
+					index = col
+				else:
+					index += column_count
+				
+				done = col >= column_count
+	
+	else:
+		# Horizontal scan. That is, left-to-right, top-to-bottom
+		for slot in _slot_container:
+			var item: Control = slot.item
+			if (item && item.is_equal(iid, itype, dcode) && !item.is_stack_full()):
+				retval = _get_column_row(item.get_slot())
+				break
+	
+	return retval
+
+
+# Try to locate an empty spot that can fit the specified item. This function takes into account items that may
+# span through multiple cells
+func _find_fitting_spot(scol: int, srow: int, iid: String, itype: int, dcode: String, cspan: int, rspan: int, vscan: bool) -> Dictionary:
+	var retval: Dictionary = {
+		"column": -1,
+		"row": -1,
+	}
+	
+	# First perform the obvious check (overflowing) to avoid needless looping
+	if (scol + cspan > column_count || srow + rspan > row_count):
+		return retval
+	
+	var col: int = scol
+	var row: int = srow
+	var done: bool = false
+	
+	while (!done):
+		var colldata: Dictionary = _get_colliding_data(col, row, iid, itype, dcode, cspan, rspan)
+		
+		# Check if the spot is empty. Because this function is meant to be called after the _find_matching() has
+		# already run, items of the same type which are not at full stack may have already been used. Because of
+		# that, this specific test will not be done in here.
+		if (colldata.collision_count == 0):
+			# Spot is completely free, so it can indeed hold the requested item
+			retval.column = col
+			retval.row = row
+			done = true
+		
+		if (!done):
+			if (vscan):
+				row += 1
+				if (row + rspan > row_count):
+					row = 0
+					col += 1
+				done = col + cspan > column_count
+			
+			else:
+				col += 1
+				if (col + cspan > column_count):
+					col = 0
+					row += 1
+				done = row + rspan > row_count
+	
+	return retval
+
+
+func _set_slot_highlight(sloti: int, type: int, cspan: int, rspan: int, manual: bool) -> void:
+	assert(sloti >= 0 && sloti < _slot_container.size())
+	
+	var cindex: int = sloti
+	var rowstep: int = column_count - cspan
+	for _y in rspan:
+		for _x in cspan:
+			_slot_container[cindex].set_highlight(type, manual)
+			cindex += 1
+		
+		cindex += rowstep
+	
+	update()
+
+
+func _clear_contents() -> void:
+	for i in _item_container:
+		i.queue_free()
+	
+	_item_container.clear()
+	
 	for s in _slot_container:
-		s.render(get_canvas_item(), size, _use_theme, _shared_data.slot_autohighlight() if _shared_data else false)
+		s.item = null
 
 
+# This function is meant to take multi-cells-span items and set the touched slots accordingly so the algorithms
+# can correctly work and find "empty spots".
+# cspan and rspan are needed as arguments because item may be null (null is to make slots empty)
+func _set_slot_content(sloti: int, cspan: int, rspan: int, item: Control) -> void:
+	# This function assume all boundary checks were already done.
+	var cindex: int = sloti
+	var rowstep: int = column_count - cspan
+	for _y in rspan:
+		for _x in cspan:
+			_slot_container[cindex].item = item
+			cindex += 1
+		
+		cindex += rowstep
 
-func _notification(what: int) -> void:
-	match what:
-		NOTIFICATION_MOUSE_EXIT:
-			_hovering = -1
-			_clear_autohighlight()
+
+# If the "add_column" is used, the "item" property of each Slot will be changed when the item in question is
+# bellow the first row. This function is meant to fix the placement within the slots
+func _verify_item_placement() -> void:
+	# First nullify the item property on all slots
+	for s in _slot_container:
+		s.item = null
+	
+	# Now correctly set the contents of the slots
+	for i in _item_container:
+		_set_slot_content(i.get_slot(), i.get_column_span(), i.get_row_span(), i)
 
 
-##############################################################################################################
-### InventoryBase overrides
+func _clear_autohighlight() -> void:
+	# IF this becomes a problem in terms of performance then a special container will be necessary to help target
+	# only the highlighted slots
+	
+	for s in _slot_container:
+		s.set_highlight(InventoryCore.HighlightType.None, false)
+	
+	# IF this becomes a problem in terms of performance then a special container will be necessary to help target
+	# only the highlighted items
+	for i in _item_container:
+		i.set_highlight(InventoryCore.HighlightType.None, false)
+	
+	update()
+
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
 func _calculate_layout() -> void:
 	_total_size.x = (column_count * cell_width) + ((column_count - 1) * cell_spacing)
 	_total_size.y = (row_count * cell_height) + ((row_count - 1) * cell_spacing)
@@ -690,7 +896,8 @@ func _calculate_layout() -> void:
 	for y in row_count:
 		for x in column_count:
 			if (!_slot_container[idx]):
-				_slot_container[idx] = Slot.new(px, py)
+				_slot_container[idx] = InventorySlot.new(px, py)
+			
 			else:
 				_slot_container[idx].set_pos(px, py)
 			
@@ -724,7 +931,7 @@ func _add_item(idata: Dictionary) -> int:
 			dsize.y = (cell_height * idata.row_span) + ((idata.row_span - 1) * cell_spacing)
 			
 			
-			var islot: Slot = _slot_container[sloti]
+			var islot: InventorySlot = _slot_container[sloti]
 			
 			var edata: Dictionary = {
 				"slot": sloti,
@@ -733,10 +940,11 @@ func _add_item(idata: Dictionary) -> int:
 				"box_size": dsize,
 				"item_position": Vector2(),
 				"item_size": dsize,
-				"item_index": _item_container.size()
+				"item_index": _item_container.size(),
+				"shared": _shared_data,
 			}
 			
-			var nitem: Item = Helper.dictionary_to_item(idata, edata)
+			var nitem: Control = InventoryCore.dictionary_to_item(idata, edata)
 			
 			# Remove slot highlight before adding the item
 			_clear_autohighlight()
@@ -775,7 +983,7 @@ func _add_item(idata: Dictionary) -> int:
 	return retval
 
 
-func _remove_item(item: Item, amount: int) -> void:
+func _remove_item(item: Control, amount: int) -> void:
 	assert(item)
 	
 	var cstack: int = item.get_current_stack()
@@ -787,10 +995,13 @@ func _remove_item(item: Item, amount: int) -> void:
 	
 	if (item.get_current_stack() == 0):
 		var conti: int = item.get_container_index()
+		
 		# Clear the slots
 		_set_slot_content(item.get_slot(), item.get_column_span(), item.get_row_span(), null)
+		
 		# Remove from the container
 		_item_container.remove(conti)
+		
 		# Previous operations may have shuffled things around within the item container, so fix the indices
 		for i in _item_container.size():
 			_item_container[i].set_container_index(i)
@@ -798,7 +1009,7 @@ func _remove_item(item: Item, amount: int) -> void:
 		item.queue_free()
 
 
-func _dragging_over(item: Item, mouse_pos: Vector2) -> void:
+func _dragging_over(item: Control, mouse_pos: Vector2) -> void:
 	# When dragging, the drawn icon preview has an offset so its center corresponds to the mouse cursor.
 	# Because of that, add some offset to the calculated hovering indices just so the position of the icon
 	# better represents where the item will be dropped
@@ -871,8 +1082,7 @@ func _get_column_row(sloti: int) -> Dictionary:
 	}
 
 
-#func _set_slot_highlight(sloti: int, type: int, cspan: int, rspan: int, manual: bool) -> void:
-func _post_drop(item: Item) -> void:
+func _post_drop(item: Control) -> void:
 	var sloti: int = item.get_slot()
 	_set_slot_highlight(sloti, InventoryCore.HighlightType.None, item.get_column_span(), item.get_row_span(), false)
 	item.set_highlight(InventoryCore.HighlightType.Normal, false)
@@ -883,230 +1093,17 @@ func _on_setting_changed() -> void:
 	for i in _item_container:
 		i.refresh()
 
-#### Helper functions
-# Given column and row indices, return the slot array index
-func _get_slot_index(col: int, row: int) -> int:
-	return column_count * row + col
 
 
 
-func _get_item(sloti: int) -> Item:
-	if (sloti < 0 || sloti >= _slot_container.size()):
-		return null
-	
-	var islot: Slot = _slot_container[sloti]
-	return islot.item
-
-
-
-# This function is meant to take multi-cells-span items and set the touched slots accordingly so the algorithms
-# can correctly work and find "empty spots".
-# cspan and rspan are needed as arguments because item may be null (null is to make slots empty)
-func _set_slot_content(sloti: int, cspan: int, rspan: int, item: Item) -> void:
-	# This function assume all boundary checks were already done.
-	var cindex: int = sloti
-	var rowstep: int = column_count - cspan
-	for _y in rspan:
-		for _x in cspan:
-			_slot_container[cindex].item = item
-			cindex += 1
-		
-		cindex += rowstep
-
-
-# If the "add_column" is used, the "item" property of each Slot will be changed when the item in question is
-# bellow the first row. This function is meant to fix the placement within the slots
-func _verify_item_placement() -> void:
-	# First nullify the item property on all slots
+func _draw() -> void:
+	var size: Vector2 = Vector2(cell_width, cell_height)
 	for s in _slot_container:
-		s.item = null
-	
-	# Now correctly set the contents of the slots
-	for i in _item_container:
-		_set_slot_content(i.get_slot(), i.get_column_span(), i.get_row_span(), i)
+		s.render(get_canvas_item(), size, _use_theme, _shared_data.slot_autohighlight() if _shared_data else false)
 
 
-# Test "collision" between items.
-func _get_colliding_data(col: int, row: int, iid: String, itype: int, dcode: String, cspan: int, rspan: int) -> Dictionary:
-	var retval: Dictionary = {
-		"overflows": false,
-		"collision_count": 0,
-		"matching": {},
-		"non_matching": {},
-		"disabled_slot": {},
-	}
-	
-	if (col + cspan > column_count || row + rspan > row_count):
-		retval.overflows = true
-	
-	if (!retval.overflows):
-		var sloti: int = _get_slot_index(col, row)
-		var rowstep: int = column_count - cspan
-	
-		for _y in rspan:
-			for _x in cspan:
-				if (_shared_data.disabled_slots_occupied() && !_slot_container[sloti].is_enabled()):
-					# Assign whatever as this inner dictionary is meant to be used as a set rather than map
-					retval.disabled_slot[sloti] = 1
-				else:
-					var item: Item = _slot_container[sloti].item
-					if (item):
-						# Assign whatever because the inner dictionaries are meant to be used as sets rather than maps
-						if (item.is_equal(iid, itype, dcode) && (!item.is_stack_full() || _shared_data.drop_mode() == InventoryCore.DropMode.FillOnly)):
-							retval.matching[item] = 1
-						else:
-							retval.non_matching[item] = 1
-				
-				sloti += 1
-			sloti += rowstep
-	
-	retval.collision_count = retval.matching.size() + retval.non_matching.size()
-	
-	return retval
-
-
-# Find any item that matches the specified one that is not at full stack
-func _find_matching(iid: String, itype: int, dcode: String, vscan: bool) -> Dictionary:
-	var retval: Dictionary = {
-		"column": -1,
-		"row": -1,
-	}
-	
-	if (vscan):
-		# Vertical scan. That is, top-to-bottom, left-to-right
-		var col: int = 0
-		var row: int = 0
-		var done: bool = false
-		var index: int = 0
-		while (!done):
-			var item: Item = _slot_container[index].item
-			if (item && item.is_equal(iid, itype, dcode) && !item.is_stack_full()):
-				retval.column = col
-				retval.row = row
-				done = true
-			
-			if (!done):
-				row += 1
-				
-				if (row >= row_count):
-					row = 0
-					col += 1
-					index = col
-				else:
-					index += column_count
-				
-				done = col >= column_count
-	
-	else:
-		# Horizontal scan. That is, left-to-right, top-to-bottom
-		for slot in _slot_container:
-			var item: Item = slot.item
-			if (item && item.is_equal(iid, itype, dcode) && !item.is_stack_full()):
-				retval = _get_column_row(item.get_slot())
-				break
-	
-	return retval
-
-
-
-# Try to locate an empty spot that can fit the specified item. This function takes into account items that may
-# span through multiple cells
-func _find_fitting_spot(scol: int, srow: int, iid: String, itype: int, dcode: String, cspan: int, rspan: int, vscan: bool) -> Dictionary:
-	var retval: Dictionary = {
-		"column": -1,
-		"row": -1,
-	}
-	
-	# First perform the obvious check (overflowing) to avoid needless looping
-	if (scol + cspan > column_count || srow + rspan > row_count):
-		return retval
-	
-	var col: int = scol
-	var row: int = srow
-	var done: bool = false
-	
-	while (!done):
-		var colldata: Dictionary = _get_colliding_data(col, row, iid, itype, dcode, cspan, rspan)
-		
-		# Check if the spot is empty. Because this function is meant to be called after the _find_matching() has
-		# already run, items of the same type which are not at full stack may have already been used. Because of
-		# that, this specific test will not be done in here.
-		if (colldata.collision_count == 0):
-			# Spot is completely free, so it can indeed hold the requested item
-			retval.column = col
-			retval.row = row
-			done = true
-		
-		if (!done):
-			if (vscan):
-				row += 1
-				if (row + rspan > row_count):
-					row = 0
-					col += 1
-				done = col + cspan > column_count
-			
-			else:
-				col += 1
-				if (col + cspan > column_count):
-					col = 0
-					row += 1
-				done = row + rspan > row_count
-	
-	return retval
-
-
-
-func _set_slot_highlight(sloti: int, type: int, cspan: int, rspan: int, manual: bool) -> void:
-	assert(sloti >= 0 && sloti < _slot_container.size())
-	
-	var cindex: int = sloti
-	var rowstep: int = column_count - cspan
-	for _y in rspan:
-		for _x in cspan:
-			_slot_container[cindex].set_highlight(type, manual)
-			cindex += 1
-		
-		cindex += rowstep
-	
-	update()
-
-
-func _clear_autohighlight() -> void:
-	# IF this becomes a problem in terms of performance then a special container will be necessary to help target
-	# only the highlighted slots
-	
-	for s in _slot_container:
-		s.set_highlight(InventoryCore.HighlightType.None, false)
-	
-	# IF this becomes a problem in terms of performance then a special container will be necessary to help target
-	# only the highlighted items
-	for i in _item_container:
-		i.set_highlight(InventoryCore.HighlightType.None, false)
-	
-	update()
-
-
-func _clear_contents() -> void:
-	for i in _item_container:
-		i.queue_free()
-	
-	_item_container.clear()
-	
-	for s in _slot_container:
-		s.item = null
-
-
-
-
-#### Setters
-func set_column_count(v: int) -> void:
-	column_count = _intclamp(v, 0, InventoryCore.MAX16-1)
-	_calculate_layout()
-
-func set_row_count(v: int) -> void:
-	row_count = _intclamp(v, 0, InventoryCore.MAX16-1)
-	_calculate_layout()
-
-func set_cell_spacing(v: int) -> void:
-	cell_spacing = v if v >= 0 else 0
-	_calculate_layout()
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_MOUSE_EXIT:
+			_hovering = -1
+			_clear_autohighlight()
