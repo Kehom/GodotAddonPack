@@ -1,8 +1,8 @@
 # Kehom's Godot Addon Pack
 
-This repository contains not only a collection of Godot addons, it's also a demo project using those "plugins". Now there is a C++ module version of this pack that can be found [here]().
+This repository contains not only a collection of Godot addons, it's also a demo project using those "plugins". All of them are pure GDScript, yet there is a C++ module version of this pack that can be found [here](https://github.com/Kehom/GodotModulePack).
 
-The addons in this pack require Godot v3.2.x to work.
+The addons in this pack require Godot v3.2+ to work.
 
 The following addons are part of this pack:
 
@@ -134,6 +134,8 @@ none | no
 Implements most of the functionality of the `LineEditControl` but provides means to "register" rules that will affect how the entered text is rendered. As an example, ":)" can be set to render an image rather than the two characters. Images will be automatically scaled in order to fit the input box, based on the font height. The main idea of this control is to be used as input for consoles and/or chat boxes.
 
 #### Inventory
+
+**Attention**: If you already use this plugin before commit 10b9c0080937037abc9ad4537ac26aaa0be4937d, updating will result in a one time script error, when loading the project, telling that the `InventorySlot` identifier isn't valid. Don't worry because the compatibility was not broken and everything will work correctly and further project loads will not result in this error.
 
 Interdependency | Extra Settings
 -|-
