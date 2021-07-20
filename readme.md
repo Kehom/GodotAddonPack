@@ -135,7 +135,7 @@ Implements most of the functionality of the `LineEditControl` but provides means
 
 #### Inventory
 
-**Attention**: If you already use this plugin before commit 10b9c0080937037abc9ad4537ac26aaa0be4937d, updating will result in a one time script error, when loading the project, telling that the `InventorySlot` identifier isn't valid. Don't worry because the compatibility was not broken and everything will work correctly and further project loads will not result in this error.
+**Attention**: If you already use this plugin before [this commit (10b9c0080937037abc9ad4537ac26aaa0be4937d)](https://github.com/Kehom/GodotAddonPack/commit/10b9c0080937037abc9ad4537ac26aaa0be4937d), updating will result in a one time script error, when loading the project, telling that the `InventorySlot` identifier isn't valid. Don't worry because the compatibility was not broken and everything will work correctly and further project loads will not result in this error.
 
 Interdependency | Extra Settings
 -|-
