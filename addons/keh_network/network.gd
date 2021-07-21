@@ -405,7 +405,12 @@ func set_local_input_enabled(enabled: bool) -> void:
 func create_server(port: int, _server_name: String, max_players: int) -> void:
 	var netpeer: NetworkedMultiplayerPeer = null
 	if (_is_websocket):
-		var net: WebSocketServer = WebSocketServer.new()
+		if (!ClassDB.can_instance("WebSocketServer")):
+			push_error("WebSocket mode has been enabled in the ProjectSettings but the module doesn't seem to be included in this Godot build.")
+			return
+		
+		# NOTE: No static typing here to avoid errors when WebSocket module is not enabled when building Godot
+		var net = ClassDB.instance("WebSocketServer")
 		
 		if (net.listen(port, PoolStringArray(), true) != OK):
 			emit_signal("server_creation_failed")
@@ -415,7 +420,12 @@ func create_server(port: int, _server_name: String, max_players: int) -> void:
 		set_process(true)
 	
 	else:
-		var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
+		if (!ClassDB.can_instance("NetworkedMultiplayerENet")):
+			push_error("ENet mode has been enabld in the ProjectSettings but the module doesn't seem to be included in this Godot build.")
+			return
+		
+		# NOTE: Not static typing here to avoid erors if ENet modules is not included in the Godot build.
+		var net = ClassDB.instance("NetworkedMultiplayerENet")
 		net.compression_mode = _compression
 		
 		# Try to crate the server
@@ -525,7 +535,12 @@ remote func server_receive_credentials(cred: Dictionary) -> void:
 func join_server(_ip: String, _port: int) -> void:
 	var netpeer: NetworkedMultiplayerPeer = null
 	if (_is_websocket):
-		var net = WebSocketClient.new()
+		if (!ClassDB.can_instance("WebSocketClient")):
+			push_error("WebSocket mode has been enabled in the ProjectSettings but the module doesn't seem to be included in this Godot build.")
+			return
+		
+		# NOTE: Not static typing here to WebSocketClient because the module may be disabled when building Godot
+		var net = ClassDB.instance("WebSocketClient")
 		
 		# Must listen to this signal because it will arrive before the actual disconnection.
 		# warning-ignore:return_value_discarded
@@ -540,7 +555,12 @@ func join_server(_ip: String, _port: int) -> void:
 		netpeer = net
 	
 	else:
-		var net: NetworkedMultiplayerENet = NetworkedMultiplayerENet.new()
+		if (!ClassDB.can_instance("NetworkedMultiplayerENet")):
+			push_error("ENet mode has been enabld in the ProjectSettings but the module doesn't seem to be included in this Godot build.")
+			return
+		
+		# NOTE: Not static typing here to avoid erors if ENet modules is not included in the Godot build.
+		var net = ClassDB.instance("NetworkedMultiplayerENet")
 		net.compression_mode = _compression
 		
 		if (net.create_client(_ip, _port) != OK):
