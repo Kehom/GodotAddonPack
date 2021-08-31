@@ -12,6 +12,7 @@ The following addons are part of this pack:
 * Nodes: Some Godot scenes with attached scripts that are meant to be used by attaching instances within other scenes.
 * Smooth: Largely based on [Lawnjelly's Smoothing Addon](https://github.com/lawnjelly/smoothing-addon), automates interpolation calculation of child nodes.
 * UI: Custom user interface Control nodes.
+* Database: An in game database system based on Godot Resource. It contains an editor plugin for easier editing of the data.
 
 ## Installation
 
@@ -125,6 +126,14 @@ yes
 
 The idea here is to provide custom user interface controls in order to increase the offer given by Godot. Activating this addon will make all of the installed controls available for use.
 
+#### CustomControlBase
+
+Interdependency | Extra Settings
+-|-
+none | no
+
+This is a base class meant to serve as a starting point for custom Controls implemented with pure GDScript. The idea of this class is to deal with the theme system in a way that will allow easier overriding of style options from the Inspector, much like any other core Control.
+
 #### FancyLineEdit
 
 Interdependency | Extra Settings
@@ -153,3 +162,23 @@ Two new Control widgets, `InventoryBag` and `InventorySpecialSlots` are used to 
 * Saving/loading inventory state into/from JSON data (binary support is in the TODO).
 * Inventory bag can be expanded or shrinked without affecting item placement.
 * Special slots can override maximum stack sizes to create specialized storing systems.
+
+
+#### TabularBox
+
+Interdependency | Extra Settings
+-|-
+`CustomControlBase` | no
+
+This Control brings tabular data viewing and editing capabilities. To increase its flexibility, it relies on Data Sources, which are resources implemented by users in order to provide the data to be rendered. When editing, the widget will directly interact with the assigned data source. This means that the actual data storage is entirely up to the project needs. A relatively simple data source is provided out of the box.
+
+There are also column types that allow advanced means to show/edit the data within the TabularBox control. Creating custom ones is relatively simple.
+
+
+### Database
+
+Interdependency | Needs Activation | Extra Settings
+-|-|-
+`UI/TabularBox` | yes | no
+
+This addon uses Godot Resource to implement a database system. A database can contain multiple tables. A table can reference another one if so desired. For easier creation/editing/management of the database, an editor plugin that uses `TabularBox` is part of this addon.

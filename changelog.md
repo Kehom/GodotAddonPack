@@ -1,5 +1,11 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2021 Aug 31
+* New addon, `CustomControlBase`, which provides a base class for custom controls and "automatically" deals with the theme system.
+* New addon, `TabularBox`, a Control that brings tabular data viewing and editing to Godot.
+* New addon, `Database`, which is a err... database system with an editor plugin that uses `TabularBox` to easily edit the data.
+* Inventory demo has been changed to use the `Database` addon instead of loading data from a JSON file. The old file is still left in the package as reference. The old code is commented out and have some information to make it clear about the changes.
+
 #### 2021 Feb 26
 * (Network) Warn (and skip) `SnapEntity` classes that contains more than 32 replicable properties.
 * (Network) Added `network.create_snap_entity()` function, to keep more in line with the upcoming C++ module version of this addon.
@@ -32,7 +38,7 @@ Some smaller commits related to minor fixes (specially comment corrections) are 
 * (Network) It now performs snapshot delta compression. If you want to always use full snapshot data set the `Full Snapshot Threshold` to 0 in the *Project Settings*. There is no need to change your code to use delta compression though. NOTE: rigid bodies are always triggering changes meaning that the savings on the mega-demo are not too great because there are 11 of those objects.
 
 #### 2020 Jun 08
-* New addon, "DebugHelper" meant to hold scripts to help with the fun debugging process.
+* New addon, `DebugHelper` meant to hold scripts to help with the fun debugging process.
 * overlayinfo.gd DebugHelper "sub-addon" script to help dump text into the screen without the need to create multiple temporary UI controls all over the place.
 * line3d.gd DebugHelper "sub-addon" script to help draw (debug) lines in 3D.
 

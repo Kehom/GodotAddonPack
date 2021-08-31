@@ -1,0 +1,47 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/keh_gddb/editor/dlg_dbinfo.gd" type="Script" id=1]
+[ext_resource path="res://addons/keh_gddb/editor/evt_esc.tres" type="InputEventKey" id=2]
+
+[sub_resource type="ShortCut" id=1]
+shortcut = ExtResource( 2 )
+
+[node name="dlg_dbinfo" type="WindowDialog"]
+margin_right = 393.0
+margin_bottom = 183.0
+popup_exclusive = true
+window_title = "Database info"
+resizable = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="vbox" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 6.0
+margin_top = 6.0
+margin_right = -6.0
+margin_bottom = -6.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="txt_info" type="RichTextLabel" parent="vbox"]
+margin_right = 381.0
+margin_bottom = 147.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="bt_ok" type="Button" parent="vbox"]
+margin_left = 150.0
+margin_top = 151.0
+margin_right = 230.0
+margin_bottom = 171.0
+rect_min_size = Vector2( 80, 0 )
+size_flags_horizontal = 4
+shortcut = SubResource( 1 )
+text = "Ok"
+[connection signal="pressed" from="vbox/bt_ok" to="." method="_on_bt_ok_pressed"]

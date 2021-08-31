@@ -24,6 +24,21 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://demos/network/scenes/unit.gd"
 }, {
+"base": "Control",
+"class": "CustomControlBase",
+"language": "GDScript",
+"path": "res://addons/keh_ui/core/customctrlbase.gd"
+}, {
+"base": "Reference",
+"class": "DBHelpers",
+"language": "GDScript",
+"path": "res://addons/keh_gddb/editor/helpers.gd"
+}, {
+"base": "Resource",
+"class": "DBTable",
+"language": "GDScript",
+"path": "res://addons/keh_gddb/dbtable.gd"
+}, {
 "base": "Reference",
 "class": "EncDecBuffer",
 "language": "GDScript",
@@ -38,6 +53,11 @@ _global_script_classes=[ {
 "class": "FancyLineEdit",
 "language": "GDScript",
 "path": "res://addons/keh_ui/fancy_line_edit.gd"
+}, {
+"base": "Resource",
+"class": "GDDatabase",
+"language": "GDScript",
+"path": "res://addons/keh_gddb/database.gd"
 }, {
 "base": "Reference",
 "class": "InputData",
@@ -204,6 +224,31 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/keh_network/snapentity.gd"
 }, {
+"base": "CustomControlBase",
+"class": "TabularBox",
+"language": "GDScript",
+"path": "res://addons/keh_ui/tabular/tabularbox.gd"
+}, {
+"base": "Resource",
+"class": "TabularDataSourceBase",
+"language": "GDScript",
+"path": "res://addons/keh_ui/tabular/datasourcebase.gd"
+}, {
+"base": "TabularDataSourceBase",
+"class": "TabularSimpleDataSource",
+"language": "GDScript",
+"path": "res://addons/keh_ui/tabular/simpleds.gd"
+}, {
+"base": "Reference",
+"class": "TabularStyler",
+"language": "GDScript",
+"path": "res://addons/keh_ui/tabular/styler.gd"
+}, {
+"base": "Reference",
+"class": "UIHelper",
+"language": "GDScript",
+"path": "res://addons/keh_ui/core/uihelpers.gd"
+}, {
 "base": "Reference",
 "class": "UnitSelectionData",
 "language": "GDScript",
@@ -218,9 +263,13 @@ _global_script_class_icons={
 "AutoInterpolate": "",
 "Cam3D": "",
 "CharUnitClass": "",
+"CustomControlBase": "",
+"DBHelpers": "",
+"DBTable": "",
 "EncDecBuffer": "",
 "EntityInfo": "",
 "FancyLineEdit": "res://addons/keh_ui/fancy_line_edit.png",
+"GDDatabase": "",
 "InputData": "",
 "InventoryBag": "res://addons/keh_ui/inventory/bag.png",
 "InventoryBase": "",
@@ -254,6 +303,11 @@ _global_script_class_icons={
 "Smooth2D": "",
 "Smooth3D": "",
 "SnapEntityBase": "",
+"TabularBox": "",
+"TabularDataSourceBase": "",
+"TabularSimpleDataSource": "",
+"TabularStyler": "",
+"UIHelper": "",
 "UnitSelectionData": "",
 "_SmoothCore": ""
 }
@@ -278,7 +332,7 @@ gdscript/warnings/unused_class_variable=true
 
 [editor_plugins]
 
-enabled=PoolStringArray( "keh_dbghelper", "keh_network", "keh_smooth", "keh_ui" )
+enabled=PoolStringArray( "keh_dbghelper", "keh_gddb", "keh_network", "keh_smooth", "keh_ui" )
 
 [global]
 

@@ -1,0 +1,137 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://addons/keh_gddb/editor/dlg_newcolumn.gd" type="Script" id=1]
+[ext_resource path="res://addons/keh_gddb/editor/evt_esc.tres" type="InputEventKey" id=2]
+[ext_resource path="res://addons/keh_gddb/editor/evt_enter.tres" type="InputEventKey" id=3]
+
+[sub_resource type="ShortCut" id=1]
+shortcut = ExtResource( 3 )
+
+[sub_resource type="ShortCut" id=2]
+shortcut = ExtResource( 2 )
+
+[node name="dlg_newcolumn" type="WindowDialog"]
+margin_right = 410.0
+margin_bottom = 104.0
+popup_exclusive = true
+window_title = "Create new column"
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="vbox" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = -5.0
+margin_bottom = -5.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="line_colname" type="HBoxContainer" parent="vbox"]
+margin_right = 400.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 0, 24 )
+
+[node name="lbl_colname" type="Label" parent="vbox/line_colname"]
+margin_top = 5.0
+margin_right = 130.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 130, 0 )
+text = "Column name: "
+
+[node name="txt_colname" type="LineEdit" parent="vbox/line_colname"]
+margin_left = 134.0
+margin_right = 400.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+
+[node name="line_vtype" type="HBoxContainer" parent="vbox"]
+margin_top = 28.0
+margin_right = 400.0
+margin_bottom = 52.0
+rect_min_size = Vector2( 0, 24 )
+
+[node name="lbl_vtype" type="Label" parent="vbox/line_vtype"]
+margin_top = 5.0
+margin_right = 130.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 130, 0 )
+text = "Type: "
+
+[node name="opt_vtype" type="OptionButton" parent="vbox/line_vtype"]
+margin_left = 134.0
+margin_right = 400.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+text = "String"
+items = [ "Unique String", null, false, 0, null, "Unique Integer", null, false, 1, null, "External String ID", null, false, 500, null, "External Integer ID", null, false, 501, null, "Random Weight", null, false, 600, null, "String", null, false, 1000, null, "Bool", null, false, 1001, null, "Integer", null, false, 1002, null, "Float", null, false, 1003, null, "Texture", null, false, 1004, null, "Audio", null, false, 1005, null, "Generic Resource", null, false, 1006, null ]
+selected = 5
+
+[node name="line_exttable" type="HBoxContainer" parent="vbox"]
+visible = false
+margin_top = 56.0
+margin_right = 400.0
+margin_bottom = 80.0
+rect_min_size = Vector2( 0, 24 )
+
+[node name="lbl_othername" type="Label" parent="vbox/line_exttable"]
+margin_top = 5.0
+margin_right = 130.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 130, 0 )
+text = "External table:"
+
+[node name="opt_othertable" type="OptionButton" parent="vbox/line_exttable"]
+margin_left = 134.0
+margin_right = 400.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+
+[node name="line_mainbts" type="HBoxContainer" parent="vbox"]
+margin_top = 56.0
+margin_right = 400.0
+margin_bottom = 76.0
+alignment = 1
+
+[node name="bt_ok" type="Button" parent="vbox/line_mainbts"]
+margin_left = 128.0
+margin_right = 188.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 60, 0 )
+disabled = true
+shortcut = SubResource( 1 )
+text = "Ok"
+
+[node name="lbl_helper" type="Label" parent="vbox/line_mainbts"]
+margin_left = 192.0
+margin_top = 3.0
+margin_right = 208.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 16, 0 )
+mouse_filter = 1
+
+[node name="bt_cancel" type="Button" parent="vbox/line_mainbts"]
+margin_left = 212.0
+margin_right = 272.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 60, 0 )
+shortcut = SubResource( 2 )
+text = "Cancel"
+
+[node name="lbl_alert" type="Label" parent="vbox"]
+visible = false
+margin_top = 80.0
+margin_right = 400.0
+margin_bottom = 94.0
+autowrap = true
+[connection signal="visibility_changed" from="." to="." method="_on_dlg_newcolumn_visibility_changed"]
+[connection signal="resized" from="vbox" to="." method="_on_vbox_resized"]
+[connection signal="text_changed" from="vbox/line_colname/txt_colname" to="." method="_on_txt_colname_text_changed"]
+[connection signal="text_entered" from="vbox/line_colname/txt_colname" to="." method="_on_txt_colname_text_entered"]
+[connection signal="item_selected" from="vbox/line_vtype/opt_vtype" to="." method="_on_opt_vtype_item_selected"]
+[connection signal="pressed" from="vbox/line_mainbts/bt_ok" to="." method="_on_bt_ok_pressed"]
+[connection signal="pressed" from="vbox/line_mainbts/bt_cancel" to="." method="_on_bt_cancel_pressed"]

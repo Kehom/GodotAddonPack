@@ -1,0 +1,68 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://addons/keh_gddb/editor/dlg_rnametbl.gd" type="Script" id=1]
+[ext_resource path="res://addons/keh_gddb/editor/evt_esc.tres" type="InputEventKey" id=2]
+[ext_resource path="res://addons/keh_gddb/editor/evt_enter.tres" type="InputEventKey" id=3]
+
+[sub_resource type="ShortCut" id=1]
+shortcut = ExtResource( 3 )
+
+[sub_resource type="ShortCut" id=2]
+shortcut = ExtResource( 2 )
+
+[node name="dlg_rnametbl" type="WindowDialog"]
+margin_right = 450.0
+margin_bottom = 84.0
+popup_exclusive = true
+window_title = "Rename table"
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="vbox" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 9.0
+margin_top = 9.0
+margin_right = -9.0
+margin_bottom = -9.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_info" type="Label" parent="vbox"]
+margin_right = 432.0
+margin_bottom = 14.0
+text = "Rename table to:"
+
+[node name="txt_newname" type="LineEdit" parent="vbox"]
+margin_top = 18.0
+margin_right = 432.0
+margin_bottom = 42.0
+
+[node name="btbox" type="HBoxContainer" parent="vbox"]
+margin_top = 46.0
+margin_right = 432.0
+margin_bottom = 66.0
+alignment = 1
+
+[node name="bt_ok" type="Button" parent="vbox/btbox"]
+margin_left = 157.0
+margin_right = 217.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 60, 0 )
+shortcut = SubResource( 1 )
+text = "Ok"
+
+[node name="bt_cancel" type="Button" parent="vbox/btbox"]
+margin_left = 221.0
+margin_right = 275.0
+margin_bottom = 20.0
+shortcut = SubResource( 2 )
+text = "Cancel"
+[connection signal="resized" from="vbox" to="." method="_on_vbox_resized"]
+[connection signal="text_changed" from="vbox/txt_newname" to="." method="_on_txt_newname_text_changed"]
+[connection signal="text_entered" from="vbox/txt_newname" to="." method="_on_txt_newname_text_entered"]
+[connection signal="pressed" from="vbox/btbox/bt_ok" to="." method="_on_bt_ok_pressed"]
+[connection signal="pressed" from="vbox/btbox/bt_cancel" to="." method="_on_bt_cancel_pressed"]

@@ -1,0 +1,5 @@
+[gd_resource type="InputEventKey" format=2]
+
+[resource]
+pressed = true
+scancode = 16777217

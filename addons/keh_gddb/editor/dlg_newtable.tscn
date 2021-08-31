@@ -1,0 +1,145 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://addons/keh_gddb/editor/dlg_newtable.gd" type="Script" id=1]
+[ext_resource path="res://addons/keh_gddb/editor/dlg_newtable_idtgroup.tres" type="ButtonGroup" id=2]
+[ext_resource path="res://addons/keh_gddb/editor/evt_esc.tres" type="InputEventKey" id=3]
+[ext_resource path="res://addons/keh_gddb/editor/evt_enter.tres" type="InputEventKey" id=4]
+
+[sub_resource type="ShortCut" id=1]
+shortcut = ExtResource( 4 )
+
+[sub_resource type="ShortCut" id=2]
+shortcut = ExtResource( 3 )
+
+[node name="dlg_newtable" type="WindowDialog"]
+margin_right = 480.0
+margin_bottom = 122.0
+popup_exclusive = true
+window_title = "Create new table"
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="vbox" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 9.0
+margin_top = 9.0
+margin_right = -9.0
+margin_bottom = -9.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="line_name" type="HBoxContainer" parent="vbox"]
+margin_right = 462.0
+margin_bottom = 24.0
+
+[node name="lbl_tbname" type="Label" parent="vbox/line_name"]
+margin_top = 5.0
+margin_right = 100.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 100, 0 )
+text = "Table name:"
+
+[node name="edt_tbname" type="LineEdit" parent="vbox/line_name"]
+margin_left = 104.0
+margin_right = 462.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+caret_blink = true
+
+[node name="line_file" type="HBoxContainer" parent="vbox"]
+margin_top = 28.0
+margin_right = 462.0
+margin_bottom = 52.0
+
+[node name="lbl_filename" type="Label" parent="vbox/line_file"]
+margin_top = 5.0
+margin_right = 100.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 100, 0 )
+text = "File name:"
+
+[node name="edt_filename" type="LineEdit" parent="vbox/line_file"]
+margin_left = 104.0
+margin_right = 332.0
+margin_bottom = 24.0
+hint_tooltip = "File will be created at the same directory of the database resource."
+size_flags_horizontal = 3
+caret_blink = true
+
+[node name="lbl_ext" type="Label" parent="vbox/line_file"]
+margin_left = 336.0
+margin_top = 5.0
+margin_right = 386.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 50, 0 )
+text = ".tres"
+
+[node name="chk_embed" type="CheckBox" parent="vbox/line_file"]
+margin_left = 390.0
+margin_right = 462.0
+margin_bottom = 24.0
+text = "Embed"
+
+[node name="line_idtype" type="HBoxContainer" parent="vbox"]
+margin_top = 56.0
+margin_right = 462.0
+margin_bottom = 80.0
+
+[node name="lbl_idtype" type="Label" parent="vbox/line_idtype"]
+margin_top = 5.0
+margin_right = 100.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 100, 0 )
+text = "ID Type:"
+
+[node name="chk_integer" type="CheckBox" parent="vbox/line_idtype"]
+margin_left = 104.0
+margin_right = 281.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+pressed = true
+group = ExtResource( 2 )
+text = "Integer"
+
+[node name="chk_string" type="CheckBox" parent="vbox/line_idtype"]
+margin_left = 285.0
+margin_right = 462.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+group = ExtResource( 2 )
+text = "String"
+
+[node name="line_buttons" type="HBoxContainer" parent="vbox"]
+margin_top = 84.0
+margin_right = 462.0
+margin_bottom = 104.0
+alignment = 1
+
+[node name="bt_ok" type="Button" parent="vbox/line_buttons"]
+margin_left = 169.0
+margin_right = 229.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 60, 0 )
+disabled = true
+shortcut = SubResource( 1 )
+text = "Create"
+
+[node name="bt_cancel" type="Button" parent="vbox/line_buttons"]
+margin_left = 233.0
+margin_right = 293.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 60, 0 )
+shortcut = SubResource( 2 )
+text = "Cancel"
+[connection signal="visibility_changed" from="." to="." method="_on_dlg_newtable_visibility_changed"]
+[connection signal="resized" from="vbox" to="." method="_on_vbox_resized"]
+[connection signal="text_changed" from="vbox/line_name/edt_tbname" to="." method="_on_edt_tbname_text_changed"]
+[connection signal="text_entered" from="vbox/line_name/edt_tbname" to="." method="_on_edit_entered"]
+[connection signal="text_entered" from="vbox/line_file/edt_filename" to="." method="_on_edit_entered"]
+[connection signal="toggled" from="vbox/line_file/chk_embed" to="." method="_on_chk_embed_toggled"]
+[connection signal="pressed" from="vbox/line_buttons/bt_ok" to="." method="_on_bt_ok_pressed"]
+[connection signal="pressed" from="vbox/line_buttons/bt_cancel" to="." method="_on_bt_cancel_pressed"]
