@@ -768,6 +768,10 @@ func _on_table_list_table_resource_dropped(res: DBTable) -> void:
 		return
 	
 	_add_table(res, true)
+	
+	# Ensure the resource is saved otherwise external tables won't be actually added into the DB unless further
+	# changes to the main database are performed.
+	_save()
 
 
 

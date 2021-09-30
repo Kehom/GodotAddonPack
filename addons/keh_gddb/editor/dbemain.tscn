@@ -206,6 +206,7 @@ rect_min_size = Vector2( 120, 85 )
 rect_clip_content = true
 size_flags_vertical = 3
 script = ExtResource( 4 )
+data_source = null
 autosave_data_source = false
 auto_edit_next_row = true
 auto_handle_remove_row = false
@@ -227,6 +228,13 @@ CustomIcons/left_arrow = null
 CustomIcons/right_arrow = null
 CustomIcons/trash_bin = null
 CustomIcons/no_texture = null
+CustomStyles/background = null
+CustomStyles/header = null
+CustomStyles/odd_row = null
+CustomStyles/even_row = null
+CustomStyles/button_normal = null
+CustomStyles/button_hover = null
+CustomStyles/button_pressed = null
 CustomFonts/header = null
 CustomFonts/cell = null
 CustomColors/header_text = null
@@ -252,7 +260,8 @@ resizable = true
 mode = 0
 access = 2
 filters = PoolStringArray( "*.tres", "*.res" )
-
+current_dir = "/Dev/Godot/KehAddons/project3.2"
+current_path = "/Dev/Godot/KehAddons/project3.2/"
 
 [node name="dlg_rnametbl" parent="dialogs" instance=ExtResource( 6 )]
 
