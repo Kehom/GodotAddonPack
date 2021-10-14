@@ -38,6 +38,7 @@ const CExternalT: Script = preload("columnexttable.gd")
 const CAudioT: Script = preload("columnaudio.gd")
 const CRWeightT: Script = preload("columnrweight.gd")
 const CGenResT: Script = preload("columngres.gd")
+const CColorT: Script = preload("columncolor.gd")
 
 #######################################################################################################################
 ### "Public" properties
@@ -87,6 +88,9 @@ func get_class_for_type(tp: int) -> Script:
 		
 		DBTable.ValueType.VT_GenericRes:
 			return CGenResT
+		
+		DBTable.ValueType.VT_Color:
+			return CColorT
 	
 	return null
 

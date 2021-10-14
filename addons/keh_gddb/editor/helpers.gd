@@ -60,6 +60,7 @@ static func generate_ui_non_unique_types() -> Dictionary:
 		DBTable.ValueType.VT_Float: "Float",
 		DBTable.ValueType.VT_Texture: "Texture",
 		DBTable.ValueType.VT_Audio: "Audio",
+		DBTable.ValueType.VT_Color: "Color",
 	}
 
 # Generate a Dictionary with all available column value types. This is meant to be shown within the "new column" dialog.
@@ -79,5 +80,6 @@ static func generate_ui_types() -> Dictionary:
 		DBTable.ValueType.VT_Float: "Float",
 		DBTable.ValueType.VT_Texture: "Texture",
 		DBTable.ValueType.VT_Audio: "Audio",
-		DBTable.ValueType.VT_GenericRes: "Generic Resource"
+		DBTable.ValueType.VT_GenericRes: "Generic Resource",
+		DBTable.ValueType.VT_Color: "Color",
 	}

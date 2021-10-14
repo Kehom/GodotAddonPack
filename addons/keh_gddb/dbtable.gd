@@ -46,6 +46,7 @@ enum ValueType {
 	VT_Texture,
 	VT_Audio,
 	VT_GenericRes,
+	VT_Color
 }
 
 #######################################################################################################################
@@ -950,6 +951,9 @@ func _get_default_val(col: Dictionary):
 		ValueType.VT_GenericRes:
 			# Generic resource is stored as a path to it
 			return ""
+		
+		ValueType.VT_Color:
+			return Color(0.0, 0.0, 0.0, 1.0)
 	
 	# Return empty string to avoid "storing null"
 	return ""
@@ -1039,6 +1043,13 @@ func _convert_value_type(ctitle: String, to_type: int) -> void:
 				
 				else:
 					rinfo[ctitle] = ""
+			
+			ValueType.VT_Color:
+				if (val is String):
+					rinfo[ctitle] = Color(val)
+				else:
+					rinfo[ctitle] = Color(0.0, 0.0, 0.0, 1.0)
+
 
 
 # Obtain the dictionary containing information about tables referenced by this one (keys) as well as the column titles
