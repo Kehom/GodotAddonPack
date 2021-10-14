@@ -531,7 +531,11 @@ func sort_by_column(cindex: int, ascending: bool) -> bool:
 	var rsorter: _RowSorter = _RowSorter.new()
 	rsorter.col = _column_arr[cindex].name
 	
-	_rowlist.sort_custom(rsorter, "asc" if ascending else "desc")
+	if (_column_arr[cindex].value_type == ValueType.VT_Color):
+		_rowlist.sort_custom(rsorter, "asccol" if ascending else "desccol")
+	
+	else:
+		_rowlist.sort_custom(rsorter, "asc" if ascending else "desc")
 	
 	return true
 
@@ -674,6 +678,42 @@ class _RowSorter:
 	
 	func desc(a: Dictionary, b: Dictionary) -> bool:
 		return b[col] < a[col]
+	
+	# Specialized for color sorting - In this case, the priority for the sorting is: Hue, Saturation then Lightness
+	func asccol(a: Dictionary, b: Dictionary) -> bool:
+		var ca: Color = a[col]
+		var cb: Color = b[col]
+		
+		#return (ca.h < cb.h || (ca.h == cb.h && ca.s < cb.s) || (ca.h == cb.h && ))
+		if (ca.h < cb.h):
+			return true
+		
+		elif (ca.h == cb.h):
+			if (ca.s < cb.s):
+				return true
+			
+			elif (ca.s == cb.s):
+				if (ca.v < cb.v):
+					return true
+		
+		return false
+	
+	func desccol(a: Dictionary, b: Dictionary) -> bool:
+		var ca: Color = a[col]
+		var cb: Color = b[col]
+		
+		if (cb.h < ca.h):
+			return true
+		
+		elif (ca.h == cb.h):
+			if (cb.s < ca.s):
+				return true
+			
+			elif (ca.s == cb.s):
+				if (cb.v < ca.v):
+					return true
+		
+		return true
 
 
 
