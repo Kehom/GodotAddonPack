@@ -1,5 +1,9 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2021 Nov 12
+* New addon, `ExpandablePanel`, which provides a panel that expands or shrinks to reveal or hide its contents.
+* (UI) The `CustomControlBase` got some small improvements. Namely a fix to the stylebox override, which now triggers the control to be redrawn and the possibility to create theme constants with defined ranges.
+
 #### 2021 Aug 31
 * New addon, `CustomControlBase`, which provides a base class for custom controls and "automatically" deals with the theme system.
 * New addon, `TabularBox`, a Control that brings tabular data viewing and editing to Godot.

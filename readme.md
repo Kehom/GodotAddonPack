@@ -182,3 +182,13 @@ Interdependency | Needs Activation | Extra Settings
 `UI/TabularBox` | yes | no
 
 This addon uses Godot Resource to implement a database system. A database can contain multiple tables. A table can reference another one if so desired. For easier creation/editing/management of the database, an editor plugin that uses `TabularBox` is part of this addon.
+
+### ExpandablePanel
+
+Interdependency | Extra Settings
+--|--
+`CustomControlBase` | no
+
+Add a panel that can expand or shrink in order to reveal/hide its contents. Each child node becomes a "page" allowing the expanding/shrinking to deal with multiple different types of contents. Expanding and/or shrinking can be animated and even have curve resources affecting the behavior of the animation.
+
+Each page gets a "button" to toggle its content. The associated icon used within that button can be configured for each available page within the expandable panel.

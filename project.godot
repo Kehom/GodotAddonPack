@@ -49,6 +49,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/keh_network/entityinfo.gd"
 }, {
+"base": "CustomControlBase",
+"class": "ExpandablePanel",
+"language": "GDScript",
+"path": "res://addons/keh_ui/expanel/expanel.gd"
+}, {
 "base": "Control",
 "class": "FancyLineEdit",
 "language": "GDScript",
@@ -268,6 +273,7 @@ _global_script_class_icons={
 "DBTable": "",
 "EncDecBuffer": "",
 "EntityInfo": "",
+"ExpandablePanel": "",
 "FancyLineEdit": "res://addons/keh_ui/fancy_line_edit.png",
 "GDDatabase": "",
 "InputData": "",
