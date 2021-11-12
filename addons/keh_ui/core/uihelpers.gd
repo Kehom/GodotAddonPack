@@ -50,7 +50,25 @@ static func set_stylebox_margin(onto: StyleBox, left: int, top: int, right: int,
 	onto.content_margin_bottom = bottom
 
 
-# Give na font and a "box height", return the Y coordinate necessary to render a text using that font vertically centered
+# Given a font and a "box height", return the Y coordinate necessary to render a text using that font vertically centered
 # within that box
 static func get_text_vertical_center(font: Font, box_height: float) -> float:
 	return ((box_height + (font.get_height() - font.get_descent() * 2.0)) * 0.5)
+
+
+# Given a Control, change its four anchor points.
+static func set_anchor_points(ctrl: Control, left: float, top: float, right: float, bottom: float) -> void:
+	ctrl.set_anchor(MARGIN_LEFT, left)
+	ctrl.set_anchor(MARGIN_TOP, top)
+	ctrl.set_anchor(MARGIN_RIGHT, right)
+	ctrl.set_anchor(MARGIN_BOTTOM, bottom)
+
+
+
+# Given a Control, change its four margin points.
+static func set_margins(ctrl: Control, left: int, top: int, right: int, bottom: int) -> void:
+	ctrl.set_margin(MARGIN_LEFT, left)
+	ctrl.set_margin(MARGIN_TOP, top)
+	ctrl.set_margin(MARGIN_RIGHT, right)
+	ctrl.set_margin(MARGIN_BOTTOM, bottom)
+

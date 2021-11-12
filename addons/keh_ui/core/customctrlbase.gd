@@ -190,6 +190,13 @@ func get_theme_color(name:String, type: String = "") -> Color:
 func add_theme_constant(name: String, constant: int, expose: bool = true, enum_string: String = "") -> void:
 	__add_entry(name, constant, expose, TYPE_INT, PROPERTY_HINT_ENUM if !enum_string.empty() else 0, enum_string, __reg_constant)
 
+# Add a constant entry with a defined range. In this case there is no point in not exposing this constant so this will
+# always be exposed
+func add_theme_constant_range(name: String, constant: int, minval: int, maxval: int, allowlesser: bool = false, allowgreater: bool = false) -> void:
+	var hstr: String = "%d,%d%s%s"  % [minval, maxval, ",or_lesser" if allowlesser else "", ",or_greater" if allowgreater else ""]
+	__add_entry(name, constant, true, TYPE_INT, PROPERTY_HINT_RANGE, hstr, __reg_constant)
+
+
 # Add a constant override
 func add_theme_constant_override(name: String, value: int) -> void:
 	# warning-ignore:return_value_discarded
@@ -350,7 +357,16 @@ func _set(prop: String, val) -> bool:
 			if (!entry):
 				return false
 			
-			entry.override = val if (val != null && val is StyleBox) else null
+			var oldval: StyleBox = entry.override
+			if (oldval):
+				oldval.disconnect("changed", self, "notification")
+			
+			var nval: StyleBox = val as StyleBox
+			entry.override = nval
+			
+			if (nval && !nval.is_connected("changed", self, "notification")):
+				# warning-ignore:return_value_discarded
+				nval.connect("changed", self, "notification", [NOTIFICATION_THEME_CHANGED])
 		
 		"CustomFonts":
 			entry = __reg_font.get(split[1], null)
