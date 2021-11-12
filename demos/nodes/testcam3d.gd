@@ -11,8 +11,8 @@ onready var original_physics: int = Engine.iterations_per_second
 
 ## Easy access to some nodes
 onready var camera: Cam3DClass = $rotator/dummy_char/Cam3D
-onready var lpanel: Panel = $ctrl/lpnl
-onready var rpanel: Panel = $ctrl/rpnl
+onready var lpanel: Panel = $ctrl/exp_left/settings
+onready var rpanel: Panel = $ctrl/exp_right/settings
 
 # This will be used to build the dropdown menu as well as help with the signal handling
 # of the choices within that control, which is meant to change the camera motion mode

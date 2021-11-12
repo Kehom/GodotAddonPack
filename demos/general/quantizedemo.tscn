@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://demos/general/quantize_checkgroup.tres" type="ButtonGroup" id=1]
 [ext_resource path="res://demos/general/quantizedemo.gd" type="Script" id=2]
+[ext_resource path="res://addons/keh_ui/expanel/expanel.gd" type="Script" id=3]
 
 [sub_resource type="CubeMesh" id=1]
 
@@ -16,36 +17,80 @@ script = ExtResource( 2 )
 
 [node name="hud" type="CanvasLayer" parent="."]
 
-[node name="pnl" type="Panel" parent="hud"]
-self_modulate = Color( 1, 1, 1, 0.529412 )
+[node name="expandable" type="Control" parent="hud"]
 anchor_bottom = 1.0
-margin_right = 209.0
+margin_right = 210.0
+rect_min_size = Vector2( 5, 5 )
+rect_clip_content = true
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+border = 0
+current_page = -1
+toggle_button_separation = 10
+keep_toggle_button_focus = false
+animation/update_on_physics = false
+animation/shrink_on_page_change = true
+animation/expand_time = 0.25
+animation/expand_curve = null
+animation/shrink_time = 0.15
+animation/shrink_curve = null
+__content_size = Vector2( 192, 12 )
+__page_data = {
+"settings": {
+"expanded_icon": null,
+"icon_color": Color( 1, 1, 1, 1 ),
+"shrinked_icon": null
+}
+}
+CustomStyles/background = null
+CustomStyles/bar = null
+CustomStyles/button_expanded_hover = null
+CustomStyles/button_expanded_pressed = null
+CustomStyles/button_expanded_focus = null
+CustomStyles/button_expanded_normal = null
+CustomStyles/button_shrinked_hover = null
+CustomStyles/button_shrinked_pressed = null
+CustomStyles/button_shrinked_focus = null
+CustomStyles/button_shrinked_normal = null
+CustomConstants/updown_width = null
+CustomConstants/updown_height = null
+CustomConstants/leftright_width = null
+CustomConstants/leftright_height = null
+
+[node name="settings" type="VBoxContainer" parent="hud/expandable"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 4.0
+margin_right = -22.0
+margin_bottom = -4.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="lbl_pivot" type="Label" parent="hud/expandable/settings"]
+margin_right = 184.0
+margin_bottom = 14.0
+text = "Pivot"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lbl_pivot" type="Label" parent="hud/pnl"]
-margin_left = 8.0
-margin_top = 8.0
-margin_right = 48.0
-margin_bottom = 22.0
-text = "Pivot"
-
-[node name="lbl_yrotation" type="Label" parent="hud/pnl"]
-margin_left = 8.0
-margin_top = 24.0
-margin_right = 48.0
-margin_bottom = 38.0
+[node name="lbl_yrotation" type="Label" parent="hud/expandable/settings"]
+margin_top = 18.0
+margin_right = 184.0
+margin_bottom = 32.0
 text = "Y Rotation"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="sl_pivyrot" type="HSlider" parent="hud/pnl"]
-margin_left = 16.0
-margin_top = 40.0
-margin_right = 192.0
-margin_bottom = 56.0
+[node name="sl_pivyrot" type="HSlider" parent="hud/expandable/settings"]
+margin_top = 36.0
+margin_right = 184.0
+margin_bottom = 52.0
 min_value = -3.0
 max_value = 3.0
 step = 0.1
@@ -53,57 +98,51 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lbl_zrotation" type="Label" parent="hud/pnl"]
-margin_left = 8.0
-margin_top = 64.0
-margin_right = 72.0
-margin_bottom = 78.0
+[node name="lbl_zrotation" type="Label" parent="hud/expandable/settings"]
+margin_top = 56.0
+margin_right = 184.0
+margin_bottom = 70.0
 text = "Z Rotation"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="sl_pivzrot" type="HSlider" parent="hud/pnl"]
-margin_left = 16.0
-margin_top = 80.0
-margin_right = 192.0
-margin_bottom = 96.0
+[node name="sl_pivzrot" type="HSlider" parent="hud/expandable/settings"]
+margin_top = 74.0
+margin_right = 184.0
+margin_bottom = 90.0
 max_value = 70.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="lbl_cube" type="Label" parent="hud/pnl"]
-margin_left = 8.0
-margin_top = 112.0
-margin_right = 48.0
-margin_bottom = 126.0
+[node name="lbl_cube" type="Label" parent="hud/expandable/settings"]
+margin_top = 94.0
+margin_right = 184.0
+margin_bottom = 108.0
 text = "Cube X Rotation"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="sl_cubexrot" type="HSlider" parent="hud/pnl"]
-margin_left = 16.0
-margin_top = 128.0
-margin_right = 192.0
-margin_bottom = 144.0
+[node name="sl_cubexrot" type="HSlider" parent="hud/expandable/settings"]
+margin_top = 112.0
+margin_right = 184.0
+margin_bottom = 128.0
 min_value = -3.5
 max_value = 3.5
 step = 0.1
 
-[node name="lbl_bitspercomp" type="Label" parent="hud/pnl"]
-margin_left = 8.0
-margin_top = 176.0
-margin_right = 48.0
-margin_bottom = 190.0
+[node name="lbl_bitspercomp" type="Label" parent="hud/expandable/settings"]
+margin_top = 132.0
+margin_right = 184.0
+margin_bottom = 146.0
 text = "Bits per Quat component:"
 
-[node name="chk_9bits" type="CheckBox" parent="hud/pnl"]
-margin_left = 16.0
-margin_top = 192.0
-margin_right = 80.0
-margin_bottom = 216.0
+[node name="chk_9bits" type="CheckBox" parent="hud/expandable/settings"]
+margin_top = 150.0
+margin_right = 184.0
+margin_bottom = 174.0
 pressed = true
 group = ExtResource( 1 )
 text = "9 bits"
@@ -111,33 +150,30 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="chk_10bits" type="CheckBox" parent="hud/pnl"]
-margin_left = 16.0
-margin_top = 216.0
-margin_right = 80.0
-margin_bottom = 240.0
+[node name="chk_10bits" type="CheckBox" parent="hud/expandable/settings"]
+margin_top = 178.0
+margin_right = 184.0
+margin_bottom = 202.0
 group = ExtResource( 1 )
 text = "10 bits"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="chk_15bits" type="CheckBox" parent="hud/pnl"]
-margin_left = 16.0
-margin_top = 240.0
-margin_right = 88.0
-margin_bottom = 264.0
+[node name="chk_15bits" type="CheckBox" parent="hud/expandable/settings"]
+margin_top = 206.0
+margin_right = 184.0
+margin_bottom = 230.0
 group = ExtResource( 1 )
 text = "15 bits"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="bt_back" type="Button" parent="hud/pnl"]
-margin_left = 8.0
-margin_top = 568.0
-margin_right = 88.0
-margin_bottom = 588.0
+[node name="bt_back" type="Button" parent="hud/expandable/settings"]
+margin_top = 234.0
+margin_right = 184.0
+margin_bottom = 254.0
 text = "Back"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -161,4 +197,4 @@ material/0 = null
 
 [node name="cam" type="Camera" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.756801, 0.653645, 0, -0.653645, 0.756801, 0, 7.3352, 10.6415 )
-[connection signal="pressed" from="hud/pnl/bt_back" to="." method="_on_bt_back_pressed"]
+[connection signal="pressed" from="hud/expandable/settings/bt_back" to="." method="_on_bt_back_pressed"]

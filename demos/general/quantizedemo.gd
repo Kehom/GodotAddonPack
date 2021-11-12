@@ -44,11 +44,11 @@ func _physics_process(dt: float) -> void:
 	
 	$source/cube.rotation.x += cube_xrotation * dt
 	
-	if ($hud/pnl/chk_9bits.is_pressed()):
+	if ($hud/expandable/settings/chk_9bits.is_pressed()):
 		simulate_replication_9bits()
-	elif ($hud/pnl/chk_10bits.is_pressed()):
+	elif ($hud/expandable/settings/chk_10bits.is_pressed()):
 		simulate_replication_10bits()
-	elif ($hud/pnl/chk_15bits.is_pressed()):
+	elif ($hud/expandable/settings/chk_15bits.is_pressed()):
 		simulate_replication_15bits()
 
 
@@ -115,13 +115,13 @@ func simulate_replication_15bits() -> void:
 
 
 func _setup_hud() -> void:
-	$hud/pnl/sl_pivyrot.value = pivot_yrotation
-	$hud/pnl/sl_pivzrot.value = pivot_zrotation
-	$hud/pnl/sl_cubexrot.value = cube_xrotation
+	$hud/expandable/settings/sl_pivyrot.value = pivot_yrotation
+	$hud/expandable/settings/sl_pivzrot.value = pivot_zrotation
+	$hud/expandable/settings/sl_cubexrot.value = cube_xrotation
 	
-	SharedUtils.connector($hud/pnl/sl_pivyrot, "value_changed", self, "_on_pivoty_changed")
-	SharedUtils.connector($hud/pnl/sl_pivzrot, "value_changed", self, "_on_pivotz_changed")
-	SharedUtils.connector($hud/pnl/sl_cubexrot, "value_changed", self, "_on_cubex_changed")
+	SharedUtils.connector($hud/expandable/settings/sl_pivyrot, "value_changed", self, "_on_pivoty_changed")
+	SharedUtils.connector($hud/expandable/settings/sl_pivzrot, "value_changed", self, "_on_pivotz_changed")
+	SharedUtils.connector($hud/expandable/settings/sl_cubexrot, "value_changed", self, "_on_cubex_changed")
 
 
 func _on_pivoty_changed(val: float) -> void:

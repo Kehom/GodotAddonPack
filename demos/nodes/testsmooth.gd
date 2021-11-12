@@ -49,7 +49,7 @@ func _exit_tree() -> void:
 
 
 func _physics_process(_dt: float) -> void:
-	$hud/pnl/lbl_fps.text = "FPS: %d" % Engine.iterations_per_second
+	$hud/expandable/pnl/lbl_fps.text = "FPS: %d" % Engine.iterations_per_second
 
 
 func _on_bt_replay_pressed() -> void:
@@ -78,7 +78,7 @@ func _on_bt_replay_pressed() -> void:
 	$s2d/autosmoothed.reset_to(initial_states.asmooth2)
 	
 	# The smoothed object must be teleported
-	if ($hud/pnl/chk_useteleport.pressed):
+	if ($hud/expandable/pnl/chk_useteleport.pressed):
 		$s3d/smoothed/Smooth3D.snap_to_target()
 		$s3d/AutoInterpolate.snap_to_target()
 		# The 2D objects will be "teleported" based on a signal, handled by the
@@ -87,42 +87,42 @@ func _on_bt_replay_pressed() -> void:
 
 
 func on_rigid2d_reset(s: Smooth2D, t: Transform2D) -> void:
-	if ($hud/pnl/chk_useteleport.pressed):
+	if ($hud/expandable/pnl/chk_useteleport.pressed):
 		# Defer the call for one extra frame, to give the change of the target object to be moved
 		s.call_deferred("teleport_to", t)
 
 
 func on_rigid2d_asmooth_reset(s: AutoInterpolate, t: Transform2D) -> void:
-	if ($hud/pnl/chk_useteleport.pressed):
+	if ($hud/expandable/pnl/chk_useteleport.pressed):
 		s.call_deferred("teleport_to", t)
 
 
 func setup_hud() -> void:
-	$hud/pnl/lbl_physicsfps.text = pfps_label % Engine.iterations_per_second
-	$hud/pnl/lbl_jitterfix.text = pjitter_label % Engine.physics_jitter_fix
-	$hud/pnl/sl_jitterfix.value = Engine.physics_jitter_fix
-	$hud/pnl/chk_vsync.pressed = OS.vsync_enabled
-	$hud/pnl/chk_showghost.pressed = $s3d/smoothed/refmesh.visible
+	$hud/expandable/pnl/lbl_physicsfps.text = pfps_label % Engine.iterations_per_second
+	$hud/expandable/pnl/lbl_jitterfix.text = pjitter_label % Engine.physics_jitter_fix
+	$hud/expandable/pnl/sl_jitterfix.value = Engine.physics_jitter_fix
+	$hud/expandable/pnl/chk_vsync.pressed = OS.vsync_enabled
+	$hud/expandable/pnl/chk_showghost.pressed = $s3d/smoothed/refmesh.visible
 	
-	$hud/pnl/chk_show3d.pressed = $s3d.visible
-	$hud/pnl/chk_show2d.pressed = $s2d.visible
+	$hud/expandable/pnl/chk_show3d.pressed = $s3d.visible
+	$hud/expandable/pnl/chk_show2d.pressed = $s2d.visible
 	
-	SharedUtils.connector($hud/pnl/sl_physicsfps, "value_changed", self, "_on_pfps_changed")
-	SharedUtils.connector($hud/pnl/sl_jitterfix, "value_changed", self, "_on_jitter_changed")
-	SharedUtils.connector($hud/pnl/chk_vsync, "toggled", self, "_on_vsync_toggled")
-	SharedUtils.connector($hud/pnl/chk_showghost, "toggled", self, "_on_showghost_toggled")
-	SharedUtils.connector($hud/pnl/chk_show3d, "toggled", self, "_on_show3d_toggled")
-	SharedUtils.connector($hud/pnl/chk_show2d, "toggled", self, "_on_show2d_toggled")
+	SharedUtils.connector($hud/expandable/pnl/sl_physicsfps, "value_changed", self, "_on_pfps_changed")
+	SharedUtils.connector($hud/expandable/pnl/sl_jitterfix, "value_changed", self, "_on_jitter_changed")
+	SharedUtils.connector($hud/expandable/pnl/chk_vsync, "toggled", self, "_on_vsync_toggled")
+	SharedUtils.connector($hud/expandable/pnl/chk_showghost, "toggled", self, "_on_showghost_toggled")
+	SharedUtils.connector($hud/expandable/pnl/chk_show3d, "toggled", self, "_on_show3d_toggled")
+	SharedUtils.connector($hud/expandable/pnl/chk_show2d, "toggled", self, "_on_show2d_toggled")
 
 
 
 func _on_pfps_changed(val: float) -> void:
 	Engine.iterations_per_second = int(val)
-	$hud/pnl/lbl_physicsfps.text = pfps_label % Engine.iterations_per_second
+	$hud/expandable/pnl/lbl_physicsfps.text = pfps_label % Engine.iterations_per_second
 
 func _on_jitter_changed(val: float) -> void:
 	Engine.physics_jitter_fix = val
-	$hud/pnl/lbl_jitterfix.text = pjitter_label % Engine.physics_jitter_fix
+	$hud/expandable/pnl/lbl_jitterfix.text = pjitter_label % Engine.physics_jitter_fix
 
 func _on_vsync_toggled(pressed: bool) -> void:
 	OS.vsync_enabled = pressed

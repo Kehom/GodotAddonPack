@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=25 format=2]
 
 [ext_resource path="res://demos/nodes/testsmooth.gd" type="Script" id=1]
 [ext_resource path="res://shared/scenes/check_plane_floor.tscn" type="PackedScene" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://icon.png" type="Texture" id=6]
 [ext_resource path="res://addons/keh_smooth/smooth2d/smooth2d.gd" type="Script" id=7]
 [ext_resource path="res://addons/keh_smooth/autointerpolate.gd" type="Script" id=8]
+[ext_resource path="res://addons/keh_ui/expanel/expanel.gd" type="Script" id=9]
 
 [sub_resource type="BoxShape" id=1]
 
@@ -58,22 +59,66 @@ script = ExtResource( 1 )
 
 [node name="hud" type="CanvasLayer" parent="."]
 
-[node name="pnl" type="Panel" parent="hud"]
-self_modulate = Color( 1, 1, 1, 0.666667 )
+[node name="expandable" type="Control" parent="hud"]
 anchor_bottom = 1.0
-margin_right = 180.0
+margin_right = 220.0
+rect_min_size = Vector2( 5, 5 )
+rect_clip_content = true
+script = ExtResource( 9 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+current_page = 0
+animation/update_on_physics = false
+animation/shrink_on_page_change = true
+animation/expand_time = 0.25
+animation/expand_curve = null
+animation/shrink_time = 0.15
+animation/shrink_curve = null
+__content_size = Vector2( 202, 12 )
+__page_data = {
+"pnl": {
+"expanded_icon": null,
+"icon_color": Color( 1, 1, 1, 1 ),
+"shrinked_icon": null
+}
+}
+CustomStyles/background = null
+CustomStyles/bar = null
+CustomStyles/button_expanded_hover = null
+CustomStyles/button_expanded_pressed = null
+CustomStyles/button_expanded_focus = null
+CustomStyles/button_expanded_normal = null
+CustomStyles/button_shrinked_hover = null
+CustomStyles/button_shrinked_pressed = null
+CustomStyles/button_shrinked_focus = null
+CustomStyles/button_shrinked_normal = null
+CustomConstants/updown_width = null
+CustomConstants/updown_height = null
+CustomConstants/leftright_width = null
+CustomConstants/leftright_height = null
 
-[node name="lbl_physicsfps" type="Label" parent="hud/pnl"]
+[node name="pnl" type="Panel" parent="hud/expandable"]
+self_modulate = Color( 1, 1, 1, 0.666667 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 4.0
+margin_right = -22.0
+margin_bottom = -4.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_physicsfps" type="Label" parent="hud/expandable/pnl"]
 margin_left = 10.0
 margin_top = 10.0
 margin_right = 88.0
 margin_bottom = 24.0
 text = "Physics FPS (%d):"
 
-[node name="sl_physicsfps" type="HSlider" parent="hud/pnl"]
+[node name="sl_physicsfps" type="HSlider" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 29.0
 margin_right = 170.0
@@ -83,14 +128,14 @@ max_value = 200.0
 value = 5.0
 ticks_on_borders = true
 
-[node name="lbl_jitterfix" type="Label" parent="hud/pnl"]
+[node name="lbl_jitterfix" type="Label" parent="hud/expandable/pnl"]
 margin_left = 10.5263
 margin_top = 60.0
 margin_right = 95.5263
 margin_bottom = 74.0
 text = "Jitter fix (%f):"
 
-[node name="sl_jitterfix" type="HSlider" parent="hud/pnl"]
+[node name="sl_jitterfix" type="HSlider" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 80.0
 margin_right = 170.0
@@ -99,14 +144,14 @@ max_value = 1.0
 step = 0.01
 ticks_on_borders = true
 
-[node name="chk_vsync" type="CheckBox" parent="hud/pnl"]
+[node name="chk_vsync" type="CheckBox" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 110.0
 margin_right = 71.0
 margin_bottom = 134.0
 text = "VSync"
 
-[node name="chk_showghost" type="CheckBox" parent="hud/pnl"]
+[node name="chk_showghost" type="CheckBox" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 134.0
 margin_right = 175.0
@@ -118,7 +163,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="chk_show3d" type="CheckBox" parent="hud/pnl"]
+[node name="chk_show3d" type="CheckBox" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 170.0
 margin_right = 89.0
@@ -126,7 +171,7 @@ margin_bottom = 194.0
 hint_tooltip = "If enabled the 3D objects will be shown."
 text = "Show 3D"
 
-[node name="chk_show2d" type="CheckBox" parent="hud/pnl"]
+[node name="chk_show2d" type="CheckBox" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 194.0
 margin_right = 89.0
@@ -134,7 +179,7 @@ margin_bottom = 218.0
 hint_tooltip = "If enabled the 2D objects will be shown."
 text = "Show 2D"
 
-[node name="chk_enable2d" type="CheckBox" parent="hud/pnl"]
+[node name="chk_enable2d" type="CheckBox" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 228.639
 margin_right = 151.0
@@ -145,7 +190,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="chk_enable3d" type="CheckBox" parent="hud/pnl"]
+[node name="chk_enable3d" type="CheckBox" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 252.639
 margin_right = 151.0
@@ -156,7 +201,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="chk_useteleport" type="CheckBox" parent="hud/pnl"]
+[node name="chk_useteleport" type="CheckBox" parent="hud/expandable/pnl"]
 margin_left = 6.0
 margin_top = 289.135
 margin_right = 150.0
@@ -169,7 +214,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="bt_replay" type="Button" parent="hud/pnl"]
+[node name="bt_replay" type="Button" parent="hud/expandable/pnl"]
 margin_left = 11.0
 margin_top = 329.135
 margin_right = 80.0
@@ -177,14 +222,14 @@ margin_bottom = 349.135
 hint_tooltip = "Reset the simulation so different physics FPS values can be tested."
 text = "Replay"
 
-[node name="lbl_fps" type="Label" parent="hud/pnl"]
+[node name="lbl_fps" type="Label" parent="hud/expandable/pnl"]
 margin_left = 11.0
 margin_top = 379.135
 margin_right = 61.0
 margin_bottom = 393.135
 text = "FPS: %d"
 
-[node name="bt_back" type="Button" parent="hud/pnl"]
+[node name="bt_back" type="Button" parent="hud/expandable/pnl"]
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
@@ -250,12 +295,13 @@ transform = Transform( 0.906308, -0.422618, 0, 0.383022, 0.821394, -0.422618, 0.
 shape = SubResource( 9 )
 
 [node name="mesh" type="MeshInstance" parent="s3d/autosmoothed"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 mesh = SubResource( 10 )
 material/0 = SubResource( 11 )
 
 [node name="AutoInterpolate" type="Node" parent="s3d"]
 script = ExtResource( 8 )
+enabled = true
+interpolate = 7
 target = NodePath("../autosmoothed")
 "Interpolate 1" = NodePath("../autosmoothed/mesh")
 "Interpolate 2" = null
@@ -313,6 +359,9 @@ shape = SubResource( 15 )
 
 [node name="AutoInterpolate" type="Node" parent="s2d/autosmoothed"]
 script = ExtResource( 8 )
+enabled = true
+interpolate = 7
+target = NodePath("")
 "Interpolate 1" = null
 
 [node name="smoth_sprite" type="Sprite" parent="s2d/autosmoothed"]
@@ -323,7 +372,7 @@ texture = ExtResource( 6 )
 visible = false
 self_modulate = Color( 0.290196, 0.278431, 0.278431, 0.478431 )
 texture = ExtResource( 6 )
-[connection signal="toggled" from="hud/pnl/chk_enable2d" to="." method="_on_chk_enable2d_toggled"]
-[connection signal="toggled" from="hud/pnl/chk_enable3d" to="." method="_on_chk_enable3d_toggled"]
-[connection signal="pressed" from="hud/pnl/bt_replay" to="." method="_on_bt_replay_pressed"]
-[connection signal="pressed" from="hud/pnl/bt_back" to="." method="_on_bt_back_pressed"]
+[connection signal="toggled" from="hud/expandable/pnl/chk_enable2d" to="." method="_on_chk_enable2d_toggled"]
+[connection signal="toggled" from="hud/expandable/pnl/chk_enable3d" to="." method="_on_chk_enable3d_toggled"]
+[connection signal="pressed" from="hud/expandable/pnl/bt_replay" to="." method="_on_bt_replay_pressed"]
+[connection signal="pressed" from="hud/expandable/pnl/bt_back" to="." method="_on_bt_back_pressed"]
