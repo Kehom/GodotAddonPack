@@ -329,6 +329,9 @@ class _IconButton extends Button:
 	func _draw() -> void:
 		var ic: Texture = _expi if expanded else _shri
 		
+		if (!ic):
+			return
+		
 		var x: float = (rect_size.x - ic.get_width()) * 0.5
 		var y: float = (rect_size.y - ic.get_height()) * 0.5
 		
@@ -751,8 +754,8 @@ func _check_layout() -> void:
 			shk_icon = _TX_ARROW_UP
 	
 	
-	
 	var cpage: int = _get_current_page()
+	
 	
 	for gp in _page:
 		var p: _Page = gp as _Page
@@ -1364,6 +1367,15 @@ func _notification(what: int) -> void:
 		
 		NOTIFICATION_EXIT_TREE, NOTIFICATION_PREDELETE:
 			_on_tree_exiting()
+		
+		
+		NOTIFICATION_POST_ENTER_TREE:
+			# In editor when the scene tab is changed, the _being_removed will be set to true but the node will not be
+			# actually deleted.
+			if (_being_removed):
+				_being_removed = false
+			
+			call_deferred("_check_layout")
 
 
 
