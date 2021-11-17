@@ -582,7 +582,7 @@ func _check_pages() -> void:
 	
 	for c in _hbox.get_children():
 		_hbox.remove_child(c)
-		c.free()	
+		c.free()
 		
 	# Initially hide both panels. The correct one will be set to visible shortly
 	_hbox.visible = false
@@ -1294,6 +1294,8 @@ func _set(propname: String, value) -> bool:
 				
 				"icon_color":
 					page.bt.set_mcolor(value)
+			
+			_save_page_data(page)
 	
 	
 	return false
