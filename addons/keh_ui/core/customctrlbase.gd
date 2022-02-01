@@ -243,6 +243,21 @@ class _ThemeEntry:
 	
 	# Helper for the inspector to generate the proper editing control
 	var hint_string: String = ""
+	
+	### The properties that are meant to be Variants (style and override) are resulting in a bunch of "unsafe access" warnings,
+	### telling the _ThemeEntry class does not have those properties. To remedy this, use the functions to intermediate access
+	### to those properties
+	func set_style(s) -> void:
+		style = s
+	
+	func get_style():
+		return style
+	
+	func set_override(o) -> void:
+		override = o
+	
+	func get_override():
+		return override
 
 #######################################################################################################################
 ### "Private" properties
@@ -268,7 +283,8 @@ func __add_entry(n: String, s, e: bool, tp: int, h: int, hs: String, cont: Dicti
 		entry = _ThemeEntry.new()
 		cont[n] = entry
 	
-	entry.style = s
+	#entry.style = s
+	entry.set_style(s)
 	entry.expose = e
 	entry.type = tp
 	entry.hint = h
@@ -277,8 +293,8 @@ func __add_entry(n: String, s, e: bool, tp: int, h: int, hs: String, cont: Dicti
 
 func __get_entry(name: String, type: String, cont: Dictionary, checker: String, getter: String):
 	var entry: _ThemeEntry = cont.get(name, null)
-	if (entry && entry.override != null):
-		return entry.override
+	if (entry && entry.get_override() != null):
+		return entry.get_override()
 	
 	if (type.empty()):
 		type = "CustomControl"
@@ -286,7 +302,7 @@ func __get_entry(name: String, type: String, cont: Dictionary, checker: String, 
 	if (call(checker, name, type)):
 		return call(getter, name, type)
 	
-	return entry.style if entry else null
+	return entry.get_style() if entry else null
 
 
 
@@ -295,7 +311,7 @@ func __has_override(name: String, cont: Dictionary) -> bool:
 	if (!entry):
 		return false
 	
-	return (entry.override != null)
+	return (entry.get_override() != null)
 
 
 func __build_props(prefix: String, cont: Dictionary, outarr: Array) -> void:
@@ -308,7 +324,7 @@ func __build_props(prefix: String, cont: Dictionary, outarr: Array) -> void:
 				"usage": PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_CHECKABLE,
 			}
 			
-			if (entry.override != null):
+			if (entry.get_override() != null):
 				out.usage |= PROPERTY_USAGE_CHECKED
 			
 			if (entry.hint != 0):
@@ -350,19 +366,19 @@ func _set(prop: String, val) -> bool:
 			if (!entry):
 				return false
 			
-			entry.override = val if (val != null && val is Texture) else null
+			entry.set_override(val if (val != null && val is Texture) else null)
 		
 		"CustomStyles":
 			entry = __reg_stylebox.get(split[1], null)
 			if (!entry):
 				return false
 			
-			var oldval: StyleBox = entry.override
+			var oldval: StyleBox = entry.get_override()
 			if (oldval):
 				oldval.disconnect("changed", self, "notification")
 			
-			var nval: StyleBox = val as StyleBox
-			entry.override = nval
+			var nval: StyleBox = val
+			entry.set_override(nval)
 			
 			if (nval && !nval.is_connected("changed", self, "notification")):
 				# warning-ignore:return_value_discarded
@@ -373,21 +389,21 @@ func _set(prop: String, val) -> bool:
 			if (!entry):
 				return false
 			
-			entry.override = val if (val != null && val is Font) else null
+			entry.set_override(val if (val != null && val is Font) else null)
 		
 		"CustomColors":
 			entry = __reg_color.get(split[1], null)
 			if (!entry):
 				return false
 			
-			entry.override = val if (val != null && val is Color) else null
+			entry.set_override(val if (val != null && val is Color) else null)
 		
 		"CustomConstants":
 			entry = __reg_constant.get(split[1], null)
 			if (!entry):
 				return false
 			
-			entry.override = val if (val != null && val is int) else null
+			entry.set_override(val if (val != null && val is int) else null)
 	
 	
 	call_deferred("notification", NOTIFICATION_THEME_CHANGED)
@@ -415,7 +431,7 @@ func _get(prop: String):
 			entry = __reg_constant.get(split[1], null)
 	
 	
-	return entry.override if entry else null
+	return entry.get_override() if entry else null
 
 
 
