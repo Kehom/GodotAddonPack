@@ -34,6 +34,13 @@
 
 extends Node2D
 
+
+#######################################################################################################################
+### Signals and definitions
+
+
+#######################################################################################################################
+### "Public" properties
 ## The dictionary bellow was used to store the data retrieved from the .json file.
 #var item_db: Dictionary
 
@@ -46,54 +53,8 @@ const idb: GDDatabase = preload("res://demos/ui/invdemo/itemdb.tres")
 # Hold in here the accumulated weights of the stuff that will be "randomly" generated.
 #var acc_weights: Dictionary = {}
 
-# This dictionary didn't exist in the old code. However it is now used to cache some data related to the
-# socket masks, taken from the database. The info held here is actually the "code" used to build the datacode
-var _socket_mask: Dictionary = {}
-
-# This is also a new dictionary that is used to cache the item type codes (index column from the item_type table)
-var _item_type: Dictionary = {}
-
-
-# Before calling the mass highlight on any bag, this property will be set with the correct criteria. This is
-# because there are two search boxes in this demo.
-var _search_criteria: String = ""
-
-
-# The part of the demo simulating "buying rows" in a bag uses this property to tell which row is being bought
-var _buy_row_index: int = 1
-
-# This dictionary will be used to provide some data to properly split stacks. The fields:
-# - container: The inventory container holding the item
-# - column: The column where the item is stored at
-# - row: The row where the item is stored at
-# Obviously column and row are only relevant if container is a bag. The actual splitting size can be obtained
-# from the popup widget
-var _splitinfo: Dictionary
-
-
-# Preload the material that will be assigned to items that are dragged above "valid sockets"
-const mat_pulsing: Material = preload("res://demos/ui/invdemo/mat_pulsing.tres")
-
-func _ready() -> void:
-	randomize()
-	
-	# Deferring this call because it uses functions that require the tree to be fully built. 
-	call_deferred("init_options")
-	
-	## Calling the init_item_db() was necessary in order to load the data from .json. However, this is not needed
-	## anymore. The function is fully commented bellow and there is some more information regarding its tasks.
-	#init_item_db()
-	
-	## Calling a new function here to cache datacode information related to the socket types
-	cache_data()
-	
-	set_special_slot_filtering()
-	set_event_listeners()
-	
-	init_odd_shaped_bag()
-	init_withbuyoption_bag()
-
-
+#######################################################################################################################
+### "Public" functions
 func init_options() -> void:
 	# As mentioned in the tutorial, it doesn't matter which inventory container is used to get/set the options.
 	$ui/tabs/options/opt_stackhalign.selected = $ui/tabs/stash/stashbag.get_stack_horizontal_align()
@@ -170,7 +131,6 @@ func cache_data() -> void:
 	for i in itype.get_row_count():
 		var row: Dictionary = itype.get_row_by_index(i)
 		_item_type[row.id] = row.index
-
 
 
 # Special slots can automatically filter item by item types. It is also possible to setup extra function to
@@ -269,407 +229,6 @@ func set_event_listeners() -> void:
 	get_tree().call_group("equip_slot", "connect", "mouse_out_socket", self, "_on_mouse_out_socket")
 
 
-
-
-func _on_bt_roll_pressed() -> void:
-	# How many items to generate
-	var gencount: int = randi() % 6 + 3
-	
-	# Clear the "ground"
-	for bt in $ui/ground/generated.get_children():
-		bt.queue_free()
-	
-	for _i in gencount:
-		_generate_item()
-
-
-
-func _generate_item() -> void:
-	## Old code to randomly pick something from the json data. This process is now automatic as the database addon
-	## has it integrated
-	# Roll for the item type
-#	var roll: float = rand_range(0.0, acc_weights.item_type)
-#	var gen_type: String = ""
-#
-#	# Locate which one was "picked by the roll"
-#	for it in item_db.item_type:
-#		if (item_db.item_type[it].accw > roll):
-#			gen_type = it
-#			break
-#	var gbutton: Button = null
-#	var rrange: float = -1.0
-	
-	
-	# With the structure the JSON data is in, the code bellow could completely skip the match and directly
-	# retrieve data from the database. It would allow for easy creation of new item types by just adding
-	# them into the correct "tables". Basically it would be a new entry in the item_type "table" then a new
-	# "table" corresponding to that entry. Having a match like bellow restricts to only the known types.
-	# Yes, probably the accumulated weights would need a proper verification of known types in order to not
-	# completely screw up the generation here.
-#	match gen_type:
-#		"gem", "ring", "potion", "shield", "onehand", "twohand":
-#			rrange = acc_weights.item[gen_type]
-	
-#	if (rrange > 0.0):
-#		roll = rand_range(0.0, rrange)
-#
-#		for iid in item_db[gen_type]:
-#			if (item_db[gen_type][iid].accw > roll):
-#				gbutton = Button.new()
-#				gbutton.text = item_db[gen_type][iid].name
-#
-#				var picked: Dictionary = item_db[gen_type][iid]
-#				var smaskname: String = picked.get("socket_mask", "")
-#				var sdata: Dictionary = item_db.socket_type.get(smaskname, {})
-#				var msockets: int = picked.get("max_sockets", 0)
-#				var sockets: Array = []
-#
-#				# If this item can contains sockets, generate them. Do not generate socket data if this item is
-#				# marked to be socketable.
-#				if (msockets > 0 && smaskname.empty()):
-#					var gen_sockets: int = randi() % (msockets + 1)
-#					for _i in gen_sockets:
-#						sockets.append(db_pick_socket())
-#
-#
-#				var idata: Dictionary = {
-#					"type": item_db.item_type[gen_type].index,
-#					"id": iid,
-#					"icon": load(picked.icon),
-#					"datacode": build_datacode(sockets),
-#					# Fill some of the optional fields with default values
-#					"max_stack": picked.get("max_stack", 1),       # Default is non stackable
-#					"socket_mask": sdata.get("mask", 0),           # Default is non socketable
-#					"column_span": picked.get("column_span", 1),
-#					"row_span": picked.get("row_span", 1),
-#					"socket_data": sockets,         # If array is empty no sockets will be added at all
-#					"use_linked": 0 if gen_type != "twohand" else InventoryCore.LinkedSlotUse.SpanToSecondary,
-#				}
-#
-#				# warning-ignore:return_value_discarded
-#				gbutton.connect("pressed", self, "_on_bt_item_pressed", [idata, gbutton])
-#
-#				break
-	
-	
-#	if (gbutton):
-#		$ui/ground/generated.add_child(gbutton)
-	
-	## New code - simply use the "ramdonly_pick_from" function and use the "id" column to find which item type
-	## is meant to be generated
-	# First make a "button" that will be added into the "ground", which will be used to "get" it
-	var gbutton: Button = null
-	
-	var gen_row: Dictionary = idb.randomly_pick_from("item_type")
-	var gen_type: String = gen_row.id
-	
-	# Pick a random item from the "gen_type" table
-	var irow: Dictionary = idb.randomly_pick_from(gen_type)
-	
-	# Item row should not be empty, but checking just to make sure
-	if (!irow.empty()):
-		gbutton = Button.new()
-		gbutton.text = irow.name
-		
-		var smaskname: String = irow.get("socket_mask", "")
-		var sdata: Dictionary = idb.get_row_from("socket_type", smaskname)
-		var msockets: int = irow.get("max_sockets", 0)
-		var sockets: Array = []
-		
-		# If this item can contain sockets, generate them.
-		if (msockets > 0 && smaskname.empty()):
-			var gen_sockets: int = randi() & (msockets + 1)
-			for _i in gen_sockets:
-				sockets.append(db_pick_socket())
-		
-		# Build the Dictionary containing item data that must be passed to the Inventory
-		var idata: Dictionary = {
-			"type": gen_row.index,
-			"id": irow.id,
-			"icon": load(irow.icon),
-			"datacode": build_datacode(sockets),
-			# Fill some of the optional fields with default values
-			"max_stack": irow.get("max_stack", 1),       # Default is non stackable
-			"socket_mask": sdata.get("mask", 0),         # Default is non socketable
-			"column_span": irow.get("column_span", 1),
-			"row_span": irow.get("row_span", 1),
-			"socket_data": sockets,      # If array is empty no sockets will be added at all
-			"use_linked": 0 if gen_type != "twohand" else InventoryCore.LinkedSlotUse.SpanToSecondary,
-		}
-		
-		# warning-ignore:return_value_discarded
-		gbutton.connect("pressed", self, "_on_bt_item_pressed", [idata, gbutton])
-	
-	if (gbutton):
-		$ui/ground/generated.add_child(gbutton)
-
-
-
-func _on_blue_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
-	return iid == "blue"
-
-func _on_green_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
-	return iid == "green"
-
-func _on_red_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
-	return iid == "red"
-
-func _on_yellow_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
-	return iid == "yellow"
-
-
-func _on_blue_potion_filter(iid: String, _itype: int, _dcode: String) -> bool:
-	return iid == "blue"
-
-func _on_green_potion_filter(iid: String, _itype: int, _dcode: String) -> bool:
-	return iid == "green"
-
-func _on_yellow_potion_filter(iid: String, _itype: int, _dcode: String) -> bool:
-	return iid == "yellow"
-
-
-func _on_item_clicked(evt: InventoryEventMouse) -> void:
-	if (evt.has_modifier):
-		if (evt.shift && evt.button_index == BUTTON_LEFT):
-			var from: InventoryBase = evt.container
-			var to: InventoryBag = null
-			
-			var pnl: Panel = evt.container.get_parent_control()
-			if (pnl == $ui/tabs/stash):
-				# Moving from stash into player bag. No "special case" here
-				to = $ui/char_equip/charbag
-			elif (pnl == $ui/char_equip):
-				# Moving from player bag into stash. In this case, the stash contains special slots for potions
-				# and gems. If the clicked item is one of those, try moving into those slots.
-				var ostack: int = evt.item_data.stack
-				var remaining: int = attemp_move_to_special(from, evt.item_data)
-				
-				if (from is InventoryBag):
-					from.remove_item_from(evt.item_data.column, evt.item_data.row, ostack - remaining)
-				
-				if (remaining > 0):
-					to = $ui/tabs/stash/stashbag
-			
-			
-			if (from && to):
-				attempt_move_to_bag(from, to, evt.item_data)
-		
-		elif ((evt.control || evt.command) && evt.button_index == BUTTON_LEFT):
-			var mstack: int = evt.item_data.max_stack
-			if (mstack == 1):
-				return
-			var stack: int = evt.item_data.stack
-			if (stack < 2):
-				return
-			var ssize: int = stack if stack <= mstack else mstack
-			
-			_splitinfo["container"] = evt.container
-			if (evt.container is InventoryBag):
-				_splitinfo["column"] = evt.item_data.column
-				_splitinfo["row"] = evt.item_data.row
-			
-			pop_split(ssize, evt.global_mouse_position)
-	
-	else:
-		if (evt.button_index == BUTTON_RIGHT && evt.container is InventoryBag):
-			attempt_equip_item(evt.container, evt.item_data)
-
-
-
-func _on_item_added(evt: InventoryEventContainer) -> void:
-	if (evt.container == $ui/char_equip/charbag):
-		# Ensure the newly added item get the correct highlight
-		_search_criteria = $ui/char_equip/txt_search.text
-		$ui/char_equip/charbag.mass_highlight(funcref(self, "bag_mass_highlight"))
-	elif (evt.container == $ui/tabs/stash/stashbag):
-		_search_criteria = $ui/tabs/stash/stashfilter.text
-		$ui/tabs/stash/stashbag.mass_highlight(funcref(self, "bag_mass_highlight"))
-
-func _on_special_slot_item_added(evt: InventoryEventContainer) -> void:
-	# Use the "if" just to ensure the container is of the correct type
-	if (evt.container is InventorySpecialSlot):
-		check_special_slot_highlight(evt.container)
-
-
-# When item is dropped it does not result in item_added event. While it would be possible to handle the event from
-# the same function that is handling the item_added, separating things just because it would then become possible
-# to perform something different. Think about the item_dropped as a "drag & drop ended event"
-func _on_item_dropped(evt: InventoryEventContainer) -> void:
-	if (evt.container is InventoryBag):
-		if (evt.container == $ui/char_equip/charbag):
-			_search_criteria = $ui/char_equip/txt_search.text
-		elif (evt.container == $ui/tabs/stash/stashbag):
-			_search_criteria = $ui/tabs/stash/stashfilter.text
-		else:
-			_search_criteria = ""
-		
-		evt.container.mass_highlight(funcref(self, "bag_mass_highlight"))
-	
-	elif (evt.container is InventorySpecialSlot):
-		var cparent: Panel = evt.container.get_parent_control()
-		if (cparent == $ui/tabs/stash):
-			check_special_slot_highlight(evt.container)
-
-
-func _on_mouse_over_item(evt: InventoryEventMouse) -> void:
-	# Do not show tooltip if something is being dragged
-	if (evt.is_dragging):
-		return
-	
-	var ttip: Dictionary = db_get_item_tooltip(evt.item_data.type, evt.item_data.id)
-	$ui/item_tooltip/lbl_name.text = ttip.name
-	$ui/item_tooltip/lbl_description.text = ttip.description
-	
-	var x: int = evt.global_mouse_position.x - $ui/item_tooltip.rect_size.x
-	var y: int = evt.global_mouse_position.y - $ui/item_tooltip.rect_size.y
-	
-	if (x < 0):
-		x = 0
-	if (y < 0):
-		y = 0
-	
-	$ui/item_tooltip.rect_global_position = Vector2(x, y)
-	
-	$ui/item_tooltip.visible = true
-
-
-func _on_mouse_out_item(_evt: InventoryEventMouse) -> void:
-	$ui/item_tooltip.visible = false
-
-
-func _on_mouse_over_socket(evt: InventoryEventSocketMouse) -> void:
-	if (!evt.item_data.empty() || !evt.is_dragging):
-		return
-	
-	if (evt.mask & evt.dragged_socket_mask != 0):
-		evt.container.set_dragged_item_material(mat_pulsing)
-
-
-
-func _on_mouse_out_socket(evt: InventoryEventSocketMouse) -> void:
-	if (evt.is_dragging):
-		# Just ensture the dragged item has no material set
-		evt.container.set_dragged_item_material(null)
-
-
-
-
-
-func _on_bt_item_pressed(idata: Dictionary, bt: Button) -> void:
-	$ui/char_equip/charbag.add_item(idata)
-	if (idata.stack == 0):
-		bt.queue_free()
-
-
-
-func _on_bt_destroy_pressed() -> void:
-	$ui/ground/special.remove_item(-1)
-
-
-# Reroll the sockets on the item that is in the "ground/special" slot
-func _on_bt_rollsockets_pressed() -> void:
-	var idata: Dictionary = $ui/ground/special.get_item_data(true)
-	if (idata.empty()):
-		return
-	
-	# Check on the item db if this item can have sockets
-	var tbl: String = db_get_item_type_from_index(idata.type)
-	if (tbl.empty()):
-		return
-	
-	## This single line is old code
-#	var dbitem: Dictionary = item_db[tbl].get(idata.id, {})
-
-	## This single line is new code
-	var dbitem: Dictionary = idb.get_row_from(tbl, idata.id)
-	
-	if (dbitem.empty()):
-		return
-	
-	var msockets: int = dbitem.get("max_sockets", 0)
-	if (msockets <= 0):
-		return
-	
-	# Randomly obtian number of sockets to be generated
-	var gen_sockets: int = randi() % (msockets + 1)
-	var sockets: Array = []
-	for _i in gen_sockets:
-		sockets.append(db_pick_socket())
-	
-	$ui/ground/special.set_item_sockets(sockets, -1, true)
-	$ui/ground/special.set_item_datacode(build_datacode(sockets))
-
-
-# Change the socket types on the item placed in the "ground/special" slot
-func _on_bt_morphsockets_pressed() -> void:
-	var idata: Dictionary = $ui/ground/special.get_item_data(true)
-	if (idata.empty()):
-		return
-	
-	var socket_count: int = idata.socket_data.size()
-	
-	for i in socket_count:
-		idata.socket_data[i] = db_pick_socket()
-		$ui/ground/special.morph_item_socket(i, idata.socket_data[i], true)
-		$ui/ground/special.set_item_datacode(build_datacode(idata.socket_data))
-
-
-func _on_bt_sortbfirst_hor_pressed() -> void:
-	# Bigger first, horizontal
-	$ui/char_equip/charbag.sort_items(true, false)
-
-func _on_bt_sortsfirst_hor_pressed() -> void:
-	# Smaller first, horizontal
-	$ui/char_equip/charbag.sort_items(false, false)
-
-
-func _on_bt_sortbfirst_ver_pressed() -> void:
-	# Bigger first, vertical
-	$ui/char_equip/charbag.sort_items(true, true)
-
-func _on_bt_sortsfirst_ver_pressed() -> void:
-	# Smaller first, vertical
-	$ui/char_equip/charbag.sort_items(false, true)
-
-
-# The sorting on the stash tab can also, if desired, incorporate extra code to move things from bag into the
-# special slots
-func _on_bt_sortbfirsth_pressed() -> void:
-	check_special_on_stash()
-	$ui/tabs/stash/stashbag.sort_items(true, false)
-
-func _on_bt_sortsfirsth_pressed() -> void:
-	check_special_on_stash()
-	$ui/tabs/stash/stashbag.sort_items(false, false)
-
-
-func _on_bt_sortbfirstv_pressed() -> void:
-	check_special_on_stash()
-	$ui/tabs/stash/stashbag.sort_items(true, true)
-
-func _on_bt_sortsfirstv_pressed() -> void:
-	check_special_on_stash()
-	$ui/tabs/stash/stashbag.sort_items(false, true)
-
-
-
-
-func _on_txt_search_text_changed(new_text: String) -> void:
-	_search_criteria = new_text
-	$ui/char_equip/charbag.mass_highlight(funcref(self, "bag_mass_highlight"))
-
-
-func _on_stashfilter_text_changed(new_text: String) -> void:
-	_search_criteria = new_text
-	$ui/tabs/stash/stashbag.mass_highlight(funcref(self, "bag_mass_highlight"))
-	
-	# Must check the special slots. Great thing those are part of a group!
-	for s in get_tree().get_nodes_in_group("special_slots"):
-		if (s is InventorySpecialSlot):
-			check_special_slot_highlight(s)
-
-
-
 # In this demo the datacode matches the socket types on the item.
 # This is mostly to result in the items being reported as different by the system, which will allow items to
 # be swapped through the item dragging system.
@@ -698,8 +257,6 @@ func build_datacode(sockets: Array) -> String:
 	
 	
 	return retval
-
-
 
 
 # Given an item type number, find the corresponding "ID" string within the database
@@ -1112,6 +669,437 @@ func check_special_on_stash() -> void:
 			attemp_move_to_special($ui/tabs/stash/stashbag, idata)
 
 
+#######################################################################################################################
+### "Private" definitions
+# Preload the material that will be assigned to items that are dragged above "valid sockets"
+const mat_pulsing: Material = preload("res://demos/ui/invdemo/mat_pulsing.tres")
+
+#######################################################################################################################
+### "Private" properties
+# This dictionary didn't exist in the old code. However it is now used to cache some data related to the
+# socket masks, taken from the database. The info held here is actually the "code" used to build the datacode
+var _socket_mask: Dictionary = {}
+
+# This is also a new dictionary that is used to cache the item type codes (index column from the item_type table)
+var _item_type: Dictionary = {}
+
+
+# Before calling the mass highlight on any bag, this property will be set with the correct criteria. This is
+# because there are two search boxes in this demo.
+var _search_criteria: String = ""
+
+
+# The part of the demo simulating "buying rows" in a bag uses this property to tell which row is being bought
+var _buy_row_index: int = 1
+
+# This dictionary will be used to provide some data to properly split stacks. The fields:
+# - container: The inventory container holding the item
+# - column: The column where the item is stored at
+# - row: The row where the item is stored at
+# Obviously column and row are only relevant if container is a bag. The actual splitting size can be obtained
+# from the popup widget
+var _splitinfo: Dictionary
+
+#######################################################################################################################
+### "Private" functions
+func _generate_item() -> void:
+	## Old code to randomly pick something from the json data. This process is now automatic as the database addon
+	## has it integrated
+	# Roll for the item type
+#	var roll: float = rand_range(0.0, acc_weights.item_type)
+#	var gen_type: String = ""
+#
+#	# Locate which one was "picked by the roll"
+#	for it in item_db.item_type:
+#		if (item_db.item_type[it].accw > roll):
+#			gen_type = it
+#			break
+#	var gbutton: Button = null
+#	var rrange: float = -1.0
+	
+	
+	# With the structure the JSON data is in, the code bellow could completely skip the match and directly
+	# retrieve data from the database. It would allow for easy creation of new item types by just adding
+	# them into the correct "tables". Basically it would be a new entry in the item_type "table" then a new
+	# "table" corresponding to that entry. Having a match like bellow restricts to only the known types.
+	# Yes, probably the accumulated weights would need a proper verification of known types in order to not
+	# completely screw up the generation here.
+#	match gen_type:
+#		"gem", "ring", "potion", "shield", "onehand", "twohand":
+#			rrange = acc_weights.item[gen_type]
+	
+#	if (rrange > 0.0):
+#		roll = rand_range(0.0, rrange)
+#
+#		for iid in item_db[gen_type]:
+#			if (item_db[gen_type][iid].accw > roll):
+#				gbutton = Button.new()
+#				gbutton.text = item_db[gen_type][iid].name
+#
+#				var picked: Dictionary = item_db[gen_type][iid]
+#				var smaskname: String = picked.get("socket_mask", "")
+#				var sdata: Dictionary = item_db.socket_type.get(smaskname, {})
+#				var msockets: int = picked.get("max_sockets", 0)
+#				var sockets: Array = []
+#
+#				# If this item can contains sockets, generate them. Do not generate socket data if this item is
+#				# marked to be socketable.
+#				if (msockets > 0 && smaskname.empty()):
+#					var gen_sockets: int = randi() % (msockets + 1)
+#					for _i in gen_sockets:
+#						sockets.append(db_pick_socket())
+#
+#
+#				var idata: Dictionary = {
+#					"type": item_db.item_type[gen_type].index,
+#					"id": iid,
+#					"icon": load(picked.icon),
+#					"datacode": build_datacode(sockets),
+#					# Fill some of the optional fields with default values
+#					"max_stack": picked.get("max_stack", 1),       # Default is non stackable
+#					"socket_mask": sdata.get("mask", 0),           # Default is non socketable
+#					"column_span": picked.get("column_span", 1),
+#					"row_span": picked.get("row_span", 1),
+#					"socket_data": sockets,         # If array is empty no sockets will be added at all
+#					"use_linked": 0 if gen_type != "twohand" else InventoryCore.LinkedSlotUse.SpanToSecondary,
+#				}
+#
+#				# warning-ignore:return_value_discarded
+#				gbutton.connect("pressed", self, "_on_bt_item_pressed", [idata, gbutton])
+#
+#				break
+	
+	
+#	if (gbutton):
+#		$ui/ground/generated.add_child(gbutton)
+	
+	## New code - simply use the "ramdonly_pick_from" function and use the "id" column to find which item type
+	## is meant to be generated
+	# First make a "button" that will be added into the "ground", which will be used to "get" it
+	var gbutton: Button = null
+	
+	var gen_row: Dictionary = idb.randomly_pick_from("item_type")
+	var gen_type: String = gen_row.id
+	
+	# Pick a random item from the "gen_type" table
+	var irow: Dictionary = idb.randomly_pick_from(gen_type)
+	
+	# Item row should not be empty, but checking just to make sure
+	if (!irow.empty()):
+		gbutton = Button.new()
+		gbutton.text = irow.name
+		
+		var smaskname: String = irow.get("socket_mask", "")
+		var sdata: Dictionary = idb.get_row_from("socket_type", smaskname)
+		var msockets: int = irow.get("max_sockets", 0)
+		var sockets: Array = []
+		
+		# If this item can contain sockets, generate them.
+		if (msockets > 0 && smaskname.empty()):
+			var gen_sockets: int = randi() & (msockets + 1)
+			for _i in gen_sockets:
+				sockets.append(db_pick_socket())
+		
+		# Build the Dictionary containing item data that must be passed to the Inventory
+		var idata: Dictionary = {
+			"type": gen_row.index,
+			"id": irow.id,
+			"icon": load(irow.icon),
+			"datacode": build_datacode(sockets),
+			# Fill some of the optional fields with default values
+			"max_stack": irow.get("max_stack", 1),       # Default is non stackable
+			"socket_mask": sdata.get("mask", 0),         # Default is non socketable
+			"column_span": irow.get("column_span", 1),
+			"row_span": irow.get("row_span", 1),
+			"socket_data": sockets,      # If array is empty no sockets will be added at all
+			"use_linked": 0 if gen_type != "twohand" else InventoryCore.LinkedSlotUse.SpanToSecondary,
+		}
+		
+		# warning-ignore:return_value_discarded
+		gbutton.connect("pressed", self, "_on_bt_item_pressed", [idata, gbutton])
+	
+	if (gbutton):
+		$ui/ground/generated.add_child(gbutton)
+
+
+
+
+#######################################################################################################################
+### Event handlers
+func _on_bt_roll_pressed() -> void:
+	# How many items to generate
+	var gencount: int = randi() % 6 + 3
+	
+	# Clear the "ground"
+	for bt in $ui/ground/generated.get_children():
+		bt.queue_free()
+	
+	for _i in gencount:
+		_generate_item()
+
+
+func _on_blue_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
+	return iid == "blue"
+
+func _on_green_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
+	return iid == "green"
+
+func _on_red_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
+	return iid == "red"
+
+func _on_yellow_gem_filter(iid: String, _itype: int, _dcode: String) -> bool:
+	return iid == "yellow"
+
+
+func _on_blue_potion_filter(iid: String, _itype: int, _dcode: String) -> bool:
+	return iid == "blue"
+
+func _on_green_potion_filter(iid: String, _itype: int, _dcode: String) -> bool:
+	return iid == "green"
+
+func _on_yellow_potion_filter(iid: String, _itype: int, _dcode: String) -> bool:
+	return iid == "yellow"
+
+
+func _on_item_clicked(evt: InventoryEventMouse) -> void:
+	if (evt.has_modifier):
+		if (evt.shift && evt.button_index == BUTTON_LEFT):
+			var from: InventoryBase = evt.container
+			var to: InventoryBag = null
+			
+			var pnl: Panel = evt.container.get_parent_control()
+			if (pnl == $ui/tabs/stash):
+				# Moving from stash into player bag. No "special case" here
+				to = $ui/char_equip/charbag
+			elif (pnl == $ui/char_equip):
+				# Moving from player bag into stash. In this case, the stash contains special slots for potions
+				# and gems. If the clicked item is one of those, try moving into those slots.
+				var ostack: int = evt.item_data.stack
+				var remaining: int = attemp_move_to_special(from, evt.item_data)
+				
+				if (from is InventoryBag):
+					from.remove_item_from(evt.item_data.column, evt.item_data.row, ostack - remaining)
+				
+				if (remaining > 0):
+					to = $ui/tabs/stash/stashbag
+			
+			
+			if (from && to):
+				attempt_move_to_bag(from, to, evt.item_data)
+		
+		elif ((evt.control || evt.command) && evt.button_index == BUTTON_LEFT):
+			var mstack: int = evt.item_data.max_stack
+			if (mstack == 1):
+				return
+			var stack: int = evt.item_data.stack
+			if (stack < 2):
+				return
+			var ssize: int = stack if stack <= mstack else mstack
+			
+			_splitinfo["container"] = evt.container
+			if (evt.container is InventoryBag):
+				_splitinfo["column"] = evt.item_data.column
+				_splitinfo["row"] = evt.item_data.row
+			
+			pop_split(ssize, evt.global_mouse_position)
+	
+	else:
+		if (evt.button_index == BUTTON_RIGHT && evt.container is InventoryBag):
+			attempt_equip_item(evt.container, evt.item_data)
+
+
+
+func _on_item_added(evt: InventoryEventContainer) -> void:
+	if (evt.container == $ui/char_equip/charbag):
+		# Ensure the newly added item get the correct highlight
+		_search_criteria = $ui/char_equip/txt_search.text
+		$ui/char_equip/charbag.mass_highlight(funcref(self, "bag_mass_highlight"))
+	elif (evt.container == $ui/tabs/stash/stashbag):
+		_search_criteria = $ui/tabs/stash/stashfilter.text
+		$ui/tabs/stash/stashbag.mass_highlight(funcref(self, "bag_mass_highlight"))
+
+func _on_special_slot_item_added(evt: InventoryEventContainer) -> void:
+	# Use the "if" just to ensure the container is of the correct type
+	if (evt.container is InventorySpecialSlot):
+		check_special_slot_highlight(evt.container)
+
+
+# When item is dropped it does not result in item_added event. While it would be possible to handle the event from
+# the same function that is handling the item_added, separating things just because it would then become possible
+# to perform something different. Think about the item_dropped as a "drag & drop ended event"
+func _on_item_dropped(evt: InventoryEventContainer) -> void:
+	if (evt.container is InventoryBag):
+		if (evt.container == $ui/char_equip/charbag):
+			_search_criteria = $ui/char_equip/txt_search.text
+		elif (evt.container == $ui/tabs/stash/stashbag):
+			_search_criteria = $ui/tabs/stash/stashfilter.text
+		else:
+			_search_criteria = ""
+		
+		evt.container.mass_highlight(funcref(self, "bag_mass_highlight"))
+	
+	elif (evt.container is InventorySpecialSlot):
+		var cparent: Panel = evt.container.get_parent_control()
+		if (cparent == $ui/tabs/stash):
+			check_special_slot_highlight(evt.container)
+
+
+func _on_mouse_over_item(evt: InventoryEventMouse) -> void:
+	# Do not show tooltip if something is being dragged
+	if (evt.is_dragging):
+		return
+	
+	var ttip: Dictionary = db_get_item_tooltip(evt.item_data.type, evt.item_data.id)
+	$ui/item_tooltip/lbl_name.text = ttip.name
+	$ui/item_tooltip/lbl_description.text = ttip.description
+	
+	var x: int = evt.global_mouse_position.x - $ui/item_tooltip.rect_size.x
+	var y: int = evt.global_mouse_position.y - $ui/item_tooltip.rect_size.y
+	
+	if (x < 0):
+		x = 0
+	if (y < 0):
+		y = 0
+	
+	$ui/item_tooltip.rect_global_position = Vector2(x, y)
+	
+	$ui/item_tooltip.visible = true
+
+
+func _on_mouse_out_item(_evt: InventoryEventMouse) -> void:
+	$ui/item_tooltip.visible = false
+
+
+func _on_mouse_over_socket(evt: InventoryEventSocketMouse) -> void:
+	if (!evt.item_data.empty() || !evt.is_dragging):
+		return
+	
+	if (evt.mask & evt.dragged_socket_mask != 0):
+		evt.container.set_dragged_item_material(mat_pulsing)
+
+
+
+func _on_mouse_out_socket(evt: InventoryEventSocketMouse) -> void:
+	if (evt.is_dragging):
+		# Just ensture the dragged item has no material set
+		evt.container.set_dragged_item_material(null)
+
+
+
+
+
+func _on_bt_item_pressed(idata: Dictionary, bt: Button) -> void:
+	$ui/char_equip/charbag.add_item(idata)
+	if (idata.stack == 0):
+		bt.queue_free()
+
+
+
+func _on_bt_destroy_pressed() -> void:
+	$ui/ground/special.remove_item(-1)
+
+
+# Reroll the sockets on the item that is in the "ground/special" slot
+func _on_bt_rollsockets_pressed() -> void:
+	var idata: Dictionary = $ui/ground/special.get_item_data(true)
+	if (idata.empty()):
+		return
+	
+	# Check on the item db if this item can have sockets
+	var tbl: String = db_get_item_type_from_index(idata.type)
+	if (tbl.empty()):
+		return
+	
+	## This single line is old code
+#	var dbitem: Dictionary = item_db[tbl].get(idata.id, {})
+
+	## This single line is new code
+	var dbitem: Dictionary = idb.get_row_from(tbl, idata.id)
+	
+	if (dbitem.empty()):
+		return
+	
+	var msockets: int = dbitem.get("max_sockets", 0)
+	if (msockets <= 0):
+		return
+	
+	# Randomly obtian number of sockets to be generated
+	var gen_sockets: int = randi() % (msockets + 1)
+	var sockets: Array = []
+	for _i in gen_sockets:
+		sockets.append(db_pick_socket())
+	
+	$ui/ground/special.set_item_sockets(sockets, -1, true)
+	$ui/ground/special.set_item_datacode(build_datacode(sockets))
+
+
+# Change the socket types on the item placed in the "ground/special" slot
+func _on_bt_morphsockets_pressed() -> void:
+	var idata: Dictionary = $ui/ground/special.get_item_data(true)
+	if (idata.empty()):
+		return
+	
+	var socket_count: int = idata.socket_data.size()
+	
+	for i in socket_count:
+		idata.socket_data[i] = db_pick_socket()
+		$ui/ground/special.morph_item_socket(i, idata.socket_data[i], true)
+		$ui/ground/special.set_item_datacode(build_datacode(idata.socket_data))
+
+
+func _on_bt_sortbfirst_hor_pressed() -> void:
+	# Bigger first, horizontal
+	$ui/char_equip/charbag.sort_items(true, false)
+
+func _on_bt_sortsfirst_hor_pressed() -> void:
+	# Smaller first, horizontal
+	$ui/char_equip/charbag.sort_items(false, false)
+
+
+func _on_bt_sortbfirst_ver_pressed() -> void:
+	# Bigger first, vertical
+	$ui/char_equip/charbag.sort_items(true, true)
+
+func _on_bt_sortsfirst_ver_pressed() -> void:
+	# Smaller first, vertical
+	$ui/char_equip/charbag.sort_items(false, true)
+
+
+# The sorting on the stash tab can also, if desired, incorporate extra code to move things from bag into the
+# special slots
+func _on_bt_sortbfirsth_pressed() -> void:
+	check_special_on_stash()
+	$ui/tabs/stash/stashbag.sort_items(true, false)
+
+func _on_bt_sortsfirsth_pressed() -> void:
+	check_special_on_stash()
+	$ui/tabs/stash/stashbag.sort_items(false, false)
+
+
+func _on_bt_sortbfirstv_pressed() -> void:
+	check_special_on_stash()
+	$ui/tabs/stash/stashbag.sort_items(true, true)
+
+func _on_bt_sortsfirstv_pressed() -> void:
+	check_special_on_stash()
+	$ui/tabs/stash/stashbag.sort_items(false, true)
+
+
+
+
+func _on_txt_search_text_changed(new_text: String) -> void:
+	_search_criteria = new_text
+	$ui/char_equip/charbag.mass_highlight(funcref(self, "bag_mass_highlight"))
+
+
+func _on_stashfilter_text_changed(new_text: String) -> void:
+	_search_criteria = new_text
+	$ui/tabs/stash/stashbag.mass_highlight(funcref(self, "bag_mass_highlight"))
+	
+	# Must check the special slots. Great thing those are part of a group!
+	for s in get_tree().get_nodes_in_group("special_slots"):
+		if (s is InventorySpecialSlot):
+			check_special_slot_highlight(s)
 
 
 func _on_opt_stackhalign_item_selected(id: int) -> void:
@@ -1147,6 +1135,36 @@ func _on_opt_dropmode_item_selected(id: int) -> void:
 
 func _on_chk_hidesocketsondrag_toggled(button_pressed: bool) -> void:
 	$ui/tabs/stash/stashbag.set_hide_sockets_on_drag_preview(button_pressed)
+
+
+func _on_bt_mainmenu_pressed() -> void:
+	get_tree().change_scene("res://main.tscn")
+
+func _on_bt_quit_pressed() -> void:
+	get_tree().quit()
+
+#######################################################################################################################
+### Overrides
+func _ready() -> void:
+	randomize()
+	
+	# Deferring this call because it uses functions that require the tree to be fully built. 
+	call_deferred("init_options")
+	
+	## Calling the init_item_db() was necessary in order to load the data from .json. However, this is not needed
+	## anymore. The function is fully commented bellow and there is some more information regarding its tasks.
+	#init_item_db()
+	
+	## Calling a new function here to cache datacode information related to the socket types
+	cache_data()
+	
+	set_special_slot_filtering()
+	set_event_listeners()
+	
+	init_odd_shaped_bag()
+	init_withbuyoption_bag()
+
+
 
 
 
@@ -1268,13 +1286,6 @@ func _on_bt_cancelsplit_pressed() -> void:
 	$ui/pop_split.visible = false
 	_splitinfo.clear()
 
-
-#############################################################################################################
-func _on_bt_mainmenu_pressed() -> void:
-	get_tree().change_scene("res://main.tscn")
-
-func _on_bt_quit_pressed() -> void:
-	get_tree().quit()
 
 
 #############################################################################################################
