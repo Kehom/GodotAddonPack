@@ -105,6 +105,25 @@ func _on_setting_changed() -> void:
 
 
 ### Other functions
+func is_dragging_item() -> bool:
+	if (!_shared_data):
+		return false
+	
+	return _shared_data.is_dragging()
+
+
+func get_dragged_item_data() -> Dictionary:
+	var ret: Dictionary = {}
+	
+	if (!_shared_data):
+		return ret
+	
+	var dragged: Control = _shared_data.get_dragged_item()
+	if (dragged):
+		ret = InventoryCore.item_to_dictionary(dragged, _shared_data.use_respath_on_signals())
+	
+	return ret
+
 
 func set_cell_width(v: int) -> void:
 	cell_width = v if v > 0 else 1
