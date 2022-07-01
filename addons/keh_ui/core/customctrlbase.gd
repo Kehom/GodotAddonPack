@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Yuri Sarudiansky
+# Copyright (c) 2021-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -359,55 +359,50 @@ func _get_property_list() -> Array:
 func _set(prop: String, val) -> bool:
 	var split: Array = prop.split("/", false, 1)
 	var entry: _ThemeEntry = null
+	var ret: bool = true
 	
 	match split[0]:
 		"CustomIcons":
 			entry = __reg_icon.get(split[1], null)
-			if (!entry):
-				return false
-			
-			entry.set_override(val if (val != null && val is Texture) else null)
+			if (entry):
+				entry.set_override(val if (val != null && val is Texture) else null)
 		
 		"CustomStyles":
 			entry = __reg_stylebox.get(split[1], null)
-			if (!entry):
-				return false
-			
-			var oldval: StyleBox = entry.get_override()
-			if (oldval):
-				oldval.disconnect("changed", self, "notification")
-			
-			var nval: StyleBox = val
-			entry.set_override(nval)
-			
-			if (nval && !nval.is_connected("changed", self, "notification")):
-				# warning-ignore:return_value_discarded
-				nval.connect("changed", self, "notification", [NOTIFICATION_THEME_CHANGED])
+			if (entry):
+				var oldval: StyleBox = entry.get_override()
+				if (oldval):
+					oldval.disconnect("changed", self, "notification")
+				
+				var nval: StyleBox = val
+				entry.set_override(nval)
+				
+				if (nval && !nval.is_connected("changed", self, "notification")):
+					# warning-ignore:return_value_discarded
+					nval.connect("changed", self, "notification", [NOTIFICATION_THEME_CHANGED])
 		
 		"CustomFonts":
 			entry = __reg_font.get(split[1], null)
-			if (!entry):
-				return false
-			
-			entry.set_override(val if (val != null && val is Font) else null)
+			if (entry):
+				entry.set_override(val if (val != null && val is Font) else null)
 		
 		"CustomColors":
 			entry = __reg_color.get(split[1], null)
-			if (!entry):
-				return false
-			
-			entry.set_override(val if (val != null && val is Color) else null)
+			if (entry):
+				entry.set_override(val if (val != null && val is Color) else null)
 		
 		"CustomConstants":
 			entry = __reg_constant.get(split[1], null)
-			if (!entry):
-				return false
-			
-			entry.set_override(val if (val != null && val is int) else null)
+			if (entry):
+				entry.set_override(val if (val != null && val is int) else null)
+		
+		_:
+			ret = false
 	
+	if (ret):
+		call_deferred("notification", NOTIFICATION_THEME_CHANGED)
 	
-	call_deferred("notification", NOTIFICATION_THEME_CHANGED)
-	return true
+	return ret
 
 
 func _get(prop: String):
@@ -439,7 +434,7 @@ func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_ENTER_TREE, NOTIFICATION_THEME_CHANGED:
 			_create_custom_theme()
-		
+	
 		NOTIFICATION_EXIT_TREE:
 			__cleanup()
 

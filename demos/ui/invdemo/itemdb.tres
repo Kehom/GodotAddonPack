@@ -5,98 +5,6 @@
 
 [sub_resource type="Resource" id=1]
 script = ExtResource( 2 )
-table_name = "item_type"
-id_type = 4
-column = [ {
-"name": "index",
-"value_type": 1
-}, {
-"name": "weight",
-"value_type": 600
-} ]
-ref_table = {
-
-}
-rowlist = [ {
-"id": "gem",
-"index": 0,
-"weight": 0.8
-}, {
-"id": "ring",
-"index": 1,
-"weight": 0.8
-}, {
-"id": "potion",
-"index": 2,
-"weight": 5.5
-}, {
-"id": "shield",
-"index": 3,
-"weight": 1.0
-}, {
-"id": "onehand",
-"index": 4,
-"weight": 1.0
-}, {
-"id": "twohand",
-"index": 5,
-"weight": 1.0
-} ]
-
-[sub_resource type="Resource" id=2]
-script = ExtResource( 2 )
-table_name = "socket_type"
-id_type = 4
-column = [ {
-"name": "mask",
-"value_type": 1002
-}, {
-"name": "weight",
-"value_type": 600
-}, {
-"name": "image",
-"value_type": 1004
-}, {
-"name": "dcode",
-"value_type": 1000
-} ]
-ref_table = {
-
-}
-rowlist = [ {
-"dcode": "B",
-"id": "blue",
-"image": "res://shared/textures/socket_blue_32x32.png",
-"mask": 1,
-"weight": 1.0
-}, {
-"dcode": "R",
-"id": "red",
-"image": "res://shared/textures/socket_red_32x32.png",
-"mask": 2,
-"weight": 1.0
-}, {
-"dcode": "G",
-"id": "green",
-"image": "res://shared/textures/socket_green_32x32.png",
-"mask": 4,
-"weight": 1.0
-}, {
-"dcode": "Y",
-"id": "yellow",
-"image": "res://shared/textures/socket_yellow_32x32.png",
-"mask": 8,
-"weight": 1.0
-}, {
-"dcode": "W",
-"id": "generic",
-"image": "res://shared/textures/socket_neutral_32x32.png",
-"mask": 15,
-"weight": 0.2
-} ]
-
-[sub_resource type="Resource" id=3]
-script = ExtResource( 2 )
 table_name = "gem"
 id_type = 4
 column = [ {
@@ -155,9 +63,49 @@ rowlist = [ {
 "weight": 1.0
 } ]
 
-[sub_resource type="Resource" id=4]
+[sub_resource type="Resource" id=2]
 script = ExtResource( 2 )
-table_name = "ring"
+table_name = "item_type"
+id_type = 4
+column = [ {
+"name": "index",
+"value_type": 1
+}, {
+"name": "weight",
+"value_type": 600
+} ]
+ref_table = {
+
+}
+rowlist = [ {
+"id": "gem",
+"index": 0,
+"weight": 0.8
+}, {
+"id": "ring",
+"index": 1,
+"weight": 0.8
+}, {
+"id": "potion",
+"index": 2,
+"weight": 5.5
+}, {
+"id": "shield",
+"index": 3,
+"weight": 1.0
+}, {
+"id": "onehand",
+"index": 4,
+"weight": 1.0
+}, {
+"id": "twohand",
+"index": 5,
+"weight": 1.0
+} ]
+
+[sub_resource type="Resource" id=3]
+script = ExtResource( 2 )
+table_name = "onehand"
 id_type = 4
 column = [ {
 "name": "name",
@@ -169,32 +117,37 @@ column = [ {
 "name": "weight",
 "value_type": 600
 }, {
-"name": "max_sockets",
+"name": "row_span",
 "value_type": 1002
 }, {
 "name": "description",
 "value_type": 1000
+}, {
+"name": "max_sockets",
+"value_type": 1002
 } ]
 ref_table = {
 
 }
 rowlist = [ {
-"description": "An ordinary looking ring.",
-"icon": "res://shared/textures/ring01_32x32.png",
-"id": "ordinary",
-"max_sockets": 1,
-"name": "Just a Ring",
+"description": "Some use this for stealthy operations.",
+"icon": "res://shared/textures/dagger01_32x64.png",
+"id": "dagger",
+"max_sockets": 2,
+"name": "Dagger",
+"row_span": 2,
 "weight": 1.0
 }, {
-"description": "There is a jewel incrusted in this rather weird looking ring.",
-"icon": "res://shared/textures/ring02_32x32.png",
-"id": "jeweled",
-"max_sockets": 0,
-"name": "Jeweled Ring",
-"weight": 0.5
+"description": "This is sharp and pointy.",
+"icon": "res://shared/textures/sword01_32x96.png",
+"id": "sword",
+"max_sockets": 2,
+"name": "Sword",
+"row_span": 3,
+"weight": 1.0
 } ]
 
-[sub_resource type="Resource" id=5]
+[sub_resource type="Resource" id=4]
 script = ExtResource( 2 )
 table_name = "potion"
 id_type = 4
@@ -240,6 +193,45 @@ rowlist = [ {
 "weight": 1.0
 } ]
 
+[sub_resource type="Resource" id=5]
+script = ExtResource( 2 )
+table_name = "ring"
+id_type = 4
+column = [ {
+"name": "name",
+"value_type": 1000
+}, {
+"name": "icon",
+"value_type": 1004
+}, {
+"name": "weight",
+"value_type": 600
+}, {
+"name": "max_sockets",
+"value_type": 1002
+}, {
+"name": "description",
+"value_type": 1000
+} ]
+ref_table = {
+
+}
+rowlist = [ {
+"description": "An ordinary looking ring.",
+"icon": "res://shared/textures/ring01_32x32.png",
+"id": "ordinary",
+"max_sockets": 1,
+"name": "Just a Ring",
+"weight": 1.0
+}, {
+"description": "There is a jewel incrusted in this rather weird looking ring.",
+"icon": "res://shared/textures/ring02_32x32.png",
+"id": "jeweled",
+"max_sockets": 0,
+"name": "Jeweled Ring",
+"weight": 0.5
+} ]
+
 [sub_resource type="Resource" id=6]
 script = ExtResource( 2 )
 table_name = "shield"
@@ -282,46 +274,54 @@ rowlist = [ {
 
 [sub_resource type="Resource" id=7]
 script = ExtResource( 2 )
-table_name = "onehand"
+table_name = "socket_type"
 id_type = 4
 column = [ {
-"name": "name",
-"value_type": 1000
-}, {
-"name": "icon",
-"value_type": 1004
+"name": "mask",
+"value_type": 1002
 }, {
 "name": "weight",
 "value_type": 600
 }, {
-"name": "row_span",
-"value_type": 1002
+"name": "image",
+"value_type": 1004
 }, {
-"name": "description",
+"name": "dcode",
 "value_type": 1000
-}, {
-"name": "max_sockets",
-"value_type": 1002
 } ]
 ref_table = {
 
 }
 rowlist = [ {
-"description": "Some use this for stealthy operations.",
-"icon": "res://shared/textures/dagger01_32x64.png",
-"id": "dagger",
-"max_sockets": 2,
-"name": "Dagger",
-"row_span": 2,
+"dcode": "B",
+"id": "blue",
+"image": "res://shared/textures/socket_blue_32x32.png",
+"mask": 1,
 "weight": 1.0
 }, {
-"description": "This is sharp and pointy.",
-"icon": "res://shared/textures/sword01_32x96.png",
-"id": "sword",
-"max_sockets": 2,
-"name": "Sword",
-"row_span": 3,
+"dcode": "R",
+"id": "red",
+"image": "res://shared/textures/socket_red_32x32.png",
+"mask": 2,
 "weight": 1.0
+}, {
+"dcode": "G",
+"id": "green",
+"image": "res://shared/textures/socket_green_32x32.png",
+"mask": 4,
+"weight": 1.0
+}, {
+"dcode": "Y",
+"id": "yellow",
+"image": "res://shared/textures/socket_yellow_32x32.png",
+"mask": 8,
+"weight": 1.0
+}, {
+"dcode": "W",
+"id": "generic",
+"image": "res://shared/textures/socket_neutral_32x32.png",
+"mask": 15,
+"weight": 0.2
 } ]
 
 [sub_resource type="Resource" id=8]
@@ -367,12 +367,12 @@ rowlist = [ {
 [resource]
 script = ExtResource( 1 )
 table = {
-"gem": SubResource( 3 ),
-"item_type": SubResource( 1 ),
-"onehand": SubResource( 7 ),
-"potion": SubResource( 5 ),
-"ring": SubResource( 4 ),
+"gem": SubResource( 1 ),
+"item_type": SubResource( 2 ),
+"onehand": SubResource( 3 ),
+"potion": SubResource( 4 ),
+"ring": SubResource( 5 ),
 "shield": SubResource( 6 ),
-"socket_type": SubResource( 2 ),
+"socket_type": SubResource( 7 ),
 "twohand": SubResource( 8 )
 }
