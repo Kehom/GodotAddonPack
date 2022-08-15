@@ -13,6 +13,7 @@ The following addons are part of this pack:
 * Smooth: Largely based on [Lawnjelly's Smoothing Addon](https://github.com/lawnjelly/smoothing-addon), automates interpolation calculation of child nodes.
 * UI: Custom user interface Control nodes.
 * Database: An in game database system based on Godot Resource. It contains an editor plugin for easier editing of the data.
+* DataAsset: A resource meant to hold data. A plugin editor is provided to help edit the properties, including support for custom scripted resources and some more advanced array editing.
 
 ## Installation
 
@@ -174,6 +175,25 @@ This Control brings tabular data viewing and editing capabilities. To increase i
 
 There are also column types that allow advanced means to show/edit the data within the TabularBox control. Creating custom ones is relatively simple.
 
+#### ExpandablePanel
+
+Interdependency | Extra Settings
+--|--
+`CustomControlBase` | no
+
+Add a panel that can expand or shrink in order to reveal/hide its contents. Each child node becomes a "page" allowing the expanding/shrinking to deal with multiple different types of contents. Expanding and/or shrinking can be animated and even have curve resources affecting the behavior of the animation.
+
+Each page gets a "button" to toggle its content. The associated icon used within that button can be configured for each available page within the expandable panel.
+
+
+#### SpinSlider
+
+Interdependency | Extra Settings
+--|--
+`CustomControlBase` | no
+
+Implements a control similar to `SpinBox` but if a well defined value range is defined then the spin buttons will be hidden while a slider will be shown.
+
 
 ### Database
 
@@ -183,12 +203,11 @@ Interdependency | Needs Activation | Extra Settings
 
 This addon uses Godot Resource to implement a database system. A database can contain multiple tables. A table can reference another one if so desired. For easier creation/editing/management of the database, an editor plugin that uses `TabularBox` is part of this addon.
 
-### ExpandablePanel
 
-Interdependency | Extra Settings
---|--
-`CustomControlBase` | no
+### DataAsset
 
-Add a panel that can expand or shrink in order to reveal/hide its contents. Each child node becomes a "page" allowing the expanding/shrinking to deal with multiple different types of contents. Expanding and/or shrinking can be animated and even have curve resources affecting the behavior of the animation.
+Interdependency | Needs Activation | Extra Settings
+--|--|--
+`UI/SpinSlider` | yes | no
 
-Each page gets a "button" to toggle its content. The associated icon used within that button can be configured for each available page within the expandable panel.
+Resources meant to hold data can be very useful. Yet editing properties through the *Inspector* panel might be very limiting on many occasions. This plugin is meant to make this kind of editing at least less clunky.

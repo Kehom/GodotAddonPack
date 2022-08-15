@@ -39,6 +39,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/keh_gddb/dbtable.gd"
 }, {
+"base": "Resource",
+"class": "DataAsset",
+"language": "GDScript",
+"path": "res://addons/keh_dataasset/dasset.gd"
+}, {
 "base": "Reference",
 "class": "EncDecBuffer",
 "language": "GDScript",
@@ -209,6 +214,16 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://demos/network/scripts/rectdrawer.gd"
 }, {
+"base": "DataAsset",
+"class": "SampleDataAsset",
+"language": "GDScript",
+"path": "res://shared/scripts/sample_dasset.gd"
+}, {
+"base": "Resource",
+"class": "SampleScriptedResource",
+"language": "GDScript",
+"path": "res://shared/scripts/sample_resource.gd"
+}, {
 "base": "Reference",
 "class": "SharedUtils",
 "language": "GDScript",
@@ -228,6 +243,11 @@ _global_script_classes=[ {
 "class": "SnapEntityBase",
 "language": "GDScript",
 "path": "res://addons/keh_network/snapentity.gd"
+}, {
+"base": "CustomControlBase",
+"class": "SpinSlider",
+"language": "GDScript",
+"path": "res://addons/keh_ui/spin_slider/spin_slider.gd"
 }, {
 "base": "CustomControlBase",
 "class": "TabularBox",
@@ -271,6 +291,7 @@ _global_script_class_icons={
 "CustomControlBase": "",
 "DBHelpers": "",
 "DBTable": "",
+"DataAsset": "",
 "EncDecBuffer": "",
 "EntityInfo": "",
 "ExpandablePanel": "",
@@ -305,10 +326,13 @@ _global_script_class_icons={
 "Network": "",
 "Quantize": "",
 "RectangleDrawer": "",
+"SampleDataAsset": "",
+"SampleScriptedResource": "",
 "SharedUtils": "",
 "Smooth2D": "",
 "Smooth3D": "",
 "SnapEntityBase": "",
+"SpinSlider": "",
 "TabularBox": "",
 "TabularDataSourceBase": "",
 "TabularSimpleDataSource": "",
@@ -338,7 +362,7 @@ gdscript/warnings/unused_class_variable=true
 
 [editor_plugins]
 
-enabled=PoolStringArray( "keh_dbghelper", "keh_gddb", "keh_network", "keh_smooth", "keh_ui" )
+enabled=PoolStringArray( "keh_dataasset", "keh_dbghelper", "keh_gddb", "keh_network", "keh_smooth", "keh_ui" )
 
 [global]
 

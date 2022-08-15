@@ -1,0 +1,42 @@
+[gd_resource type="Resource" load_steps=8 format=2]
+
+[ext_resource path="res://shared/scripts/sample_dasset.gd" type="Script" id=1]
+[ext_resource path="res://shared/scripts/sample_resource.gd" type="Script" id=2]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 2 )
+some_color = Color( 0.768627, 0.796078, 0.11, 1 )
+some_vec3 = Vector3( 0, 1, 0 )
+some_image_file = ""
+
+[sub_resource type="Resource" id=2]
+script = ExtResource( 2 )
+some_color = Color( 0.417969, 0.05, 0.05, 1 )
+some_vec3 = Vector3( 0, 1, 0 )
+some_image_file = ""
+
+[sub_resource type="Resource" id=3]
+script = ExtResource( 2 )
+some_color = Color( 0.11, 0.11, 0.76, 1 )
+some_vec3 = Vector3( 0, 1, 0 )
+some_image_file = ""
+
+[sub_resource type="Resource" id=4]
+script = ExtResource( 2 )
+some_color = Color( 0.269113, 0.02, 0.304688, 1 )
+some_vec3 = Vector3( 0, 1, 0 )
+some_image_file = ""
+
+[sub_resource type="Resource" id=5]
+script = ExtResource( 2 )
+some_color = Color( 1, 1, 1, 1 )
+some_vec3 = Vector3( 0, 1, 0 )
+some_image_file = ""
+
+[resource]
+script = ExtResource( 1 )
+some_string = ""
+some_float = 1.0
+some_flags = 0
+some_resource = SubResource( 5 )
+some_array = [ SubResource( 1 ), SubResource( 2 ), SubResource( 1 ), SubResource( 3 ), SubResource( 4 ) ]

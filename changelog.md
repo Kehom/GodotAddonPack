@@ -1,5 +1,9 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2022 Aug 15
+* New addon, `SpinSlider`, which provides a `SpinBox` like control that provides a slider instead of the spin buttons in case a value range is defined.
+* New addon, `DataAsset`, an editor plugin to help edit resources meant to deal with data.
+
 #### 2021 Nov 12
 * New addon, `ExpandablePanel`, which provides a panel that expands or shrinks to reveal or hide its contents.
 * (UI) The `CustomControlBase` got some small improvements. Namely a fix to the stylebox override, which now triggers the control to be redrawn and the possibility to create theme constants with defined ranges.
