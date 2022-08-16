@@ -1446,6 +1446,10 @@ func _unhandled_input(evt: InputEvent) -> void:
 		pass
 
 
+func _get_minimum_size() -> Vector2:
+	return Vector2(120, 85)
+
+
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_THEME_CHANGED, NOTIFICATION_RESIZED:
@@ -1463,9 +1467,6 @@ func _draw() -> void:
 func _init() -> void:
 	# Ensure nothing will be drawn outside of the control boundaries
 	set_clip_contents(true)
-	
-	# Setup minimum size
-	rect_min_size = Vector2(120, 85)
 	
 	### Setup objects
 	if (!_styler):
