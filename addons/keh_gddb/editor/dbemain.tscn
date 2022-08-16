@@ -1,20 +1,19 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://addons/keh_gddb/editor/dbemain.gd" type="Script" id=1]
 [ext_resource path="res://addons/keh_gddb/editor/dlg_newtable.tscn" type="PackedScene" id=2]
 [ext_resource path="res://addons/keh_gddb/editor/table_list.tscn" type="PackedScene" id=3]
-[ext_resource path="res://addons/keh_ui/tabular/tabularbox.gd" type="Script" id=4]
 [ext_resource path="res://addons/keh_gddb/editor/dlg_newcolumn.tscn" type="PackedScene" id=5]
 [ext_resource path="res://addons/keh_gddb/editor/dlg_rnametbl.tscn" type="PackedScene" id=6]
 [ext_resource path="res://addons/keh_gddb/editor/dlg_dbinfo.tscn" type="PackedScene" id=7]
 [ext_resource path="res://addons/keh_gddb/editor/dlg_confirm.tscn" type="PackedScene" id=8]
 
-[sub_resource type="StyleBoxEmpty" id=1]
+[sub_resource type="StyleBoxEmpty" id=6]
 content_margin_left = 15.0
 content_margin_right = 15.0
 content_margin_top = 15.0
 
-[sub_resource type="StyleBoxFlat" id=2]
+[sub_resource type="StyleBoxFlat" id=7]
 bg_color = Color( 0.6, 0.6, 0.6, 0 )
 border_width_left = 1
 border_width_top = 1
@@ -22,13 +21,13 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color( 0.101961, 0.117647, 0.152941, 1 )
 
-[sub_resource type="StyleBoxEmpty" id=3]
+[sub_resource type="StyleBoxEmpty" id=8]
 content_margin_left = 15.0
 content_margin_right = 35.0
 content_margin_top = 15.0
 content_margin_bottom = 15.0
 
-[sub_resource type="Image" id=7]
+[sub_resource type="Image" id=11]
 data = {
 "data": PoolByteArray( 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42, 37, 37, 42 ),
 "format": "RGB8",
@@ -40,10 +39,10 @@ data = {
 [sub_resource type="ImageTexture" id=5]
 flags = 4
 flags = 4
-image = SubResource( 7 )
+image = SubResource( 11 )
 size = Vector2( 8, 8 )
 
-[sub_resource type="StyleBoxTexture" id=6]
+[sub_resource type="StyleBoxTexture" id=10]
 content_margin_left = 2.0
 content_margin_right = 2.0
 content_margin_top = 2.0
@@ -74,7 +73,7 @@ __meta__ = {
 [node name="top_container" type="PanelContainer" parent="vbox"]
 margin_right = 1024.0
 margin_bottom = 35.0
-custom_styles/panel = SubResource( 1 )
+custom_styles/panel = SubResource( 6 )
 
 [node name="hbox_tbar" type="HBoxContainer" parent="vbox/top_container"]
 margin_left = 15.0
@@ -97,7 +96,7 @@ margin_top = 2.0
 margin_right = 840.0
 margin_bottom = 18.0
 size_flags_horizontal = 3
-custom_styles/normal = SubResource( 2 )
+custom_styles/normal = SubResource( 7 )
 
 [node name="bt_openclose" type="Button" parent="vbox/top_container/hbox_tbar"]
 margin_left = 844.0
@@ -117,7 +116,7 @@ margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_styles/panel = SubResource( 3 )
+custom_styles/panel = SubResource( 8 )
 
 [node name="hsplit" type="HSplitContainer" parent="vbox/main_container"]
 margin_left = 15.0
@@ -156,7 +155,7 @@ margin_right = 200.0
 margin_bottom = 525.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_styles/bg = SubResource( 6 )
+custom_styles/bg = SubResource( 10 )
 
 [node name="table_list" parent="vbox/main_container/hsplit/vbleft/scrollc" instance=ExtResource( 3 )]
 anchor_right = 0.0
@@ -197,49 +196,6 @@ margin_right = 762.0
 margin_bottom = 20.0
 disabled = true
 text = "Add row"
-
-[node name="tabularbox" type="Control" parent="vbox/main_container/hsplit/vbright"]
-margin_top = 24.0
-margin_right = 762.0
-margin_bottom = 525.0
-rect_min_size = Vector2( 120, 85 )
-rect_clip_content = true
-size_flags_vertical = 3
-script = ExtResource( 4 )
-data_source = null
-autosave_data_source = false
-auto_edit_next_row = true
-auto_handle_remove_row = false
-auto_handle_remove_column = false
-auto_handle_column_insertion = false
-auto_handle_column_rename = false
-auto_handle_column_reorder = false
-auto_handle_column_type_change = false
-auto_handle_row_insertion = false
-auto_handle_row_move = false
-auto_handle_row_sort = false
-show_row_numbers = true
-show_row_checkboxes = true
-hide_move_column_buttons = true
-CustomIcons/unchecked = null
-CustomIcons/checked = null
-CustomIcons/down_arrow = null
-CustomIcons/left_arrow = null
-CustomIcons/right_arrow = null
-CustomIcons/trash_bin = null
-CustomIcons/no_texture = null
-CustomStyles/background = null
-CustomStyles/header = null
-CustomStyles/odd_row = null
-CustomStyles/even_row = null
-CustomStyles/button_normal = null
-CustomStyles/button_hover = null
-CustomStyles/button_pressed = null
-CustomFonts/header = null
-CustomFonts/cell = null
-CustomColors/header_text = null
-CustomColors/cell_text = null
-CustomConstants/header_align = null
 
 [node name="dialogs" type="Control" parent="."]
 __meta__ = {
@@ -283,17 +239,6 @@ popup_exclusive = true
 [connection signal="table_resource_dropped" from="vbox/main_container/hsplit/vbleft/scrollc/table_list" to="." method="_on_table_list_table_resource_dropped"]
 [connection signal="pressed" from="vbox/main_container/hsplit/vbright/boxbuttons/bt_addcolumn" to="." method="_on_bt_addcolumn_pressed"]
 [connection signal="pressed" from="vbox/main_container/hsplit/vbright/boxbuttons/bt_addrow" to="." method="_on_bt_addrow_pressed"]
-[connection signal="column_move_requested" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_column_move_requested"]
-[connection signal="column_remove_request" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_column_remove_request"]
-[connection signal="column_rename_requested" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_column_rename_requested"]
-[connection signal="column_resized" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_column_resized"]
-[connection signal="column_type_change_requested" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_column_type_change_requested"]
-[connection signal="insert_column_request" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_insert_column_request"]
-[connection signal="insert_row_request" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_insert_row_request"]
-[connection signal="row_move_request" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_row_move_request"]
-[connection signal="row_remove_request" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_row_remove_request"]
-[connection signal="row_sort_request" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_row_sort_request"]
-[connection signal="value_change_request" from="vbox/main_container/hsplit/vbright/tabularbox" to="." method="_on_tabularbox_value_change_request"]
 [connection signal="ok_pressed" from="dialogs/dlg_newtable" to="." method="_on_dlg_newtable_ok_pressed"]
 [connection signal="ok_pressed" from="dialogs/dlg_newcolumn" to="." method="_on_dlg_newcolumn_ok_pressed"]
 [connection signal="file_selected" from="dialogs/dlg_ocdb" to="." method="_on_dlg_ocdb_file_selected"]

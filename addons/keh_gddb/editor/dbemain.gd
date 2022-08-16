@@ -227,7 +227,8 @@ var _cwidth_data: Dictionary
 onready var _table_box: VBoxContainer = $vbox/main_container/hsplit/vbleft/scrollc/table_list as VBoxContainer
 
 # Cache the TabularBox that will display the edited table data
-onready var _tabular: TabularBoxT = $vbox/main_container/hsplit/vbright/tabularbox as TabularBoxT
+#onready var _tabular: TabularBoxT = $vbox/main_container/hsplit/vbright/tabularbox as TabularBoxT
+var _tabular: TabularBoxT = TabularBoxT.new()
 
 # Cache the open/create database dialog
 onready var _dlg_ocdb: FileDialog = $dialogs/dlg_ocdb as FileDialog
@@ -849,7 +850,73 @@ func _notification(what: int) -> void:
 			$vbox/main_container/hsplit/vbleft/scrollc.add_stylebox_override("bg", pnl_style)
 
 
+func _enter_tree() -> void:
+	var vbright: VBoxContainer = get_node_or_null("vbox/main_container/hsplit/vbright")
+	if (vbright):
+		var ci: int = 0
+		var done: bool = false
+		
+		while (!done):
+			var c: Node = vbright.get_child(ci)
+			
+			if (c is TabularBoxT):
+				vbright.remove_child(c)
+				c.free()
+			
+			else:
+				ci += 1
+			
+			done = ci >= vbright.get_child_count()
+		
+		vbright.add_child(_tabular)
+		_tabular.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_tabular.size_flags_vertical = Control.SIZE_EXPAND_FILL
+
+
 
 func _init() -> void:
 	_state = _State.new()
+	
+	_tabular.set_autosave_source(false)
+	_tabular.set_autoedit_next_row(true)
+	_tabular.set_autohandle_rem_row(false)
+	_tabular.set_autohandle_rem_col(false)
+	_tabular.set_autohandle_column_insertion(false)
+	_tabular.set_autohandle_col_rename(false)
+	_tabular.set_autohandle_col_move(false)
+	_tabular.set_autohandle_col_type_change(false)
+	_tabular.set_autohandle_row_insertion(false)
+	_tabular.set_autohandle_row_move(false)
+	_tabular.set_autohandle_row_sort(false)
+	_tabular.set_show_row_numbers(true)
+	_tabular.set_show_row_checkboxes(true)
+	_tabular.set_hide_move_col_buttons(true)
+	
+	
+	DBHelpers.connector(_tabular, "column_move_requested", self, "_on_tabularbox_column_move_requested")
+	DBHelpers.connector(_tabular, "column_remove_request", self, "_on_tabularbox_column_remove_request")
+	DBHelpers.connector(_tabular, "column_rename_requested", self, "_on_tabularbox_column_rename_requested")
+	DBHelpers.connector(_tabular, "column_resized", self, "_on_tabularbox_column_resized")
+	DBHelpers.connector(_tabular, "column_type_change_requested", self, "_on_tabularbox_column_type_change_requested")
+	DBHelpers.connector(_tabular, "insert_column_request", self, "_on_tabularbox_insert_column_request")
+	DBHelpers.connector(_tabular, "insert_row_request", self, "_on_tabularbox_insert_row_request")
+	DBHelpers.connector(_tabular, "row_move_request", self, "_on_tabularbox_row_move_request")
+	DBHelpers.connector(_tabular, "row_remove_request", self, "_on_tabularbox_row_remove_request")
+	DBHelpers.connector(_tabular, "row_sort_request", self, "_on_tabularbox_row_sort_request")
+	DBHelpers.connector(_tabular, "value_change_request", self, "_on_tabularbox_value_change_request")
 
+### Those are the settings of the original version - which directly used the TabularBox.
+#autosave_data_source = false
+#auto_edit_next_row = true
+#auto_handle_remove_row = false
+#auto_handle_remove_column = false
+#auto_handle_column_insertion = false
+#auto_handle_column_rename = false
+#auto_handle_column_reorder = false
+#auto_handle_column_type_change = false
+#auto_handle_row_insertion = false
+#auto_handle_row_move = false
+#auto_handle_row_sort = false
+#show_row_numbers = true
+#show_row_checkboxes = true
+#hide_move_column_buttons = true
