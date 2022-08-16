@@ -192,7 +192,7 @@ func _handle_mouse_button(evt: InputEventMouseButton) -> bool:
 			
 			else:
 				if (ibase.has_method("_notify_item_socketing_denied")):
-					ibase.call("_notify_item_socketing_denied", InventoryCore.item_to_dictionary(di, false), oitem, {"mask": _socket_mask, "index": _index})
+					ibase.call("_notify_item_socketing_denied", di, oitem, {"mask": _socket_mask, "index": _index})
 		
 		else:
 			if (!is_empty() && evt.button_index == _shared.unsocket_item_mouse_button()):
