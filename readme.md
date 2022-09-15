@@ -222,7 +222,7 @@ This addon is meant to provide means to easily playback audio without having to 
 
 The specific demo for this addon uses assets:
 
-- 3 audio tracks by Rafael Klux and downloaded from https://freepd.com
+- 3 audio tracks by Rafael Krux and downloaded from https://freepd.com
 - The texture and the sound effects are by Kenney, https://kenney.nl
 
 

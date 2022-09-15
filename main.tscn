@@ -704,7 +704,7 @@ In this demo:
 - There is an area that can be clicked, which will result in a random sound effect. If 2D or 3D SFX mode, then the attenuation will consider the \"listener\" (represented by a person) related to where the click was performed.
 - An expandable panel will show a little bit of debug information regarding the AudioMaster object.
 
-There are 3 audio tracks composed by Rafael Klux, downloaded from https://freepd.com
+There are 3 audio tracks composed by Rafael Krux, downloaded from https://freepd.com
 All other assets used in the demo (texture and sound effects) are by Kenney (https://kenney.nl).
 Sound effects have been converted from OGG into WAV because 2D and 3D playback resulted in some random \"pops\" when using OGG, but didn't have any problem with WAV."
 autowrap = true

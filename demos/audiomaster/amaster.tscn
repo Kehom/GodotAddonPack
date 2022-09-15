@@ -442,7 +442,7 @@ text = "Stop"
 margin_top = 416.0
 margin_right = 332.0
 margin_bottom = 515.0
-text = "All three audio tracks have been downloaded from https://freepd.com and composed by Rafael Klux.
+text = "All three audio tracks have been downloaded from https://freepd.com and composed by Rafael Krux.
 
 Sound effects are by Kenney (https://kenney.nl).
 
@@ -452,19 +452,19 @@ autowrap = true
 [node name="spacer" type="Control" parent="ui/pnl1/vbox"]
 margin_top = 525.0
 margin_right = 332.0
-margin_bottom = 551.0
+margin_bottom = 544.0
 size_flags_vertical = 3
 
 [node name="hsep2" type="HSeparator" parent="ui/pnl1/vbox"]
-margin_top = 561.0
+margin_top = 554.0
 margin_right = 332.0
-margin_bottom = 565.0
+margin_bottom = 558.0
 
 [node name="bt_return" type="Button" parent="ui/pnl1/vbox"]
 margin_left = 106.0
-margin_top = 575.0
+margin_top = 568.0
 margin_right = 226.0
-margin_bottom = 595.0
+margin_bottom = 588.0
 rect_min_size = Vector2( 120, 0 )
 size_flags_horizontal = 4
 text = "Return"
