@@ -211,3 +211,19 @@ Interdependency | Needs Activation | Extra Settings
 `UI/SpinSlider` | yes | no
 
 Resources meant to hold data can be very useful. Yet editing properties through the *Inspector* panel might be very limiting on many occasions. This plugin is meant to make this kind of editing at least less clunky.
+
+### AudioMaster
+
+Interdependency | Needs Activation | Extra Settings
+-|-|-
+none | yes* | no
+
+This addon is meant to provide means to easily playback audio without having to worry about node lifetime. A few additional features are added, which makes cross-fading between audio tracks rather simple.
+
+The specific demo for this addon uses assets:
+
+- 3 audio tracks by Rafael Klux and downloaded from https://freepd.com
+- The texture and the sound effects are by Kenney, https://kenney.nl
+
+
+\* Activating this plugin only adds the `AudioMaster` script into the auto-load list. Alternatively you can manually add the desired script(s) to your auto-load list, meaning that you can set your preferred name more easily in order to access the functionality.

@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/impactMining_000.wav-41de4099fb9b04d828135da294c5bafa.sample"
+
+[deps]
+
+source_file="res://shared/sfx/impactMining_000.wav"
+dest_files=[ "res://.import/impactMining_000.wav-41de4099fb9b04d828135da294c5bafa.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=false
+edit/loop=false
+compress/mode=0

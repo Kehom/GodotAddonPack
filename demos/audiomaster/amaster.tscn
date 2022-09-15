@@ -1,0 +1,566 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://demos/audiomaster/amaster.gd" type="Script" id=1]
+[ext_resource path="res://addons/keh_ui/spin_slider/spin_slider.gd" type="Script" id=2]
+[ext_resource path="res://addons/keh_ui/expanel/expanel.gd" type="Script" id=3]
+[ext_resource path="res://demos/audiomaster/sfxhelper.gd" type="Script" id=4]
+
+[node name="amaster" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="ui" type="CanvasLayer" parent="."]
+
+[node name="SFXHelper" type="Control" parent="ui"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 344.0
+margin_top = 34.0
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="top" type="Panel" parent="ui"]
+anchor_right = 1.0
+margin_left = 344.0
+margin_bottom = 34.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="hbox" type="HBoxContainer" parent="ui/top"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 6.0
+margin_top = 6.0
+margin_right = -6.0
+margin_bottom = -6.0
+custom_constants/separation = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="lbl_sfxtype" type="Label" parent="ui/top/hbox"]
+margin_top = 4.0
+margin_right = 54.0
+margin_bottom = 18.0
+text = "SFX type"
+
+[node name="opt_sfxtype" type="OptionButton" parent="ui/top/hbox"]
+margin_left = 64.0
+margin_right = 144.0
+margin_bottom = 22.0
+rect_min_size = Vector2( 80, 0 )
+clip_text = true
+
+[node name="pnl1" type="Panel" parent="ui"]
+anchor_bottom = 1.0
+margin_right = 344.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="vbox" type="VBoxContainer" parent="ui/pnl1"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 6.0
+margin_top = 6.0
+margin_right = -6.0
+margin_bottom = -6.0
+custom_constants/separation = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="hbox1" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_right = 332.0
+margin_bottom = 20.0
+
+[node name="lbl_device" type="Label" parent="ui/pnl1/vbox/hbox1"]
+margin_top = 3.0
+margin_right = 70.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 70, 0 )
+text = "Device"
+
+[node name="opt_device" type="OptionButton" parent="ui/pnl1/vbox/hbox1"]
+margin_left = 74.0
+margin_right = 332.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+clip_text = true
+
+[node name="lbl_volinfo" type="Label" parent="ui/pnl1/vbox"]
+margin_top = 30.0
+margin_right = 332.0
+margin_bottom = 44.0
+text = "Output volume:"
+
+[node name="hbox_master" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 54.0
+margin_right = 332.0
+margin_bottom = 78.0
+
+[node name="spacer" type="Control" parent="ui/pnl1/vbox/hbox_master"]
+margin_right = 20.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+
+[node name="lbl_bus" type="Label" parent="ui/pnl1/vbox/hbox_master"]
+margin_left = 24.0
+margin_top = 5.0
+margin_right = 104.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 80, 0 )
+text = "Master"
+
+[node name="spin" type="Control" parent="ui/pnl1/vbox/hbox_master"]
+margin_left = 108.0
+margin_right = 332.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+step = 0.05
+rounded_values = false
+flat = false
+select_all_on_focus = true
+use_min_value = true
+min_value = 0.0
+use_max_value = true
+max_value = 1.0
+value = 0.0
+CustomIcons/updown = null
+CustomIcons/grabber = null
+CustomIcons/grabber_highlight = null
+CustomStyles/normal = null
+CustomStyles/focus = null
+CustomFonts/font = null
+CustomColors/font_color = null
+CustomConstants/slider_height = null
+
+[node name="hbox_music" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 88.0
+margin_right = 332.0
+margin_bottom = 112.0
+
+[node name="spacer" type="Control" parent="ui/pnl1/vbox/hbox_music"]
+margin_right = 20.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+
+[node name="lbl_bus" type="Label" parent="ui/pnl1/vbox/hbox_music"]
+margin_left = 24.0
+margin_top = 5.0
+margin_right = 104.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 80, 0 )
+text = "Music"
+
+[node name="spin" type="Control" parent="ui/pnl1/vbox/hbox_music"]
+margin_left = 108.0
+margin_right = 332.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+step = 0.05
+rounded_values = false
+flat = false
+select_all_on_focus = true
+use_min_value = true
+min_value = 0.0
+use_max_value = true
+max_value = 1.0
+value = 0.0
+CustomIcons/updown = null
+CustomIcons/grabber = null
+CustomIcons/grabber_highlight = null
+CustomStyles/normal = null
+CustomStyles/focus = null
+CustomFonts/font = null
+CustomColors/font_color = null
+CustomConstants/slider_height = null
+
+[node name="hbox_sfx" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 122.0
+margin_right = 332.0
+margin_bottom = 146.0
+
+[node name="spacer" type="Control" parent="ui/pnl1/vbox/hbox_sfx"]
+margin_right = 20.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+
+[node name="lbl_bus" type="Label" parent="ui/pnl1/vbox/hbox_sfx"]
+margin_left = 24.0
+margin_top = 5.0
+margin_right = 104.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 80, 0 )
+text = "SFX"
+
+[node name="spin" type="Control" parent="ui/pnl1/vbox/hbox_sfx"]
+margin_left = 108.0
+margin_right = 332.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+step = 0.05
+rounded_values = false
+flat = false
+select_all_on_focus = true
+use_min_value = true
+min_value = 0.0
+use_max_value = true
+max_value = 1.0
+value = 0.0
+CustomIcons/updown = null
+CustomIcons/grabber = null
+CustomIcons/grabber_highlight = null
+CustomStyles/normal = null
+CustomStyles/focus = null
+CustomFonts/font = null
+CustomColors/font_color = null
+CustomConstants/slider_height = null
+
+[node name="hbox_sfx2d" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 156.0
+margin_right = 332.0
+margin_bottom = 180.0
+
+[node name="spacer" type="Control" parent="ui/pnl1/vbox/hbox_sfx2d"]
+margin_right = 20.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+
+[node name="lbl_bus" type="Label" parent="ui/pnl1/vbox/hbox_sfx2d"]
+margin_left = 24.0
+margin_top = 5.0
+margin_right = 104.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 80, 0 )
+text = "SFX2D"
+
+[node name="spin" type="Control" parent="ui/pnl1/vbox/hbox_sfx2d"]
+margin_left = 108.0
+margin_right = 332.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+step = 0.05
+rounded_values = false
+flat = false
+select_all_on_focus = true
+use_min_value = true
+min_value = 0.0
+use_max_value = true
+max_value = 1.0
+value = 0.0
+CustomIcons/updown = null
+CustomIcons/grabber = null
+CustomIcons/grabber_highlight = null
+CustomStyles/normal = null
+CustomStyles/focus = null
+CustomFonts/font = null
+CustomColors/font_color = null
+CustomConstants/slider_height = null
+
+[node name="hbox_sfx3d" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 190.0
+margin_right = 332.0
+margin_bottom = 214.0
+
+[node name="spacer" type="Control" parent="ui/pnl1/vbox/hbox_sfx3d"]
+margin_right = 20.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+
+[node name="lbl_bus" type="Label" parent="ui/pnl1/vbox/hbox_sfx3d"]
+margin_left = 24.0
+margin_top = 5.0
+margin_right = 104.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 80, 0 )
+text = "SFX3D"
+
+[node name="spin" type="Control" parent="ui/pnl1/vbox/hbox_sfx3d"]
+margin_left = 108.0
+margin_right = 332.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+step = 0.05
+rounded_values = false
+flat = false
+select_all_on_focus = true
+use_min_value = true
+min_value = 0.0
+use_max_value = true
+max_value = 1.0
+value = 0.0
+CustomIcons/updown = null
+CustomIcons/grabber = null
+CustomIcons/grabber_highlight = null
+CustomStyles/normal = null
+CustomStyles/focus = null
+CustomFonts/font = null
+CustomColors/font_color = null
+CustomConstants/slider_height = null
+
+[node name="hbox_ui" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 224.0
+margin_right = 332.0
+margin_bottom = 248.0
+
+[node name="spacer" type="Control" parent="ui/pnl1/vbox/hbox_ui"]
+margin_right = 20.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+
+[node name="lbl_bus" type="Label" parent="ui/pnl1/vbox/hbox_ui"]
+margin_left = 24.0
+margin_top = 5.0
+margin_right = 104.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 80, 0 )
+text = "UI"
+
+[node name="spin" type="Control" parent="ui/pnl1/vbox/hbox_ui"]
+margin_left = 108.0
+margin_right = 332.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+step = 0.05
+rounded_values = false
+flat = false
+select_all_on_focus = true
+use_min_value = true
+min_value = 0.0
+use_max_value = true
+max_value = 1.0
+value = 0.0
+CustomIcons/updown = null
+CustomIcons/grabber = null
+CustomIcons/grabber_highlight = null
+CustomStyles/normal = null
+CustomStyles/focus = null
+CustomFonts/font = null
+CustomColors/font_color = null
+CustomConstants/slider_height = null
+
+[node name="hsep1" type="HSeparator" parent="ui/pnl1/vbox"]
+margin_top = 258.0
+margin_right = 332.0
+margin_bottom = 262.0
+
+[node name="lbl_mplayback" type="Label" parent="ui/pnl1/vbox"]
+margin_top = 272.0
+margin_right = 332.0
+margin_bottom = 286.0
+text = "Music Playback"
+align = 1
+
+[node name="hbox_fade" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 296.0
+margin_right = 332.0
+margin_bottom = 320.0
+
+[node name="lbl_ftime" type="Label" parent="ui/pnl1/vbox/hbox_fade"]
+margin_top = 5.0
+margin_right = 100.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 100, 0 )
+text = "Fade time"
+
+[node name="spin" type="Control" parent="ui/pnl1/vbox/hbox_fade"]
+margin_left = 104.0
+margin_right = 332.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+step = 0.05
+rounded_values = false
+flat = false
+select_all_on_focus = true
+use_min_value = true
+min_value = 0.0
+use_max_value = true
+max_value = 3.0
+value = 1.5
+CustomIcons/updown = null
+CustomIcons/grabber = null
+CustomIcons/grabber_highlight = null
+CustomStyles/normal = null
+CustomStyles/focus = null
+CustomFonts/font = null
+CustomColors/font_color = null
+CustomConstants/slider_height = null
+
+[node name="hbox_mbuttons" type="HBoxContainer" parent="ui/pnl1/vbox"]
+margin_top = 330.0
+margin_right = 332.0
+margin_bottom = 350.0
+
+[node name="bt_music1" type="Button" parent="ui/pnl1/vbox/hbox_mbuttons"]
+margin_right = 100.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Action Strike"
+
+[node name="bt_music2" type="Button" parent="ui/pnl1/vbox/hbox_mbuttons"]
+margin_left = 104.0
+margin_right = 213.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Dreams of Vain"
+
+[node name="bt_music3" type="Button" parent="ui/pnl1/vbox/hbox_mbuttons"]
+margin_left = 217.0
+margin_right = 332.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Epic Boss Battle"
+
+[node name="pb_pbackpos" type="ProgressBar" parent="ui/pnl1/vbox"]
+margin_top = 360.0
+margin_right = 332.0
+margin_bottom = 376.0
+rect_min_size = Vector2( 0, 16 )
+max_value = 1.0
+percent_visible = false
+
+[node name="bt_stopmusic" type="Button" parent="ui/pnl1/vbox"]
+margin_left = 106.0
+margin_top = 386.0
+margin_right = 226.0
+margin_bottom = 406.0
+rect_min_size = Vector2( 120, 0 )
+size_flags_horizontal = 4
+text = "Stop"
+
+[node name="lbl_credit" type="Label" parent="ui/pnl1/vbox"]
+margin_top = 416.0
+margin_right = 332.0
+margin_bottom = 515.0
+text = "All three audio tracks have been downloaded from https://freepd.com and composed by Rafael Klux.
+
+Sound effects are by Kenney (https://kenney.nl).
+
+The texture of the \"person\" is also by Kenney."
+autowrap = true
+
+[node name="spacer" type="Control" parent="ui/pnl1/vbox"]
+margin_top = 525.0
+margin_right = 332.0
+margin_bottom = 551.0
+size_flags_vertical = 3
+
+[node name="hsep2" type="HSeparator" parent="ui/pnl1/vbox"]
+margin_top = 561.0
+margin_right = 332.0
+margin_bottom = 565.0
+
+[node name="bt_return" type="Button" parent="ui/pnl1/vbox"]
+margin_left = 106.0
+margin_top = 575.0
+margin_right = 226.0
+margin_bottom = 595.0
+rect_min_size = Vector2( 120, 0 )
+size_flags_horizontal = 4
+text = "Return"
+
+[node name="expandable" type="Control" parent="ui"]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -169.0
+rect_min_size = Vector2( 5, 5 )
+rect_clip_content = true
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+border = 2
+current_page = -1
+toggle_button_separation = 10
+keep_toggle_button_focus = false
+animation/update_on_physics = false
+animation/shrink_on_page_change = true
+animation/expand_time = 0.25
+animation/expand_curve = null
+animation/shrink_time = 0.15
+animation/shrink_curve = null
+__content_size = Vector2( 151, 12 )
+__page_data = {
+"DebugInfo": {
+"expanded_icon": null,
+"icon_color": Color( 1, 1, 1, 1 ),
+"shrinked_icon": null
+}
+}
+CustomStyles/background = null
+CustomStyles/bar = null
+CustomStyles/button_expanded_hover = null
+CustomStyles/button_expanded_pressed = null
+CustomStyles/button_expanded_focus = null
+CustomStyles/button_expanded_normal = null
+CustomStyles/button_shrinked_hover = null
+CustomStyles/button_shrinked_pressed = null
+CustomStyles/button_shrinked_focus = null
+CustomStyles/button_shrinked_normal = null
+CustomConstants/updown_width = null
+CustomConstants/updown_height = null
+CustomConstants/leftright_width = null
+CustomConstants/leftright_height = null
+
+[node name="DebugInfo" type="Panel" parent="ui/expandable"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 22.0
+margin_top = 4.0
+margin_right = -4.0
+margin_bottom = -4.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="info" type="Label" parent="ui/expandable/DebugInfo"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 6.0
+margin_top = 6.0
+margin_right = -6.0
+margin_bottom = -6.0
+clip_text = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="updater" type="Timer" parent="ui"]
+wait_time = 0.5
+autostart = true
+
+[node name="setup2d" type="Node2D" parent="."]
+
+[node name="setup3d" type="Spatial" parent="."]
+
+[node name="cam" type="Camera" parent="setup3d"]
+
+[node name="source1" type="Position3D" parent="setup3d"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1 )
+
+[node name="source2" type="Position3D" parent="setup3d"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1 )
+[connection signal="source_chosen" from="ui/SFXHelper" to="." method="_on_SFXHelper_source_chosen"]
+[connection signal="item_selected" from="ui/pnl1/vbox/hbox1/opt_device" to="." method="_on_opt_device_item_selected"]
+[connection signal="mouse_entered" from="ui/pnl1/vbox/hbox_mbuttons/bt_music1" to="." method="_on_button_mouse_over"]
+[connection signal="pressed" from="ui/pnl1/vbox/hbox_mbuttons/bt_music1" to="." method="_on_bt_music1_pressed"]
+[connection signal="mouse_entered" from="ui/pnl1/vbox/hbox_mbuttons/bt_music2" to="." method="_on_button_mouse_over"]
+[connection signal="pressed" from="ui/pnl1/vbox/hbox_mbuttons/bt_music2" to="." method="_on_bt_music2_pressed"]
+[connection signal="mouse_entered" from="ui/pnl1/vbox/hbox_mbuttons/bt_music3" to="." method="_on_button_mouse_over"]
+[connection signal="pressed" from="ui/pnl1/vbox/hbox_mbuttons/bt_music3" to="." method="_on_bt_music3_pressed"]
+[connection signal="gui_input" from="ui/pnl1/vbox/pb_pbackpos" to="." method="_on_pb_pbackpos_gui_input"]
+[connection signal="mouse_entered" from="ui/pnl1/vbox/bt_stopmusic" to="." method="_on_button_mouse_over"]
+[connection signal="pressed" from="ui/pnl1/vbox/bt_stopmusic" to="." method="_on_bt_stopmusic_pressed"]
+[connection signal="mouse_entered" from="ui/pnl1/vbox/bt_return" to="." method="_on_button_mouse_over"]
+[connection signal="timeout" from="ui/updater" to="." method="_on_updater_timeout"]

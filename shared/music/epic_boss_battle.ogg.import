@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/epic_boss_battle.ogg-49b363f44aa16aad098d89e3746f322d.oggstr"
+
+[deps]
+
+source_file="res://shared/music/epic_boss_battle.ogg"
+dest_files=[ "res://.import/epic_boss_battle.ogg-49b363f44aa16aad098d89e3746f322d.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

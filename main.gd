@@ -32,6 +32,7 @@ func _ready() -> void:
 	set_tab_button("bt_smooth", "smooth")
 	set_tab_button("bt_megademo", "megademo")
 	set_tab_button("bt_dbghelper", "dbghelper")
+	set_tab_button("bt_audiomaster", "audiomaster")
 	
 	# Connect the networking signals. Those are necessary in order to transition
 	# into the game scene only on success and give the chance to show a message

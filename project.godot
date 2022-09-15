@@ -214,6 +214,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://demos/network/scripts/rectdrawer.gd"
 }, {
+"base": "Control",
+"class": "SFXHelper",
+"language": "GDScript",
+"path": "res://demos/audiomaster/sfxhelper.gd"
+}, {
 "base": "DataAsset",
 "class": "SampleDataAsset",
 "language": "GDScript",
@@ -326,6 +331,7 @@ _global_script_class_icons={
 "Network": "",
 "Quantize": "",
 "RectangleDrawer": "",
+"SFXHelper": "",
 "SampleDataAsset": "",
 "SampleScriptedResource": "",
 "SharedUtils": "",
@@ -348,11 +354,17 @@ config/name="Addons"
 run/main_scene="res://main.tscn"
 config/icon="res://icon.png"
 
+[audio]
+
+default_bus_layout="res://shared/resources/audiobus.tres"
+
 [autoload]
 
 network="*res://addons/keh_network/network.gd"
 OverlayDebugInfo="*res://addons/keh_dbghelper/overlayinfo.gd"
 DebugLine3D="*res://addons/keh_dbghelper/line3d.gd"
+AudioMaster="*res://addons/keh_audiomaster/audiomaster.gd"
+Gamestate="*res://shared/scripts/gamestate.gd"
 
 [debug]
 
@@ -362,7 +374,7 @@ gdscript/warnings/unused_class_variable=true
 
 [editor_plugins]
 
-enabled=PoolStringArray( "keh_dataasset", "keh_dbghelper", "keh_gddb", "keh_network", "keh_smooth", "keh_ui" )
+enabled=PoolStringArray( "keh_audiomaster", "keh_dataasset", "keh_dbghelper", "keh_gddb", "keh_network", "keh_smooth", "keh_ui" )
 
 [global]
 

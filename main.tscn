@@ -119,15 +119,23 @@ toggle_mode = true
 group = ExtResource( 2 )
 text = "Debug Helpers"
 
-[node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
+[node name="bt_audiomaster" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 240.0
 margin_right = 206.0
-margin_bottom = 244.0
+margin_bottom = 260.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "AudioMaster"
 
-[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 254.0
+[node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 270.0
 margin_right = 206.0
 margin_bottom = 274.0
+
+[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 284.0
+margin_right = 206.0
+margin_bottom = 304.0
 toggle_mode = true
 group = ExtResource( 2 )
 text = "Complete"
@@ -161,11 +169,23 @@ margin_top = 8.0
 margin_right = -4.0
 margin_bottom = -4.0
 
-[node name="description" type="Label" parent="mpnl/stabs/encdecbuffer"]
+[node name="bt_encdecload" type="Button" parent="mpnl/stabs/encdecbuffer"]
 margin_left = 14.0
-margin_top = 43.0
-margin_right = 744.0
-margin_bottom = 580.0
+margin_top = 11.0
+margin_right = 122.0
+margin_bottom = 31.0
+text = "Load"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="description" type="Label" parent="mpnl/stabs/encdecbuffer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 14.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
 text = "Interdependency: None
 
 The EncDecBuffer is meant to make things easier to encode values into binary format while also stripping out the variant header, which normally means at least 4 extra bytes per property stored within the binary array (PoolByteArray).
@@ -174,16 +194,6 @@ In this demo there are two major panels. On the left a bunch of fields allow for
 
 While the sole intention behind this addon was originally meant to be used by the networking system, maybe it can be useful for other things, like a \"compact\" file save for example."
 autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="bt_encdecload" type="Button" parent="mpnl/stabs/encdecbuffer"]
-margin_left = 14.0
-margin_top = 11.0
-margin_right = 122.0
-margin_bottom = 31.0
-text = "Load"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -197,27 +207,29 @@ margin_top = 8.0
 margin_right = -4.0
 margin_bottom = -4.0
 
-[node name="description" type="Label" parent="mpnl/stabs/quantize"]
-margin_left = 14.0
-margin_top = 43.0
-margin_right = 744.0
-margin_bottom = 580.0
-text = "Interdependency: None
-
-This addon is meant to provide means to quantize floating point numbers and also use those to compress rotation quaternions using the smallest three method.
-
-The example here does not directly use any of the floating point quantization functions, however it uses the quaternion compression to simulate replication of orientation. Basically, a cube is used to \"generate\" the original orientation, which is then compressed using either 9, 10 or 15 bits per component. Soon after the quaternion is restaured and applied into a second cube. In a way, to simulate the replication of the orientation through networked multiplayer games."
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="bt_utilsload" type="Button" parent="mpnl/stabs/quantize"]
 margin_left = 14.0
 margin_top = 11.0
 margin_right = 122.0
 margin_bottom = 31.0
 text = "Load"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="description" type="Label" parent="mpnl/stabs/quantize"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 14.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
+text = "Interdependency: None
+
+This addon is meant to provide means to quantize floating point numbers and also use those to compress rotation quaternions using the smallest three method.
+
+The example here does not directly use any of the floating point quantization functions, however it uses the quaternion compression to simulate replication of orientation. Basically, a cube is used to \"generate\" the original orientation, which is then compressed using either 9, 10 or 15 bits per component. Soon after the quaternion is restaured and applied into a second cube. In a way, to simulate the replication of the orientation through networked multiplayer games."
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -238,11 +250,13 @@ margin_right = 114.0
 margin_bottom = 31.0
 text = "Cam3D"
 
-[node name="Label" type="Label" parent="mpnl/stabs/cam3d"]
+[node name="description" type="Label" parent="mpnl/stabs/cam3d"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 14.0
-margin_top = 41.0
-margin_right = 744.0
-margin_bottom = 293.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
 text = "Interdependency: none
 This addon is a simple node that can be attached (add scene, cam3d.tscn,  instance) into a moving object. From there, selecting the new node allows for extra configuration regarding the overal behavior. While the demo uses Smooth3D addon it's not a dependency of the Cam3D.
 
@@ -279,11 +293,13 @@ margin_right = 114.0
 margin_bottom = 31.0
 text = "Smoothing"
 
-[node name="Label" type="Label" parent="mpnl/stabs/smooth"]
+[node name="description" type="Label" parent="mpnl/stabs/smooth"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 14.0
-margin_top = 41.0
-margin_right = 744.0
-margin_bottom = 293.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
 text = "Interdependency: none
 This addon is only possible thanks to the excelent contribution by Lawnjelly, which calculates the interpolation fraction (more on this shortly). Nevertheless, two nodes (Smooth2D and Smooth3D) become available once the addon is enabled from the project settings. Those nodes smoothly follow a target node (the parent of the Smooth*D). The goal here is to obtain an smooth motion when the physics simulation pace is different from the rendering pace. Think, for example, a simulation set for 60 frames per second running on a machine using a monither with faster refresh rates.
 
@@ -352,13 +368,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="mpnl/stabs/network"]
+[node name="description" type="Label" parent="mpnl/stabs/network"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 82.0
-margin_right = -10.0
-margin_bottom = -10.0
+margin_left = 14.0
+margin_top = 80.0
+margin_right = -9.99994
+margin_bottom = -2.0
 text = "Network addon interdependency: EncDecBuffer
 
 This addon requires activation through the project settings window, which will not only add a few extra settings to the first tab, it will also add the network singleton to the list (auto-load scripts, that is). To that end, if you intend to access any functionality in the network addon from another singleton script, make sure that one is loaded after the network script.
@@ -488,13 +504,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="mpnl/stabs/megademo"]
+[node name="description" type="Label" parent="mpnl/stabs/megademo"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 14.0
-margin_top = 122.0
-margin_right = -10.0
-margin_bottom = -8.0
+margin_top = 110.0
+margin_right = -9.99994
+margin_bottom = -26.0
 text = "Demo Overview:
 This demo is meant to be a \"more complete\" example, not limiting which addons are used. In away, all of the relevant addons in this pack are used in this demo.
 
@@ -522,11 +538,13 @@ margin_right = 114.0
 margin_bottom = 31.0
 text = "Open"
 
-[node name="Label" type="Label" parent="mpnl/stabs/fancyle"]
+[node name="description" type="Label" parent="mpnl/stabs/fancyle"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 14.0
-margin_top = 41.0
-margin_right = 744.0
-margin_bottom = 293.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
 text = "Interdependency: none
 This is a custom UI control that implements most of the functionality of the LineEdit control, but allows rendering images as well as some basic text formatting. The idea is to use this as input for consoles and/or chat boxes.
 
@@ -565,11 +583,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="mpnl/stabs/dbghelper"]
+[node name="description" type="Label" parent="mpnl/stabs/dbghelper"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 14.0
-margin_top = 41.0
-margin_right = 744.0
-margin_bottom = 293.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
 text = "Interdependency: none
 This addon is meant to provide a few  scripts to help the debugging process.
 
@@ -610,10 +630,12 @@ __meta__ = {
 }
 
 [node name="description" type="Label" parent="mpnl/stabs/inventory"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 14.0
-margin_top = 43.0
-margin_right = 744.0
-margin_bottom = 582.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
 text = "Interdependency: None
 
 The inventory addon brings two major new Control widgets, InventoryBag and InventorySpecialSlot. The features provided by those two controls allow the creation of a multitude of different inventory styles. Bellow are the feature highlights:
@@ -639,6 +661,52 @@ This demo provides a lot of use case examples, including:
 - A special slot being used to simulate a crafting system.
 - Inventory bag with some disabled slots added to stylebox that results in odd shaped bag.
 - Inventory bag with some disabled slots to simulate a \"buy extra slots\" feature."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="audiomaster" type="Panel" parent="mpnl/stabs"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_amasterload" type="Button" parent="mpnl/stabs/audiomaster"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 122.0
+margin_bottom = 31.0
+text = "Load"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="description" type="Label" parent="mpnl/stabs/audiomaster"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 14.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
+text = "The AudioMaster addon is designed to be used as a \"singleton\" (auto-load script). When this addon is activated this auto-loading is automatically added into the list. An alternative is to manually add the audiomaster.gd script into that list.
+
+Notice that part of the setup is performed in yet another auto-load script, defined in the gamestate.gd (shared/scripts subdirectory). Please pay close attention to the order in which the scripts are loaded. The \"gamestate\" must be loaded after the AudioMaster one.
+
+Another thing that must be noted in this project is the fact that the \"default bus layout\" has been changed within the Project Settings window (under the General > Audio category).
+
+In this demo:
+
+- The left panel allows some configuration over audio output volume, music playback and output device
+- Top panel allows choosing which audio stream player node type will be used for SFX.
+- There is an area that can be clicked, which will result in a random sound effect. If 2D or 3D SFX mode, then the attenuation will consider the \"listener\" (represented by a person) related to where the click was performed.
+- An expandable panel will show a little bit of debug information regarding the AudioMaster object.
+
+There are 3 audio tracks composed by Rafael Klux, downloaded from https://freepd.com
+All other assets used in the demo (texture and sound effects) are by Kenney (https://kenney.nl).
+Sound effects have been converted from OGG into WAV because 2D and 3D playback resulted in some random \"pops\" when using OGG, but didn't have any problem with WAV."
 autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false

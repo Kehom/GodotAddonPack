@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2022 Sep 15
+* New addon, `AudioMaster`, a system to help playback audio without having to worry about node lifetime.
+
 #### 2022 Aug 15
 * New addon, `SpinSlider`, which provides a `SpinBox` like control that provides a slider instead of the spin buttons in case a value range is defined.
 * New addon, `DataAsset`, an editor plugin to help edit resources meant to deal with data.

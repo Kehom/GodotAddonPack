@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/dreams_of_vain.ogg-c801f756cd7addb653c5b7d9662489ed.oggstr"
+
+[deps]
+
+source_file="res://shared/music/dreams_of_vain.ogg"
+dest_files=[ "res://.import/dreams_of_vain.ogg-c801f756cd7addb653c5b7d9662489ed.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0
