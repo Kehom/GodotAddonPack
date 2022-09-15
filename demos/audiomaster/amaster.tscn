@@ -563,4 +563,5 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1 )
 [connection signal="mouse_entered" from="ui/pnl1/vbox/bt_stopmusic" to="." method="_on_button_mouse_over"]
 [connection signal="pressed" from="ui/pnl1/vbox/bt_stopmusic" to="." method="_on_bt_stopmusic_pressed"]
 [connection signal="mouse_entered" from="ui/pnl1/vbox/bt_return" to="." method="_on_button_mouse_over"]
+[connection signal="pressed" from="ui/pnl1/vbox/bt_return" to="." method="_on_bt_return_pressed"]
 [connection signal="timeout" from="ui/updater" to="." method="_on_updater_timeout"]

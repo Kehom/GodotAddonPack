@@ -182,8 +182,15 @@ func _on_bt_invdemoload_pressed() -> void:
 func _on_bt_dbgload_pressed() -> void:
 	open_scene("res://demos/debughelper/maindbghelper.tscn")
 
+### AudioMaster
+func _on_bt_amasterload_pressed():
+	open_scene("res://demos/audiomaster/amaster.tscn")
+
 
 func _on_bt_quit_pressed() -> void:
 	get_tree().quit()
+
+
+
 
 

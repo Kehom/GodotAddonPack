@@ -250,7 +250,15 @@ func _on_SFXHelper_source_chosen(relative_pos: Vector2, scale: float) -> void:
 			# 3D
 			var pos3d: Vector3 = Vector3(relative_pos.x, 1.0, relative_pos.y)
 			AudioMaster.play_audio("SFX3D", _sfx_list[which], -1, 0.0, { "position": pos3d })
+
+
+
+func _on_bt_return_pressed() -> void:
+	AudioMaster.stop_all(1.5)
 	
+	# warning-ignore:return_value_discarded
+	get_tree().change_scene("res://main.tscn")
+
 
 
 #######################################################################################################################
@@ -277,7 +285,6 @@ func _ready() -> void:
 	SharedUtils.connector(_spin_sfx2d, "value_changed", self, "_on_volume_changed", ["SFX2D"])
 	SharedUtils.connector(_spin_sfx3d, "value_changed", self, "_on_volume_changed", ["SFX3D"])
 	SharedUtils.connector(_spin_ui, "value_changed", self, "_on_volume_changed", ["UI"])
-
 
 
 

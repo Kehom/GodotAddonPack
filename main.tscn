@@ -725,3 +725,4 @@ __meta__ = {
 [connection signal="pressed" from="mpnl/stabs/fancyle/bt_fleload" to="." method="_on_bt_fleload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/dbghelper/bt_dbgload" to="." method="_on_bt_dbgload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/inventory/bt_invdemoload" to="." method="_on_bt_invdemoload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/audiomaster/bt_amasterload" to="." method="_on_bt_amasterload_pressed"]
