@@ -261,8 +261,7 @@ func get_properties_from_node(node: Node) -> Array:
 	var proplist: Array = [node.get_meta("uid"),node.get_meta("chash")]
 	for repl in replicable:
 		proplist.append(node[repl.name])
-#	for property in proplist:
-#		assert(!(property == null))
+#		assert(node[repl.name] == proplist[-1])
 	return proplist
 
 func apply_properties_to_node(node: Node,entity: Array) -> void:

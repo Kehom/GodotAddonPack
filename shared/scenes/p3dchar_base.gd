@@ -25,6 +25,7 @@ const _floor_normal: Vector3 = Vector3.UP
 const gravity: float = 9.81
 
 # Hold accumulated velocity through each physics iteration
+var _velocity: Vector3 = Vector3()
 var net_velocity: Vector3 = Vector3()
 
 # This flag indicates if the character can jump
@@ -65,6 +66,7 @@ export var sprint_mult: float = 1.8
 var _mouse_sensitivity: Vector2 = Vector2(0.45, 0.5)
 
 # Keep track of the pitch angle - this will be changed whe moving the mouse
+var _pitch_angle: float = 0.0
 var net_pitch_angle: float = 0.0
 
 # This will be shown within the OverlayDebugInfo. In this demo, pressing F10 will show (unhide) the panel
@@ -76,12 +78,12 @@ var DEBUG_correction_count: int = 0
 # correction data is actually stored within this dictionary, which will be used
 # within the next physics_process iteration. A flag indicates if the data must
 # be used or not.
-var _correction_data: Dictionary
+#var _correction_data: Dictionary
 
 # Cache UID - as retrieved from the meta
 var _uid: int = 0
 
-
+var _effects: PoolByteArray = PoolByteArray()
 var net_effects: PoolByteArray = PoolByteArray()
 
 func _ready() -> void:
@@ -108,16 +110,23 @@ func _ready() -> void:
 	
 	
 	# Initialize the correction data dictionary
-	_correction_data = {
-		"transform": global_transform,
-		"velocity": net_velocity,
-		"angle": net_pitch_angle,
-		"stamina": 1.0,
-		"corrected": false,
-	}
+	net_corrected = false
+	net_position = global_transform.origin
+	net_orientation = Quat(global_transform.basis)
+	net_stamina = 1.0
+	current_stamina = net_stamina
+#	net_pitch_angle
+#	_correction_data = {
+#		"transform": global_transform,
+#		"velocity": net_velocity,
+#		"angle": net_pitch_angle,
+#		"stamina": 1.0,
+#		"corrected": false,
+#	}
 
-var net_transform: Transform
-var net_stamina: float
+var net_position: Vector3
+var net_orientation: Quat
+var net_stamina: float = 1.0
 var net_corrected: bool
 
 func _physics_process(_dt: float) -> void:
@@ -129,11 +138,11 @@ func _physics_process(_dt: float) -> void:
 		net_corrected = false
 		
 		# Apply the correct state 
-		global_transform = net_transform
-#		_velocity = _correction_data.velocity
-#		_pitch_angle = _correction_data.angle
+		global_transform = Transform(Basis(net_orientation),net_position)
+		_velocity = net_velocity
+		_pitch_angle = net_pitch_angle
 		current_stamina = net_stamina
-#		_effects = _correction_data.effects
+		_effects = net_effects
 		
 		# Replay the input objects within internal history if this character belongs
 		# to the local player
@@ -164,7 +173,9 @@ func _physics_process(_dt: float) -> void:
 	handle_input(input)
 	
 	# Snapshot this entity
+	net_corrected = true
 	network.snapshot_entity(self)
+	net_corrected = false
 	
 	# Even if the value hasn't changed this will ensure the HUD can stay updated
 	emit_signal("stamina_changed", _uid, current_stamina)
@@ -177,16 +188,17 @@ func _physics_process(_dt: float) -> void:
 	OverlayDebugInfo.set_label("p%s_effects" % _uid, msg)
 
 
-
+func apply_state() -> void:
+	pass
 # The snapshot entity object representing player characters (instances of
 # MegaSnapPCharacter) will call this function when the state must be applied
-func apply_state(state: Dictionary) -> void:
-	_correction_data.corrected = true
-	_correction_data.transform = Transform(Basis(state.orientation), state.position)
-	_correction_data.velocity.y = state.vertical_vel
-	_correction_data.angle = state.angle
-	_correction_data.stamina = state.stamina
-	_correction_data.effects = state.effects
+#func apply_state(state: Dictionary) -> void:
+#	_correction_data.corrected = true
+#	_correction_data.transform = Transform(Basis(state.orientation), state.position)
+#	_correction_data.velocity.y = state.vertical_vel
+#	_correction_data.angle = state.angle
+#	_correction_data.stamina = state.stamina
+#	_correction_data.effects = state.effects
 
 
 
@@ -205,15 +217,15 @@ func handle_input(input: InputData) -> void:
 			speed *= sprint_mult
 	else:
 		current_stamina = min(current_stamina + (stamina_recover * dt), 1.0)
-	
+	net_stamina = current_stamina
 	if (_shoot_timer > 0.0):
 		_shoot_timer = max(_shoot_timer - dt, 0.0)
 	
 	
 	# Reset floor movement - that is, ensure character does not move as a result
 	# of the slide from the previous update
-	net_velocity.x = 0.0
-	net_velocity.z = 0.0
+	_velocity.x = 0.0
+	_velocity.z = 0.0
 	
 	# First deal with mouse relative input data as it may change orientation
 	var relative: Vector2 = input.get_mouse_relative()
@@ -224,9 +236,10 @@ func handle_input(input: InputData) -> void:
 	
 	if (relative.y != 0.0):
 		var change: float = relative.y * _mouse_sensitivity.y
-		net_pitch_angle = clamp(net_pitch_angle + change, -40, 70)
+		_pitch_angle = clamp(_pitch_angle + change, -40, 70)
 		if (_camera_ref):
-			_camera_ref.rotation.x = deg2rad(net_pitch_angle)
+			_camera_ref.rotation.x = deg2rad(_pitch_angle)
+	net_pitch_angle = _pitch_angle
 	
 	# Movement input
 	var aim: Basis = get_global_transform().basis
@@ -257,16 +270,19 @@ func handle_input(input: InputData) -> void:
 	move_dir.z *= speed
 	
 	# Integrate gravity. IN 3D, negative Y is down
-	net_velocity.y -= (gravity * dt)
+	_velocity.y -= (gravity * dt)
 	
 	# Apply input to the velocity
-	net_velocity += move_dir
+	_velocity += move_dir
 	
 	# Perform the movement. One thing to keep in mind is the last argument of the
 	# move_and_slide() function, which enables/disables infinite inertia. It
 	# must be false in order for kinematic bodies to correctly collide with
 	# rigid bodies.
-	net_velocity = move_and_slide(net_velocity, _floor_normal, false, 4, 0.785398, false)
+	_velocity = move_and_slide(_velocity, _floor_normal, false, 4, 0.785398, false)
+	net_velocity = _velocity
+	net_position = global_transform.origin
+	net_orientation = Quat(global_transform.basis)
 	
 	# Cache the "on_floor" state so in the next frame the jump button can be
 	# directly used
@@ -306,14 +322,15 @@ func shoot() -> void:
 	var bullet: Node = network.snapshot_data.spawn_node(GlowProjectile, projid, 0)
 	bullet.init(position_node.global_transform)
 	# Apply the correct pitch
-	bullet.rotation.x = deg2rad(net_pitch_angle)
+	bullet.rotation.x = deg2rad(_pitch_angle)
 	
 	# Set a random number of effects (between 0 and 5). Please note that in here the effects array will be
 	# completely rewritten just to test the replication of the arrays.
 	var ne: int = randi() % 6
-	net_effects = PoolByteArray()
+	_effects = PoolByteArray()
 	for _i in ne:
-		net_effects.append(randi() % 51)
+		_effects.append(randi() % 51)
+	net_effects = _effects
 
 
 

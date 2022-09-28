@@ -348,6 +348,10 @@ func encode_delta(snap: NetSnapshot, oldsnap: NetSnapshot, into: EncDecBuffer, i
 			# Retrieve new state of this entity - it should exist as the iteration is based on the
 			# new snapshot.
 			var enew: Array = snap.get_entity(ehash, uid)
+#			var node: Node = einfo.get_game_node(uid)
+#			if node is p3dchar:
+#				prints(node,enew,node.net_position)
+#				assert(enew[5] == node.net_position)
 			
 			# Assume the entity is new
 			var cmask: int = einfo.get_full_change_mask()
@@ -580,6 +584,8 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 				# If here, then it's necessary to apply the server's state into the node
 #				rentity.apply_state(node)
 #				new solution was orignally gonna be node.apply_state(rentity)
+#				could also be implemented as apply_properties_to_node and then calling just
+#				node.apply_state() for the node to execute different behaviors
 				einfo.apply_properties_to_node(node,rentity)
 				
 				# "Propagate" the server's data into every snapshot in the local history

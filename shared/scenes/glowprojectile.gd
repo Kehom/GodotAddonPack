@@ -22,7 +22,7 @@ var _impact_position: Vector3 = Vector3()
 var _uid: int = 0
 
 var net_position: Vector3
-var net_orientation: int
+var net_orientation: Quat
 var net_has_correction: bool
 
 func _ready() -> void:
@@ -54,7 +54,7 @@ func _physics_process(dt: float) -> void:
 		network.snapshot_data.despawn_node(get_script(), _uid)
 	
 	if (net_has_correction):
-		global_transform = Transform(Basis(Quantize.restore_rquat_9bits(net_orientation)), net_position)
+		global_transform = Transform(Basis(net_orientation), net_position)
 		net_has_correction = false
 		
 		# Re-simulate the projectile the number of times client predicted this after server data was used
@@ -72,10 +72,12 @@ func _physics_process(dt: float) -> void:
 	if (!_hit):
 		
 		net_position = global_transform.origin
-		net_orientation = Quantize.compress_rquat_9bits(global_transform.basis.get_rotation_quat())
+		net_orientation = global_transform.basis.get_rotation_quat()
 		var sobj: Array = network.create_snap_entity(get_script(),_uid,0)
 		
+		net_has_correction = true
 		network.snapshot_entity(self)
+		net_has_correction = false
 
 
 func init(t: Transform) -> void:

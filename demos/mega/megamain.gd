@@ -78,6 +78,7 @@ func _ready() -> void:
 	# this way
 	if (!network.has_authority()):
 		network.notify_ready()
+	OverlayDebugInfo.set_visibility(true)
 
 
 
@@ -106,6 +107,7 @@ func _exit_tree() -> void:
 
 
 func _physics_process(_dt: float) -> void:
+	OverlayDebugInfo.set_label("cpu idle time",str(_dt - Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)))
 	# Update the HUD info
 	$hud/lbl_fpsinfo.text = fps_info_str % [int(Engine.get_frames_per_second()), Engine.iterations_per_second]
 	

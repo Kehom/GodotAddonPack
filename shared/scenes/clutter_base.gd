@@ -8,10 +8,10 @@ class_name ClutterBase
 # and it's needed to wait until the next physics update. So, this dictionary
 # will hold the rigid body state. Also, when setting up the snapshot the data
 # will be taken from this dictionary
-var _current_state: Dictionary
+#var _current_state: Dictionary
 
 var net_has_correction: bool
-var net_transform: Transform
+#var net_transform: Transform
 var net_position: Vector3
 var net_orientation: Basis
 var net_ang_velocity: Vector3
@@ -60,7 +60,11 @@ func _physics_process(_dt: float) -> void:
 	net_ang_velocity = angular_velocity
 	net_lin_velocity = linear_velocity
 	
-	network.snapshot_entity(self)
+	if net_has_correction:
+		network.snapshot_entity(self)
+	else:
+		net_has_correction = true
+		network.snapshot_entity(self)
 
 
 
@@ -72,8 +76,8 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 		# apply it into the object.
 #		state.transform.origin = net_position
 #		state.transform.basis = net_orientation
-		state.transform = net_transform
-		assert(net_transform.basis == net_orientation and net_transform.origin == net_position)
+		state.transform = Transform(Basis(net_orientation),net_position)
+#		assert(state.transform.basis == net_orientation and state.transform.origin == net_position)
 #		state.set_transform(_current_state.transform)
 		state.set_angular_velocity(net_ang_velocity)
 		state.set_linear_velocity(net_lin_velocity)
@@ -88,21 +92,24 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 	state.linear_velocity.y -= 9.8 * state.get_step()
 	
 	# Store the state so it can be added into the snapshot
-	net_transform = state.get_transform()
+	net_position = state.transform.origin
+	net_orientation = Quat(state.transform.basis.get_rotation_quat())
 	net_ang_velocity = state.get_angular_velocity()
 	net_lin_velocity = state.get_linear_velocity()
 
+func apply_state() -> void:
+	pass
 
-func apply_state(state: Dictionary) -> void:
-	# This is called during the replication system update, meaning that it
-	# contains data from the server correcting the internal state. Indicate
-	# the fact through the flag and store the correction so it can be applied
-	# during the next physics iteration
-	# First, must restore the orientation, that is compressed
-	#var orient: Quat = KehUtils.restore_rquat_10bit(state.orientation)
-	var t: Transform = Transform(Basis(state.orientation), state.position)
-
-	_current_state.has_correction = true
-	_current_state.transform = t
-	_current_state.angular_velocity = state.angular_velocity
-	_current_state.linear_velocity = state.linear_velocity
+#func apply_state(state: Dictionary) -> void:
+#	# This is called during the replication system update, meaning that it
+#	# contains data from the server correcting the internal state. Indicate
+#	# the fact through the flag and store the correction so it can be applied
+#	# during the next physics iteration
+#	# First, must restore the orientation, that is compressed
+#	#var orient: Quat = KehUtils.restore_rquat_10bit(state.orientation)
+#	var t: Transform = Transform(Basis(state.orientation), state.position)
+#
+#	_current_state.has_correction = true
+#	_current_state.transform = t
+#	_current_state.angular_velocity = state.angular_velocity
+#	_current_state.linear_velocity = state.linear_velocity
