@@ -549,8 +549,8 @@ func _check_properties(script: Script, cname: String) -> void:
 				if (rprop):
 					# Push the replicable property into the internal container
 					replicable.push_back(rprop)
-					printerr("THIS IS THE BIG BUG")
-					default_values.push_back(script.get_property_default_value(rprop.name))
+					default_values.push_back(get_default_property_value(tp))
+#					default_values.push_back(script.get_property_default_value(rprop.name))
 #					prints(rprop.name,script.get_property_default_value(rprop.name))
 					# Advance the mask
 					mask *= 2
@@ -568,6 +568,39 @@ func _check_properties(script: Script, cname: String) -> void:
 	_namestr = cname
 	_entity = {}
 
+# hacky and stupid but what can you do :/
+static func get_default_property_value(type: int):
+	match type:
+		TYPE_BOOL:
+			return false
+		TYPE_INT:
+			return 0
+		TYPE_REAL:
+			return 0.0
+		TYPE_VECTOR2:
+			return Vector2.ZERO
+		TYPE_RECT2:
+			return Rect2()
+		TYPE_QUAT:
+			return Quat()
+		TYPE_COLOR:
+			return Color()
+		TYPE_VECTOR3:
+			return Vector3.ZERO
+		CTYPE_UINT:
+			return 0
+		CTYPE_BYTE:
+			return 0
+		CTYPE_USHORT:
+			return 0
+		TYPE_STRING:
+			return ""
+		TYPE_RAW_ARRAY:
+			return PoolByteArray()
+		TYPE_INT_ARRAY:
+			return PoolIntArray()
+		TYPE_REAL_ARRAY:
+			return PoolRealArray()
 
 # Based on the given instance of ReplicableProperty, reads a property from the
 # byte buffer into an instance of the snapshot entity object.
