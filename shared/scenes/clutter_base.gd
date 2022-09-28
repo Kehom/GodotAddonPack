@@ -65,6 +65,7 @@ func _physics_process(_dt: float) -> void:
 	else:
 		net_has_correction = true
 		network.snapshot_entity(self)
+		net_has_correction = false
 
 
 

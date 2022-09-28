@@ -25,7 +25,6 @@ const _floor_normal: Vector3 = Vector3.UP
 const gravity: float = 9.81
 
 # Hold accumulated velocity through each physics iteration
-var _velocity: Vector3 = Vector3()
 var net_velocity: Vector3 = Vector3()
 
 # This flag indicates if the character can jump
@@ -66,7 +65,6 @@ export var sprint_mult: float = 1.8
 var _mouse_sensitivity: Vector2 = Vector2(0.45, 0.5)
 
 # Keep track of the pitch angle - this will be changed whe moving the mouse
-var _pitch_angle: float = 0.0
 var net_pitch_angle: float = 0.0
 
 # This will be shown within the OverlayDebugInfo. In this demo, pressing F10 will show (unhide) the panel
@@ -83,7 +81,6 @@ var DEBUG_correction_count: int = 0
 # Cache UID - as retrieved from the meta
 var _uid: int = 0
 
-var _effects: PoolByteArray = PoolByteArray()
 var net_effects: PoolByteArray = PoolByteArray()
 
 func _ready() -> void:
@@ -139,10 +136,7 @@ func _physics_process(_dt: float) -> void:
 		
 		# Apply the correct state 
 		global_transform = Transform(Basis(net_orientation),net_position)
-		_velocity = net_velocity
-		_pitch_angle = net_pitch_angle
 		current_stamina = net_stamina
-		_effects = net_effects
 		
 		# Replay the input objects within internal history if this character belongs
 		# to the local player
@@ -224,8 +218,8 @@ func handle_input(input: InputData) -> void:
 	
 	# Reset floor movement - that is, ensure character does not move as a result
 	# of the slide from the previous update
-	_velocity.x = 0.0
-	_velocity.z = 0.0
+	net_velocity.x = 0.0
+	net_velocity.z = 0.0
 	
 	# First deal with mouse relative input data as it may change orientation
 	var relative: Vector2 = input.get_mouse_relative()
@@ -236,10 +230,9 @@ func handle_input(input: InputData) -> void:
 	
 	if (relative.y != 0.0):
 		var change: float = relative.y * _mouse_sensitivity.y
-		_pitch_angle = clamp(_pitch_angle + change, -40, 70)
+		net_pitch_angle = clamp(net_pitch_angle + change, -40, 70)
 		if (_camera_ref):
-			_camera_ref.rotation.x = deg2rad(_pitch_angle)
-	net_pitch_angle = _pitch_angle
+			_camera_ref.rotation.x = deg2rad(net_pitch_angle)
 	
 	# Movement input
 	var aim: Basis = get_global_transform().basis
@@ -270,17 +263,16 @@ func handle_input(input: InputData) -> void:
 	move_dir.z *= speed
 	
 	# Integrate gravity. IN 3D, negative Y is down
-	_velocity.y -= (gravity * dt)
+	net_velocity.y -= (gravity * dt)
 	
 	# Apply input to the velocity
-	_velocity += move_dir
+	net_velocity += move_dir
 	
 	# Perform the movement. One thing to keep in mind is the last argument of the
 	# move_and_slide() function, which enables/disables infinite inertia. It
 	# must be false in order for kinematic bodies to correctly collide with
 	# rigid bodies.
-	_velocity = move_and_slide(_velocity, _floor_normal, false, 4, 0.785398, false)
-	net_velocity = _velocity
+	net_velocity = move_and_slide(net_velocity, _floor_normal, false, 4, 0.785398, false)
 	net_position = global_transform.origin
 	net_orientation = Quat(global_transform.basis)
 	
@@ -322,15 +314,14 @@ func shoot() -> void:
 	var bullet: Node = network.snapshot_data.spawn_node(GlowProjectile, projid, 0)
 	bullet.init(position_node.global_transform)
 	# Apply the correct pitch
-	bullet.rotation.x = deg2rad(_pitch_angle)
+	bullet.rotation.x = deg2rad(net_pitch_angle)
 	
 	# Set a random number of effects (between 0 and 5). Please note that in here the effects array will be
 	# completely rewritten just to test the replication of the arrays.
 	var ne: int = randi() % 6
-	_effects = PoolByteArray()
+	net_effects = PoolByteArray()
 	for _i in ne:
-		_effects.append(randi() % 51)
-	net_effects = _effects
+		net_effects.append(randi() % 51)
 
 
 
