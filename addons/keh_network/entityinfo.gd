@@ -301,7 +301,7 @@ func calculate_change_mask(e1: Array, e2: Array) -> int:
 	
 	for idx in replicable.size():
 		var p: ReplicableProperty = replicable[idx]
-		if (!p.compare(e1[idx], e2[idx])):
+		if (!p.compare(e1[idx+VARS], e2[idx+VARS])):
 			cmask |= p.mask
 	
 	return cmask
