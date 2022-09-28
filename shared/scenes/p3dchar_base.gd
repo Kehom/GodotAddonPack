@@ -7,6 +7,7 @@
 # that in mind when reading the code.
 
 extends KinematicBody
+class_name p3dchar
 
 signal stamina_changed(pid, newval)
 
@@ -135,7 +136,7 @@ func _physics_process(_dt: float) -> void:
 			var inlist: Array = network.player_data.local_player.get_cached_input_list()
 			for i in inlist:
 				handle_input(i)
-				network.correct_in_snapshot(create_snapentity_object(), i)
+				network.correct_in_snapshot(self, i)
 				OverlayDebugInfo.set_label("correct_count", "Correction Count: %s" % DEBUG_correction_count)
 	
 	
@@ -158,7 +159,7 @@ func _physics_process(_dt: float) -> void:
 	handle_input(input)
 	
 	# Snapshot this entity
-	network.snapshot_entity(create_snapentity_object())
+	network.snapshot_entity(self)
 	
 	# Even if the value hasn't changed this will ensure the HUD can stay updated
 	emit_signal("stamina_changed", _uid, current_stamina)
@@ -297,7 +298,7 @@ func shoot() -> void:
 	
 	# Spawn the projectile and set its state - last argument, class_hash is not
 	# needed in this demo since there aren't different types of projectiles.
-	var bullet: Node = network.snapshot_data.spawn_node(MegaSnapProjectile, projid, 0)
+	var bullet: Node = network.snapshot_data.spawn_node(GlowProjectile, projid, 0)
 	bullet.init(position_node.global_transform)
 	# Apply the correct pitch
 	bullet.rotation.x = deg2rad(_pitch_angle)
@@ -317,21 +318,21 @@ func calculate_jump() -> float:
 
 # This function is used to create the snapshot entity object representing player
 # characters within the snapshots
-func create_snapentity_object() -> MegaSnapPCharacter:
-	assert(has_meta("uid"))
-	assert(has_meta("chash"))
-	
-	var uid: int = get_meta("uid")
-	var chash: int = get_meta("chash")
-	
-	var e: MegaSnapPCharacter = MegaSnapPCharacter.new(uid, chash)
-	e.position = global_transform.origin
-	e.set_orientation(Quat(global_transform.basis))
-#	e.velocity = _velocity
-	e.vertical_vel = _velocity.y
-	e.pitch_angle = _pitch_angle
-	e.stamina = current_stamina
-	e.effects = _effects
-	
-	return e
+#func create_snapentity_object() -> MegaSnapPCharacter:
+#	assert(has_meta("uid"))
+#	assert(has_meta("chash"))
+#
+#	var uid: int = get_meta("uid")
+#	var chash: int = get_meta("chash")
+#
+#	var e: MegaSnapPCharacter = MegaSnapPCharacter.new(uid, chash)
+#	e.position = global_transform.origin
+#	e.set_orientation(Quat(global_transform.basis))
+##	e.velocity = _velocity
+#	e.vertical_vel = _velocity.y
+#	e.pitch_angle = _pitch_angle
+#	e.stamina = current_stamina
+#	e.effects = _effects
+#
+#	return e
 

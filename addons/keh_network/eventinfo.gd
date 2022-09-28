@@ -28,9 +28,9 @@ extends Reference
 class_name NetEventInfo
 
 # Those are just shortcuts
-const CTYPE_UINT: int = SnapEntityBase.CTYPE_UINT
-const CTYPE_USHORT: int = SnapEntityBase.CTYPE_USHORT
-const CTYPE_BYTE: int = SnapEntityBase.CTYPE_BYTE
+const CTYPE_UINT: int = 65538
+const CTYPE_USHORT: int = 131074
+const CTYPE_BYTE: int = 196610
 
 # Type ID of events described by this
 var _type_id: int

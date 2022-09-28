@@ -180,13 +180,13 @@ func _input(evt: InputEvent) -> void:
 
 func create_player_character(pnode: NetPlayerNode) -> void:
 	# Unique ID for player character will be the same as the network unique ID
-	var charnode: KinematicBody = network.snapshot_data.get_game_node(pnode.net_id, MegaSnapPCharacter)
+	var charnode: KinematicBody = network.snapshot_data.get_game_node(pnode.net_id, p3dchar)
 	if (!charnode):
 		# The desired character class hash is specified in the custom property named "char_class")
 		var chash: int = pnode.get_custom_property("char_class", _default_pchar_hash)
 		
 		# Spawn the node
-		charnode = network.snapshot_data.spawn_node(MegaSnapPCharacter, pnode.net_id, chash)
+		charnode = network.snapshot_data.spawn_node(p3dchar, pnode.net_id, chash)
 		
 		# Use the spawn points within the level to set the initial player position
 		var index: int = network.player_data.get_player_count()
@@ -265,21 +265,21 @@ func _setup_net_spawners() -> void:
 	# character types, so 3 instances of that spawner are necessary.
 	var ps_caps: PackedScene = load("res://shared/scenes/pchar_capsule.tscn")
 	var chash_caps: int = ps_caps.resource_path.hash()
-	network.snapshot_data.register_spawner(MegaSnapPCharacter, chash_caps, NetDefaultSpawner.new(ps_caps), $player, fref)
+	network.snapshot_data.register_spawner(p3dchar, chash_caps, NetDefaultSpawner.new(ps_caps), $player, fref)
 	
 	var ps_cyl: PackedScene = load("res://shared/scenes/pchar_cylinder.tscn")
 	var chash_cyl: int = ps_cyl.resource_path.hash()
-	network.snapshot_data.register_spawner(MegaSnapPCharacter, chash_cyl, NetDefaultSpawner.new(ps_cyl), $player, fref)
+	network.snapshot_data.register_spawner(p3dchar, chash_cyl, NetDefaultSpawner.new(ps_cyl), $player, fref)
 	
 	var ps_cube: PackedScene = load("res://shared/scenes/pchar_cuboid.tscn")
 	var chash_cube: int = ps_cube.resource_path.hash()
-	network.snapshot_data.register_spawner(MegaSnapPCharacter, chash_cube, NetDefaultSpawner.new(ps_cube), $player, fref)
+	network.snapshot_data.register_spawner(p3dchar, chash_cube, NetDefaultSpawner.new(ps_cube), $player, fref)
 	
 	# The projectiles of this demo are also very simple. And because there aren't
 	# different types of them, class hash has been disabled (see the megasnapprojectile.gd)
 	# In this case, those are meant to be children of the "projectile" node
 	var ps_glowproj: PackedScene = load("res://shared/scenes/glowprojectile.tscn")
-	network.snapshot_data.register_spawner(MegaSnapProjectile, 0, NetDefaultSpawner.new(ps_glowproj), $projectile)
+	network.snapshot_data.register_spawner(GlowProjectile, 0, NetDefaultSpawner.new(ps_glowproj), $projectile)
 	
 	# And set the default player character class_hash to be the capsule one.
 	_default_pchar_hash = chash_caps
@@ -295,7 +295,7 @@ func on_player_joined(pid: int) -> void:
 # the HUD will be updated
 func on_player_left(pid: int) -> void:
 	# Remove the player character node from the game world
-	network.snapshot_data.despawn_node(MegaSnapPCharacter, pid)
+	network.snapshot_data.despawn_node(p3dchar, pid)
 	
 	_ui_player[pid].queue_free()
 	# warning-ignore:return_value_discarded

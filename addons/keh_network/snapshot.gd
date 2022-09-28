@@ -55,16 +55,16 @@ func get_entity_count(nhash: int) -> int:
 	assert(_entity_data.has(nhash))
 	return _entity_data[nhash].size()
 
-func add_entity(nhash: int, entity: SnapEntityBase) -> void:
+func add_entity(nhash: int, entity: Array) -> void:
 	assert(_entity_data.has(nhash))
-	_entity_data[nhash][entity.id] = entity
+	_entity_data[nhash][entity[EntityInfo.UID]] = entity
 
 func remove_entity(nhash: int, uid: int) -> void:
 	assert(_entity_data.has(nhash))
 	if (_entity_data[nhash].has(uid)):
 		_entity_data[nhash].erase(uid)
 
-func get_entity(nhash: int, uid: int) -> SnapEntityBase:
+func get_entity(nhash: int, uid: int) -> Array:
 	assert(_entity_data.has(nhash))
 	return _entity_data[nhash].get(uid)
 

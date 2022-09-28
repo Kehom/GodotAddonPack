@@ -26,7 +26,6 @@ material/0 = SubResource( 2 )
 [node name="directionclue" type="MeshInstance" parent="smooth3d/mainmesh" index="0"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.918205, 0.813299, 0.535878 )
 mesh = SubResource( 3 )
-material/0 = null
 
 [node name="collision" type="CollisionShape" parent="." index="2"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )

@@ -71,9 +71,9 @@ func register_entity_types() -> void:
 	var pdebug: bool = ProjectSettings.get_setting("keh_addons/network/print_debug_info") if ProjectSettings.has_setting("keh_addons/network/print_debug_info") else false
 	
 	for c in clist:
-		# Only interested in classes derived from SnapEntityBase
-		if (c.base == "SnapEntityBase"):
-			var edata: EntityInfo = EntityInfo.new(c.class, c.path)
+		var script: Script = load(c.path)
+		if script_has_net_vars(script):
+			var edata: EntityInfo = EntityInfo.new(script,c.class)
 			
 			if (edata.error.length() > 0):
 				var msg: String = "Skipping registration of class %s (%d). Reason: %s"
@@ -91,7 +91,14 @@ func register_entity_types() -> void:
 					"hash": edata._name_hash,
 				}
 
+static func extract_class_name(path: String) -> String:
+	return path.get_file().rstrip(path.get_extension())
 
+static func script_has_net_vars(script: Script) -> bool:
+	for property in script.get_script_property_list():
+		if property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE and property.name.begins_with("net_"):
+			return true
+	return false
 
 # Spawners are the main mean to create game nodes in association with the various
 # classes derived from SnapEntityBase
@@ -186,8 +193,8 @@ func reset() -> void:
 	_isig_to_snap.clear()
 
 
-func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> SnapEntityBase:
-	var ret: SnapEntityBase = null
+func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> Array:
+	var ret: Array
 	
 	var einfo: EntityInfo = _get_entity_info(eclass)
 	if (einfo):
@@ -225,7 +232,7 @@ func encode_full(snap: NetSnapshot, into: EncDecBuffer, isig: int) -> void:
 		# Encode the entities of this type
 		for uid in snap._entity_data[ehash]:
 			# Get the entity in order to encode the properties
-			var entity: SnapEntityBase = snap.get_entity(ehash, uid)
+			var entity: Array = snap.get_entity(ehash, uid)
 			
 			einfo.encode_full_entity(entity, into)
 
@@ -273,7 +280,7 @@ func decode_full(from: EncDecBuffer) -> NetSnapshot:
 		var count: int = from.read_uint()
 		
 		for _i in count:
-			var entity: SnapEntityBase = einfo.decode_full_entity(from)
+			var entity: Array = einfo.decode_full_entity(from)
 			if (entity):
 				retval.add_entity(ehash, entity)
 	
@@ -335,10 +342,10 @@ func encode_delta(snap: NetSnapshot, oldsnap: NetSnapshot, into: EncDecBuffer, i
 		# Check the entities
 		for uid in snap._entity_data[ehash]:
 			# Retrive old state of this entity - obviously if it exists (if not this will be null)
-			var eold: SnapEntityBase = oldsnap.get_entity(ehash, uid)
+			var eold: Array = oldsnap.get_entity(ehash, uid)
 			# Retrieve new state of this entity - it should exist as the iteration is based on the
 			# new snapshot.
-			var enew: SnapEntityBase = snap.get_entity(ehash, uid)
+			var enew: Array = snap.get_entity(ehash, uid)
 			
 			# Assume the entity is new
 			var cmask: int = einfo.get_full_change_mask()
@@ -377,7 +384,7 @@ func encode_delta(snap: NetSnapshot, oldsnap: NetSnapshot, into: EncDecBuffer, i
 				into.write_uint(ccount)
 				written_type_header = true
 			
-			einfo.encode_delta_entity(uid, null, 0, into)
+			einfo.encode_delta_entity(uid, [], 0, into)
 			ccount += 1
 		
 		if (ccount > 0):
@@ -436,7 +443,7 @@ func decode_delta(from: EncDecBuffer) -> NetSnapshot:
 			for _i in count:
 				var edata: Dictionary = einfo.decode_delta_entity(from)
 				
-				var oldent: SnapEntityBase = _server_state.get_entity(ehash, edata.entity.id)
+				var oldent: Array = _server_state.get_entity(ehash, edata.entity.id)
 				
 				if (oldent):
 					# The entity exists in the old state. Check if it's not marked for removal
@@ -462,7 +469,7 @@ func decode_delta(from: EncDecBuffer) -> NetSnapshot:
 	for ehash in tracker:
 		var einfo: EntityInfo = _entity_info.get(ehash)
 		for uid in tracker[ehash]:
-			var entity: SnapEntityBase = _server_state.get_entity(ehash, uid)
+			var entity: Array = _server_state.get_entity(ehash, uid)
 			retval.add_entity(ehash, einfo.clone_entity(entity))
 	
 	return retval
@@ -538,8 +545,8 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 		
 		# Iterate through entities of the server's snapshot
 		for uid in snap._entity_data[ehash]:
-			var rentity: SnapEntityBase = snap.get_entity(ehash, uid)
-			var lentity: SnapEntityBase = local.get_entity(ehash, uid)
+			var rentity: Array = snap.get_entity(ehash, uid)
+			var lentity: Array = local.get_entity(ehash, uid)
 			var node: Node = null
 			
 			if (rentity && lentity):
@@ -558,12 +565,14 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 				# Entity exists only on the server's data. If necessary spawn the game node.
 				var n: Node = einfo.get_game_node(uid)
 				if (!n):
-					node = einfo.spawn_node(uid, rentity.class_hash)
+					node = einfo.spawn_node(uid, rentity[EntityInfo.CHASH])
 			
 			
 			if (node):
 				# If here, then it's necessary to apply the server's state into the node
-				rentity.apply_state(node)
+#				rentity.apply_state(node)
+#				new solution was orignally gonna be node.apply_state(rentity)
+				einfo.apply_properties_to_node(node,rentity)
 				
 				# "Propagate" the server's data into every snapshot in the local history
 				for s in _history:

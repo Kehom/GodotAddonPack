@@ -1,4 +1,5 @@
 extends KinematicBody
+class_name GlowProjectile
 
 # Destroy itself after 4 seconds
 const TIME_TO_LIVE: float = 4.0
@@ -15,18 +16,21 @@ var _impact_position: Vector3 = Vector3()
 
 # Hold correction data so it is applied only during physics process. This should
 # avoid some jittery movement
-var _correction_data: Dictionary
+#var _correction_data: Dictionary
 
 # Cache the unique ID
 var _uid: int = 0
 
+var net_position: Vector3
+var net_orientation: Quat
+var net_has_correction: bool
 
 func _ready() -> void:
-	_correction_data = {
-		"position": Vector3(),
-		"orientation": Quat(),
-		"has_correction": false,
-	}
+#	_correction_data = {
+#		"position": Vector3(),
+#		"orientation": Quat(),
+#		"has_correction": false,
+#	}
 	
 	_uid = get_meta("uid") if has_meta("uid") else 0
 
@@ -37,7 +41,7 @@ func _process(dt: float) -> void:
 	_time_alive += dt
 	if (_time_alive >= TIME_TO_LIVE):
 		if (_uid > 0):
-			network.snapshot_data.despawn_node(MegaSnapProjectile, _uid)
+			network.snapshot_data.despawn_node(GlowProjectile, _uid)
 
 
 func _physics_process(dt: float) -> void:
@@ -47,15 +51,15 @@ func _physics_process(dt: float) -> void:
 	if (_hit):
 		# Force despawning since the projectile did hit something and the previous
 		# test didn't indicate this node is queued for removal
-		network.snapshot_data.despawn_node(MegaSnapProjectile, _uid)
+		network.snapshot_data.despawn_node(GlowProjectile, _uid)
 	
-	if (_correction_data.has_correction):
+	if (net_has_correction):
 		global_transform = Transform(Basis(_correction_data.orientation), _correction_data.position)
 		_correction_data.has_correction = false
 		
 		# Re-simulate the projectile the number of times client predicted this after server data was used
 		# to trigger the correction
-		for _i in network.snapshot_data.get_prediction_count(_uid, MegaSnapProjectile):
+		for _i in network.snapshot_data.get_prediction_count(_uid, GlowProjectile):
 			_simulate(dt)
 		
 		$Smooth3D.snap_to_target()
@@ -66,7 +70,8 @@ func _physics_process(dt: float) -> void:
 	# is, there is no point in adding something that is about to be removed from the
 	# game. Moreover, delta data will take care of explicitly telling about this fact.
 	if (!_hit):
-		var sobj: MegaSnapProjectile = MegaSnapProjectile.new(_uid, 0)
+		
+		var sobj: Array = network.create_snap_entity(get_script(),_uid,0)
 		sobj.position = global_transform.origin
 		#sobj.orientation = Quat(global_transform.basis)
 		sobj.orientation = Quantize.compress_rquat_9bits(global_transform.basis.get_rotation_quat())
@@ -80,10 +85,10 @@ func init(t: Transform) -> void:
 	$Smooth3D.snap_to_target()
 
 
-func apply_state(state: Dictionary) -> void:
-	_correction_data.position = state.position
-	_correction_data.orientation = Quantize.restore_rquat_9bits(state.orientation)
-	_correction_data.has_correction = true
+#func apply_state(state: Dictionary) -> void:
+#	_correction_data.position = state.position
+#	_correction_data.orientation = Quantize.restore_rquat_9bits(state.orientation)
+#	_correction_data.has_correction = true
 
 
 func _simulate(dt: float) -> void:

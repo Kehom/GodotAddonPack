@@ -667,6 +667,7 @@ __meta__ = {
 }
 
 [node name="audiomaster" type="Panel" parent="mpnl/stabs"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
@@ -711,6 +712,7 @@ autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
 [connection signal="pressed" from="mpnl/demo_list/pnl/bt_quit" to="." method="_on_bt_quit_pressed"]
 [connection signal="pressed" from="mpnl/stabs/encdecbuffer/bt_encdecload" to="." method="_on_bt_encdecload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/quantize/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]

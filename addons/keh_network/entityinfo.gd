@@ -34,9 +34,9 @@ class_name EntityInfo
 
 
 # Those are just shortcuts
-const CTYPE_UINT: int = SnapEntityBase.CTYPE_UINT
-const CTYPE_USHORT: int = SnapEntityBase.CTYPE_USHORT
-const CTYPE_BYTE: int = SnapEntityBase.CTYPE_BYTE
+const CTYPE_UINT: int = 65538
+const CTYPE_USHORT: int = 131074
+const CTYPE_BYTE: int = 196610
 
 # Maximum amount of array elements (PoolByteArray, PoolRealArray and PoolIntArray)
 const MAX_ARRAY_SIZE: int = 0xFF
@@ -185,6 +185,7 @@ var _resource: Resource
 # The replicable properties list. Each entry in this array is an instance of the
 # inner class ReplicableProperty
 var replicable: Array
+var default_values: Array
 # This is held mostly to help with debugging
 var _namestr: String
 # Snap entity objects may disable the class_hash and this info is cashed in this
@@ -214,11 +215,11 @@ var _entity: Dictionary
 var _spawner_data: Dictionary = {}
 
 
-func _init(cname: String, rpath: String) -> void:
+func _init(script: Script, cname: String) -> void:
 	replicable = []
 	# Verifies if the resource contains replicable properties and if implements
 	# the required apply_state(node) function.
-	_check_properties(cname, rpath)
+	_check_properties(script, cname)
 	
 	if replicable.size() <= 8:
 		_cmask_size = 1
@@ -245,22 +246,38 @@ func register_spawner(chash: int, spawner: NetNodeSpawner, parent: Node, esetup:
 
 
 # Creates an instance of the entity described by this object.
-func create_instance(uid: int, chash: int) -> SnapEntityBase:
+func create_instance(uid: int, chash: int) -> Array:
 	assert(_resource)
-	return _resource.new(uid, chash)
+	return default_values.duplicate()
 
+enum {UID,CHASH,VARS}
+func get_properties_from_node(node: Node) -> Array:
+							# maybe make these get_meta's? (wound up doing that.
+							# could maybe move to direct accessors one day?)
+	var proplist: Array = [node.get_meta("uid"),node.get_meta("chash")]
+	for repl in replicable:
+		proplist.append(node[repl.name])
+	return proplist
+
+func apply_properties_to_node(node: Node,entity: Array) -> void:
+	var i: int
+	# maybe just store a list of all variable names tbh
+	for idx in replicable.size():
+		var repl: ReplicableProperty = replicable[idx]
+		node[repl.name] = entity[idx + VARS]
 
 # Creates a clone of the specified entity.
-func clone_entity(entity: SnapEntityBase) -> SnapEntityBase:
-	# If failing here, then provided entity is of different type than the one described by this info
-	assert(entity.get_script() == _resource)
-	
-	var ret: SnapEntityBase = create_instance(0, 0)
-	
-	for repl in replicable:
-		ret.set(repl.name, entity.get(repl.name))
-	
-	return ret
+# depreciated. just duplicate array
+#func clone_entity(entity: Array) -> SnapEntityBase:
+#	# If failing here, then provided entity is of different type than the one described by this info
+#	assert(entity.get_script() == _resource)
+#
+#	var ret: SnapEntityBase = create_instance(0, 0)
+#
+#	for repl in replicable:
+#		ret.set(repl.name, entity.get(repl.name))
+#
+#	return ret
 
 
 # Just to give a different access to the change mask size property.
@@ -271,52 +288,55 @@ func get_change_mask_size() -> int:
 # Compare two entities described by this instance and return a value that
 # can be used as a change mask. In other words, a non zero value means the
 # two given entities are in different states.
-func calculate_change_mask(e1: SnapEntityBase, e2: SnapEntityBase) -> int:
+func calculate_change_mask(e1: Array, e2: Array) -> int:
 	assert(typeof(e1) == typeof(e2))
 	
 	# The change mask
 	var cmask: int = 0
 	
-	for p in replicable:
-		if (!p.compare(e1.get(p.name), e2.get(p.name))):
+	for idx in replicable.size():
+		var p: ReplicableProperty = replicable[idx]
+		if (!p.compare(e1[idx], e2[idx])):
 			cmask |= p.mask
 	
 	return cmask
 
 
 # Fully encode the given snapshot entity object into the specified byte buffer
-func encode_full_entity(entity: SnapEntityBase, into: EncDecBuffer) -> void:
+func encode_full_entity(entity: Array, into: EncDecBuffer) -> void:
 	# Ensure id is encoded first
-	into.write_uint(entity.id)
+	into.write_uint(entity[UID])
 	# Next, if the class_hash has not been disabled, encode it first
 	if (_has_chash):
-		into.write_uint(entity.class_hash)
+		into.write_uint(entity[CHASH])
 	
-	for repl in replicable:
+	for idx in replicable.size():
+		var repl: ReplicableProperty = replicable[idx]
 		if (repl.name != "id" && repl.name != "class_hash"):
-			_property_writer(repl, entity, into)
+			_property_writer(idx, repl, entity, into)
 
 
 # Given the raw byte array, decode an entity from it and return the instance
 # with the properties set. This assumes the reading index is at the desired
 # position
-func decode_full_entity(from: EncDecBuffer) -> SnapEntityBase:
+func decode_full_entity(from: EncDecBuffer) -> Array:
 	# Read the unique ID
 	var uid: int = from.read_uint()
 	# If the class_hash has not been disabled, read it
 	var chash: int = from.read_uint() if _has_chash else 0
 	
-	var ret: SnapEntityBase = create_instance(uid, chash)
+	var ret: Array = create_instance(uid, chash)
 	
 	# Read/decode each one of the replicable properties
-	for repl in replicable:
+	for idx in replicable.size():
+		var repl: ReplicableProperty = replicable[idx]
 		if (repl.name != "id" && repl.name != "class_hash"):
-			_property_reader(repl, from, ret)
+			_property_reader(idx, repl, from, ret)
 	
 	return ret
 
 
-func encode_delta_entity(uid: int, entity: SnapEntityBase, cmask: int, into: EncDecBuffer) -> void:
+func encode_delta_entity(uid: int, entity: Array, cmask: int, into: EncDecBuffer) -> void:
 	# Write the entity ID first
 	into.write_uint(uid)
 	
@@ -341,7 +361,8 @@ func encode_delta_entity(uid: int, entity: SnapEntityBase, cmask: int, into: Enc
 		# Avoid needless loop iteration
 		return
 	
-	for repl in replicable:
+	for idx in replicable.size():
+		var repl: ReplicableProperty = replicable[idx]
 		# Not ignoring class hash. Although it's not supposed to be changed,
 		# new entities will have the corresponding bit mask set.
 		# ID was already encoded above, before the change mask
@@ -350,7 +371,7 @@ func encode_delta_entity(uid: int, entity: SnapEntityBase, cmask: int, into: Enc
 		
 		if (repl.mask & cmask):
 			# This is a changed property, so encode it
-			_property_writer(repl, entity, into)
+			_property_writer(idx, repl, entity, into)
 
 
 func get_full_change_mask() -> int:
@@ -390,14 +411,15 @@ func decode_delta_entity(from: EncDecBuffer) -> Dictionary:
 	
 	# Observation here: The returned entity is meant to contain only the changed data. The rest
 	# that does not match in the change mask will be left with default values.
-	var entity: SnapEntityBase = create_instance(uid, 0)
+	var entity: Array = create_instance(uid, 0)
 	
 	# Avoid replicable looping if the change mask is 0, as this entity is marked for removal
 	# and does not contain any encoded data
 	if (cmask > 0):
-		for repl in replicable:
+		for idx in replicable.size():
+			var repl: ReplicableProperty = replicable[idx]
 			if (repl.name != "id" && repl.mask & cmask):
-				_property_reader(repl, from, entity)
+				_property_reader(idx, repl, from, entity)
 	
 	return {
 		"entity": entity,
@@ -405,13 +427,14 @@ func decode_delta_entity(from: EncDecBuffer) -> Dictionary:
 	}
 
 
-func match_delta(changed: SnapEntityBase, source: SnapEntityBase, cmask: int) -> void:
+func match_delta(changed: Array, source: Array, cmask: int) -> void:
 	# changed is meant to have the old values copied into it as it's the entity to be
 	# added into the new snapshot data
-	for repl in replicable:
+	for idx in replicable.size():
+		var repl: ReplicableProperty = replicable[idx]
 		# Only take from old value if the replicable proprety is not marked as changed
 		if (!(repl.mask & cmask)):
-			changed.set(repl.name, source.get(repl.name))
+			changed[idx] = source[idx]
 
 
 
@@ -473,52 +496,47 @@ func despawn_node(uid: int) -> void:
 func add_pre_spawned(uid: int, node: Node) -> void:
 	_entity[uid] = GameEntity.new(node, 0)
 
+static func script_has_method(script: Script,method: String) -> bool:
+	for script_method in script.get_script_method_list():
+		if script_method.name == method:
+			return true
+	return false
 
 # This will check the specified resource and if there are any replicable
 # properties finalize the initialization of this object.
-func _check_properties(cname: String, rpath: String) -> void:
-	_resource = load(rpath)
+func _check_properties(script: Script, cname: String) -> void:
+	_resource = script
 	
-	if (!_resource):
+	if !_resource:
 		return
 	
-	# Unfortunately it's necessary to create an instance of the class in order
-	# to traverse its properties and methods. Since this is a dummy object
-	# uid and class_hash are irrelevant
-	var obj: SnapEntityBase = create_instance(0, 0)
-	
-	if (!obj):
-		_resource = null
-		error = "Unable to create dummy instance of the class %s (%s)"
-		error = error % [cname, rpath]
-		return
-	
-	if (!obj.has_method("apply_state")):
+	if (!script_has_method(script,"apply_state")):
 		_resource = null
 		error = "Method apply_state(Node) is not implemented."
 		return
 	
 	var mask: int = 1
-	var plist: Array = obj.get_property_list()
+	var plist: Array = script.get_script_property_list()
 	var min_size: int = 2      # Assume class_hash is not disabled
 	
 	for p in plist:
 		if (p.usage & PROPERTY_USAGE_SCRIPT_VARIABLE):
 			# If this property is the class_hash and the meta "class_hash" is set
 			# to 0, then skip it as it means it's desired to be disabled
-			if (p.name == "class_hash" && obj.get_meta("class_hash") == 0):
+			if (p.name == "class_hash" && script.get_meta("class_hash") == 0):
 				_has_chash = false
 				min_size -= 1
 				continue
-			
-			var tp: int = p.type
-			var rprop: ReplicableProperty = _build_replicable_prop(p.name, tp, mask, obj)
-			
-			if (rprop):
-				# Push the replicable property into the internal container
-				replicable.push_back(rprop)
-				# Advance the mask
-				mask *= 2
+			elif p.name.begins_with("net_"):
+				var tp: int = p.type
+				var rprop: ReplicableProperty = _build_replicable_prop(p.name, tp, mask, script)
+				
+				if (rprop):
+					# Push the replicable property into the internal container
+					replicable.push_back(rprop)
+					default_values.push_back(script.get_property_default_value(rprop.name))
+					# Advance the mask
+					mask *= 2
 	
 	
 	# After iterating through available properties, verify if there is at least
@@ -536,56 +554,57 @@ func _check_properties(cname: String, rpath: String) -> void:
 
 # Based on the given instance of ReplicableProperty, reads a property from the
 # byte buffer into an instance of the snapshot entity object.
-func _property_reader(repl: ReplicableProperty, from: EncDecBuffer, into: SnapEntityBase) -> void:
+func _property_reader(idx: int, repl: ReplicableProperty, from: EncDecBuffer, into: Array) -> void:
 	match repl.type:
 		TYPE_BOOL:
-			into.set(repl.name, from.read_bool())
+			into[idx] = from.read_bool()
+#			into.set(repl.name, from.read_bool())
 		TYPE_INT:
-			into.set(repl.name, from.read_int())
+			into[idx] = from.read_int()
 		TYPE_REAL:
-			into.set(repl.name, from.read_float())
+			into[idx] = from.read_float()
 		TYPE_VECTOR2:
-			into.set(repl.name, from.read_vector2())
+			into[idx] = from.read_vector2()
 		TYPE_RECT2:
-			into.set(repl.name, from.read_rect2())
+			into[idx] = from.read_rect2()
 		TYPE_QUAT:
-			into.set(repl.name, from.read_quat())
+			into[idx] = from.read_quat()
 		TYPE_COLOR:
-			into.set(repl.name, from.read_color())
+			into[idx] = from.read_color()
 		TYPE_VECTOR3:
-			into.set(repl.name, from.read_vector3())
+			into[idx] = from.read_vector3()
 		CTYPE_UINT:
-			into.set(repl.name, from.read_uint())
+			into[idx] = from.read_uint()
 		CTYPE_BYTE:
-			into.set(repl.name, from.read_byte())
+			into[idx] = from.read_byte()
 		CTYPE_USHORT:
-			into.set(repl.name, from.read_ushort())
+			into[idx] = from.read_ushort()
 		TYPE_STRING:
-			into.set(repl.name, from.read_string())
+			into[idx] = from.read_string()
 		TYPE_RAW_ARRAY:
 			var s: int = from.read_byte()
 			var a: PoolByteArray = PoolByteArray()
 			for _i in s:
 				a.append(from.read_byte())
-			into.set(repl.name, a)
+			into[idx] = a
 		TYPE_INT_ARRAY:
 			var s: int = from.read_byte()
 			var a: PoolIntArray = PoolIntArray()
 			for _i in s:
 				a.append(from.read_int())
-			into.set(repl.name, a)
+			into[idx] = a
 		TYPE_REAL_ARRAY:
 			var s: int = from.read_byte()
 			var a: PoolRealArray = PoolRealArray()
 			for _i in s:
 				a.append(from.read_float())
-			into.set(repl.name, a)
+			into[idx] = a
 
 # Based on the given instance of ReplicableProperty, writes a property from the
 # instance of snapshot entity object into the specified byte array
-func _property_writer(repl: ReplicableProperty, entity: SnapEntityBase, into: EncDecBuffer) -> void:
+func _property_writer(idx: int, repl: ReplicableProperty, entity: Array, into: EncDecBuffer) -> void:
 	# Relying on the variant feature so no static typing here
-	var val = entity.get(repl.name)
+	var val = entity[idx]
 	
 	match repl.type:
 		TYPE_BOOL:

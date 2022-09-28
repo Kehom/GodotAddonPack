@@ -23,6 +23,10 @@
 extends Node
 class_name Network
 
+const CTYPE_UINT: int = 65538
+const CTYPE_BYTE: int = 131074
+const CTYPE_USHORT: int = 196610
+
 # TODO:
 # - Method to "cull" objects from snapshots which may lead to *some* bandwidth
 #   savings. One such case would be to eliminate every object that is relatively
@@ -762,27 +766,28 @@ func get_snap_building_signature() -> int:
 
 
 # Create an instance of the given snapshot entity class.
-func create_snap_entity(eclass: Script, uid: int, class_hash: int) -> SnapEntityBase:
+func create_snap_entity(eclass: Script, uid: int, class_hash: int) -> Array:
 	return snapshot_data._instantiate_snap_entity(eclass, uid, class_hash)
 
 
 # Add the provided entity into the snapshot that is being built
-func snapshot_entity(entity: SnapEntityBase) -> void:
+func snapshot_entity(node: Node) -> void:
 	assert(_update_control.snap)
-	assert(snapshot_data._entity_name.has(entity.get_script()))
+	assert(snapshot_data._entity_name.has(node.get_script()))
 	
-	var ehash: int = snapshot_data._entity_name.get(entity.get_script()).hash
-	_update_control.snap.add_entity(ehash, entity)
+	var ehash: int = snapshot_data._entity_name.get(node.get_script()).hash
+											# long ass accessor no CAAAAP
+	_update_control.snap.add_entity(ehash, snapshot_data._entity_info[ehash].get_properties_from_node(node))
 
 
 
-func correct_in_snapshot(entity: SnapEntityBase, input: InputData) -> void:
-	assert(snapshot_data._entity_name.has(entity.get_script()))
+func correct_in_snapshot(node: Node, input: InputData) -> void:
+	assert(snapshot_data._entity_name.has(node.get_script()))
 	
 	var snap: NetSnapshot = snapshot_data.get_snapshot_by_input(input.signature)
 	if (snap):
-		var ehash: int = snapshot_data._entity_name.get(entity.get_script()).hash
-		snap.add_entity(ehash, entity)
+		var ehash: int = snapshot_data._entity_name.get(node.get_script()).hash
+		snap.add_entity(ehash, snapshot_data._entity_info[ehash].get_properties_from_node(node))
 
 
 
