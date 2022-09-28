@@ -66,7 +66,10 @@ func remove_entity(nhash: int, uid: int) -> void:
 
 func get_entity(nhash: int, uid: int) -> Array:
 	assert(_entity_data.has(nhash))
-	return _entity_data[nhash].get(uid)
+	var ret = _entity_data[nhash].get(uid)
+	if ret:
+		return ret
+	return []
 
 
 func build_tracker() -> Dictionary:

@@ -66,6 +66,9 @@ func hover() -> void:
 func unhover() -> void:
 	$mesh/outline_hover.visible = false
 
+func apply_state() -> void:
+	pass
+
 #func apply_state(state: Dictionary) -> void:
 #	global_transform.origin = state.position
 #	global_transform.basis = Basis(state.orientation)

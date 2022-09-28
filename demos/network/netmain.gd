@@ -128,7 +128,7 @@ func create_player_units(pnode: NetPlayerNode, pnum: int) -> void:
 		var idstr: String = "%d_%d" % [pnode.net_id, i]
 		var uid: int = idstr.hash()
 		
-		var unode: KinematicBody = network.snapshot_data.get_game_node(uid, NetSnapUnit)
+		var unode: KinematicBody = network.snapshot_data.get_game_node(uid, CharUnitClass)
 		if (unode):
 			# If here, all 3 nodes are likely spawned, so bail
 			return
@@ -139,15 +139,15 @@ func create_player_units(pnode: NetPlayerNode, pnum: int) -> void:
 		
 		# If here, the node does not exist so create it. Remember, for this
 		# specific case/demo, class_hash is not used, so setting it to 0
-		unode = network.snapshot_data.spawn_node(NetSnapUnit, uid, 0)
+		unode = network.snapshot_data.spawn_node(CharUnitClass, uid, 0)
 		unode.global_transform = point.global_transform
 		
 		# Must set the owner
-		unode._owner_id = pnode.net_id
+		unode.net_owner_id = pnode.net_id
 		
 		# Must ensure the target position of the unit corresponds to the spawn point
 		# otherwise it will move towards the origin (0, 0, 0)
-		unode._target = point.global_transform.origin
+		unode.net_target = point.global_transform.origin
 		
 		unode.set_color(player_color[pnum])
 
@@ -177,7 +177,7 @@ func _setup_net_spawners() -> void:
 	# is no need to deal with this extra information. So, the second argument is 0
 	# There is also an extra setup that is needed. In this case, setting the function
 	# reference to the "unit_etra_setup()" function to perform this task
-	network.snapshot_data.register_spawner(NetSnapUnit, 0, NetDefaultSpawner.new(UnitCharScene), $player, funcref(self, "unit_extra_setup"))
+	network.snapshot_data.register_spawner(CharUnitClass, 0, NetDefaultSpawner.new(UnitCharScene), $player, funcref(self, "unit_extra_setup"))
 
 
 func on_player_left(pid: int) -> void:
@@ -185,7 +185,7 @@ func on_player_left(pid: int) -> void:
 	for i in 3:
 		var idstr: String = "%d_%d" % [pid, i]
 		var uid: int = idstr.hash()
-		network.snapshot_data.despawn_node(NetSnapUnit, uid)
+		network.snapshot_data.despawn_node(CharUnitClass, uid)
 
 
 # This function will be called by the network system whenever a unit node is spawned. This

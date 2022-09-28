@@ -22,7 +22,7 @@ var _impact_position: Vector3 = Vector3()
 var _uid: int = 0
 
 var net_position: Vector3
-var net_orientation: Quat
+var net_orientation: int
 var net_has_correction: bool
 
 func _ready() -> void:
@@ -41,7 +41,7 @@ func _process(dt: float) -> void:
 	_time_alive += dt
 	if (_time_alive >= TIME_TO_LIVE):
 		if (_uid > 0):
-			network.snapshot_data.despawn_node(GlowProjectile, _uid)
+			network.snapshot_data.despawn_node(get_script(), _uid)
 
 
 func _physics_process(dt: float) -> void:
@@ -51,15 +51,15 @@ func _physics_process(dt: float) -> void:
 	if (_hit):
 		# Force despawning since the projectile did hit something and the previous
 		# test didn't indicate this node is queued for removal
-		network.snapshot_data.despawn_node(GlowProjectile, _uid)
+		network.snapshot_data.despawn_node(get_script(), _uid)
 	
 	if (net_has_correction):
-		global_transform = Transform(Basis(_correction_data.orientation), _correction_data.position)
-		_correction_data.has_correction = false
+		global_transform = Transform(Basis(Quantize.restore_rquat_9bits(net_orientation)), net_position)
+		net_has_correction = false
 		
 		# Re-simulate the projectile the number of times client predicted this after server data was used
 		# to trigger the correction
-		for _i in network.snapshot_data.get_prediction_count(_uid, GlowProjectile):
+		for _i in network.snapshot_data.get_prediction_count(_uid, get_script()):
 			_simulate(dt)
 		
 		$Smooth3D.snap_to_target()
@@ -71,20 +71,19 @@ func _physics_process(dt: float) -> void:
 	# game. Moreover, delta data will take care of explicitly telling about this fact.
 	if (!_hit):
 		
+		net_position = global_transform.origin
+		net_orientation = Quantize.compress_rquat_9bits(global_transform.basis.get_rotation_quat())
 		var sobj: Array = network.create_snap_entity(get_script(),_uid,0)
-		sobj.position = global_transform.origin
-		#sobj.orientation = Quat(global_transform.basis)
-		sobj.orientation = Quantize.compress_rquat_9bits(global_transform.basis.get_rotation_quat())
-#		sobj.fired_by = 
 		
-		network.snapshot_entity(sobj)
+		network.snapshot_entity(self)
 
 
 func init(t: Transform) -> void:
 	global_transform = t
 	$Smooth3D.snap_to_target()
 
-
+func apply_state() -> void:
+	pass
 #func apply_state(state: Dictionary) -> void:
 #	_correction_data.position = state.position
 #	_correction_data.orientation = Quantize.restore_rquat_9bits(state.orientation)

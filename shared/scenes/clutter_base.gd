@@ -1,4 +1,5 @@
 extends RigidBody
+class_name ClutterBase
 
 # Rigid bodies must set/update the state through the custom itegration function.
 # To that end, the "Custom Integrator" property must be enabled and the function
@@ -8,6 +9,13 @@ extends RigidBody
 # will hold the rigid body state. Also, when setting up the snapshot the data
 # will be taken from this dictionary
 var _current_state: Dictionary
+
+var net_has_correction: bool
+var net_transform: Transform
+var net_position: Vector3
+var net_orientation: Basis
+var net_ang_velocity: Vector3
+var net_lin_velocity: Vector3
 
 # Holds the unique ID of the object.
 var _uid: int
@@ -19,15 +27,17 @@ func _ready() -> void:
 	# Although the property has been set through the editor, ensure this fact here
 	custom_integrator = true
 	
-	_current_state = {
-		"transform": global_transform,
-		"angular_velocity": Vector3(),
-		"linear_velocity": Vector3(),
-		"has_correction": false,
-	}
+#	_current_state = {
+#		"transform": global_transform,
+#		"angular_velocity": Vector3(),
+#		"linear_velocity": Vector3(),
+#		"has_correction": false,
+#	}
 	
 	_uid = get_name().hash()
 	_chash = 0
+	set_meta("uid",_uid)
+	set_meta("chash",_chash)
 	
 	# The basic idea here is that "clutter/rigid bodies" are added to the scene
 	# through the editor, so "pre-spawned". The replication system must know
@@ -37,37 +47,40 @@ func _ready() -> void:
 	# are dynamically spawned, it will not be a big problem since all that is
 	# done with this function is associate the node with the UID.
 	if (!Engine.editor_hint):
-		network.snapshot_data.add_pre_spawned_node(MegaSnapClutter, _uid, self)
+		network.snapshot_data.add_pre_spawned_node(get_script(), _uid, self)
 
 
 # During the physics_process() iteration the snapshot object is created and
 # added into the snapshot that is currently being built.
 func _physics_process(_dt: float) -> void:
 	# Generate the snapshot entity object and add to the snapshot
-	pass
-	var sobj: MegaSnapClutter = MegaSnapClutter.new(_uid, _chash)
-	sobj.position = _current_state.transform.origin
-	sobj.orientation = _current_state.transform.basis
-	sobj.ang_velocity = _current_state.angular_velocity
-	sobj.lin_velocity = _current_state.linear_velocity
 	
-	network.snapshot_entity(sobj)
+	net_position = global_transform.origin
+	net_orientation = global_transform.basis
+	net_ang_velocity = angular_velocity
+	net_lin_velocity = linear_velocity
+	
+	network.snapshot_entity(self)
 
 
 
 
 # This is the custom integration
 func _integrate_forces(state: PhysicsDirectBodyState) -> void:
-	if (_current_state.has_correction):
+	if (net_has_correction):
 		# The _current_state is holding new data (taken from the server) so
 		# apply it into the object.
-		state.set_transform(_current_state.transform)
-		state.set_angular_velocity(_current_state.angular_velocity)
-		state.set_linear_velocity(_current_state.linear_velocity)
+#		state.transform.origin = net_position
+#		state.transform.basis = net_orientation
+		state.transform = net_transform
+		assert(net_transform.basis == net_orientation and net_transform.origin == net_position)
+#		state.set_transform(_current_state.transform)
+		state.set_angular_velocity(net_ang_velocity)
+		state.set_linear_velocity(net_lin_velocity)
 		
 		# And ensure next time _integrate_forces is called the data is not
 		# applied again
-		_current_state.has_correction = false
+		net_has_correction = false
 	
 	# Integrate the forces
 	state.integrate_forces()
@@ -75,9 +88,9 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 	state.linear_velocity.y -= 9.8 * state.get_step()
 	
 	# Store the state so it can be added into the snapshot
-	_current_state.transform = state.get_transform()
-	_current_state.angular_velocity = state.get_angular_velocity()
-	_current_state.linear_velocity = state.get_linear_velocity()
+	net_transform = state.get_transform()
+	net_ang_velocity = state.get_angular_velocity()
+	net_lin_velocity = state.get_linear_velocity()
 
 
 func apply_state(state: Dictionary) -> void:

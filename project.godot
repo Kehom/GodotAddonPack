@@ -24,6 +24,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://demos/network/scenes/unit.gd"
 }, {
+"base": "RigidBody",
+"class": "ClutterBase",
+"language": "GDScript",
+"path": "res://shared/scenes/clutter_base.gd"
+}, {
 "base": "Control",
 "class": "CustomControlBase",
 "language": "GDScript",
@@ -278,6 +283,7 @@ _global_script_class_icons={
 "AutoInterpolate": "",
 "Cam3D": "",
 "CharUnitClass": "",
+"ClutterBase": "",
 "CustomControlBase": "",
 "DBHelpers": "",
 "DBTable": "",

@@ -96,7 +96,9 @@ static func extract_class_name(path: String) -> String:
 
 static func script_has_net_vars(script: Script) -> bool:
 	for property in script.get_script_property_list():
+#		prints(property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE, property.name, property.name.begins_with("net_"))
 		if property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE and property.name.begins_with("net_"):
+#			print(property.name)
 			return true
 	return false
 
@@ -350,7 +352,7 @@ func encode_delta(snap: NetSnapshot, oldsnap: NetSnapshot, into: EncDecBuffer, i
 			# Assume the entity is new
 			var cmask: int = einfo.get_full_change_mask()
 			
-			if (eold && enew):
+			if (!eold.empty() && !enew.empty()):
 				# Ok, entity exist on both snapshots so it's not new. Calculate the "real" change mask
 				cmask = einfo.calculate_change_mask(eold, enew)
 				# Remove this from the tracker so it isn't considered as a removed entity
@@ -442,35 +444,37 @@ func decode_delta(from: EncDecBuffer) -> NetSnapshot:
 			# Decode them
 			for _i in count:
 				var edata: Dictionary = einfo.decode_delta_entity(from)
-				
-				var oldent: Array = _server_state.get_entity(ehash, edata.entity.id)
+				var entity: Array = edata.entity
+				var cmask: int = edata.cmask
+				var id: int = entity[EntityInfo.UID]
+				var oldent: Array = _server_state.get_entity(ehash, id)
 				
 				if (oldent):
 					# The entity exists in the old state. Check if it's not marked for removal
-					if (edata.cmask > 0):
+					if (cmask > 0):
 						# It isn't. So, "match" the delta to make the data correct (that is, take unchanged)
 						# data from the old state and apply into the new one.
-						einfo.match_delta(edata.entity, oldent, edata.cmask)
+						einfo.match_delta(entity, oldent, cmask)
 						# Add the changed entity into the return value
-						retval.add_entity(ehash, edata.entity)
+						retval.add_entity(ehash, entity)
 					
 					# This is a changed entity, so remove it from the tracker
-					tracker[ehash].erase(edata.entity.id)
+					tracker[ehash].erase(id)
 				
 				else:
 					# Entity is not in the old state. Add the decoded data into the return value in the
 					# hopes it is holding the entire correct data (this can be checked by comparing the cmask though)
 					# Change mask can be 0 in this case, when the acknowledgement still didn't arrive theren when
 					# server dispatched a new data set.
-					if (edata.cmask > 0):
-						retval.add_entity(ehash, edata.entity)
+					if (cmask > 0):
+						retval.add_entity(ehash, entity)
 	
 	# Check the tracker now
 	for ehash in tracker:
 		var einfo: EntityInfo = _entity_info.get(ehash)
 		for uid in tracker[ehash]:
 			var entity: Array = _server_state.get_entity(ehash, uid)
-			retval.add_entity(ehash, einfo.clone_entity(entity))
+			retval.add_entity(ehash, entity.duplicate(true))
 	
 	return retval
 
@@ -547,9 +551,13 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 		for uid in snap._entity_data[ehash]:
 			var rentity: Array = snap.get_entity(ehash, uid)
 			var lentity: Array = local.get_entity(ehash, uid)
+#			for property in lentity:
+#				assert(property != null)
+#			for property in rentity:
+#				assert(property != null)
 			var node: Node = null
 			
-			if (rentity && lentity):
+			if (!rentity.empty() && !lentity.empty()):
 				# Entity exists on both ends. First update the local_entity array because
 				# it's meant to hold entities that are present only in the local machine
 				local_entity.erase(uid)
@@ -576,7 +584,7 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 				
 				# "Propagate" the server's data into every snapshot in the local history
 				for s in _history:
-					s.add_entity(ehash, einfo.clone_entity(rentity))
+					s.add_entity(ehash, rentity.duplicate(true))
 		
 		# Now check the entities that are in the local snapshot but not on the
 		# remote one. The local ones must be removed from the game.

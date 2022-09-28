@@ -248,15 +248,21 @@ func register_spawner(chash: int, spawner: NetNodeSpawner, parent: Node, esetup:
 # Creates an instance of the entity described by this object.
 func create_instance(uid: int, chash: int) -> Array:
 	assert(_resource)
-	return default_values.duplicate()
+	var ret: Array = [uid,chash]
+	ret.append_array(default_values.duplicate(true))
+	return ret
 
 enum {UID,CHASH,VARS}
 func get_properties_from_node(node: Node) -> Array:
+	assert(node.has_meta("uid"))
+	assert(node.has_meta("chash"))
 							# maybe make these get_meta's? (wound up doing that.
 							# could maybe move to direct accessors one day?)
 	var proplist: Array = [node.get_meta("uid"),node.get_meta("chash")]
 	for repl in replicable:
 		proplist.append(node[repl.name])
+#	for property in proplist:
+#		assert(!(property == null))
 	return proplist
 
 func apply_properties_to_node(node: Node,entity: Array) -> void:
@@ -313,7 +319,7 @@ func encode_full_entity(entity: Array, into: EncDecBuffer) -> void:
 	for idx in replicable.size():
 		var repl: ReplicableProperty = replicable[idx]
 		if (repl.name != "id" && repl.name != "class_hash"):
-			_property_writer(idx, repl, entity, into)
+			_property_writer(idx+VARS, repl, entity, into)
 
 
 # Given the raw byte array, decode an entity from it and return the instance
@@ -331,7 +337,7 @@ func decode_full_entity(from: EncDecBuffer) -> Array:
 	for idx in replicable.size():
 		var repl: ReplicableProperty = replicable[idx]
 		if (repl.name != "id" && repl.name != "class_hash"):
-			_property_reader(idx, repl, from, ret)
+			_property_reader(idx+VARS, repl, from, ret)
 	
 	return ret
 
@@ -371,7 +377,7 @@ func encode_delta_entity(uid: int, entity: Array, cmask: int, into: EncDecBuffer
 		
 		if (repl.mask & cmask):
 			# This is a changed property, so encode it
-			_property_writer(idx, repl, entity, into)
+			_property_writer(idx+VARS, repl, entity, into)
 
 
 func get_full_change_mask() -> int:
@@ -419,7 +425,7 @@ func decode_delta_entity(from: EncDecBuffer) -> Dictionary:
 		for idx in replicable.size():
 			var repl: ReplicableProperty = replicable[idx]
 			if (repl.name != "id" && repl.mask & cmask):
-				_property_reader(idx, repl, from, entity)
+				_property_reader(idx+VARS, repl, from, entity)
 	
 	return {
 		"entity": entity,
@@ -512,12 +518,21 @@ func _check_properties(script: Script, cname: String) -> void:
 	
 	if (!script_has_method(script,"apply_state")):
 		_resource = null
-		error = "Method apply_state(Node) is not implemented."
+		error = "Method apply_state() is not implemented."
 		return
 	
 	var mask: int = 1
 	var plist: Array = script.get_script_property_list()
 	var min_size: int = 2      # Assume class_hash is not disabled
+	
+#	for property in script.get_property_list():
+#		var deez = script.get_property_default_value(property.name)
+#		if deez != null:
+#			prints(property.name,deez)
+#	for property in script.get_script_property_list():
+#		var deez = script.get_property_default_value(property.name)
+#		if deez != null:
+#			prints(property.name,deez)
 	
 	for p in plist:
 		if (p.usage & PROPERTY_USAGE_SCRIPT_VARIABLE):
@@ -534,7 +549,9 @@ func _check_properties(script: Script, cname: String) -> void:
 				if (rprop):
 					# Push the replicable property into the internal container
 					replicable.push_back(rprop)
+					printerr("THIS IS THE BIG BUG")
 					default_values.push_back(script.get_property_default_value(rprop.name))
+#					prints(rprop.name,script.get_property_default_value(rprop.name))
 					# Advance the mask
 					mask *= 2
 	
