@@ -5,13 +5,10 @@ class_name ClutterBase
 # To that end, the "Custom Integrator" property must be enabled and the function
 # must be implemented. From there server state can be applied to the object. But
 # when the data arrives it's not possible to force the integration to be called
-# and it's needed to wait until the next physics update. So, this dictionary
+# and it's needed to wait until the next physics update. So, these variables
 # will hold the rigid body state. Also, when setting up the snapshot the data
-# will be taken from this dictionary
-#var _current_state: Dictionary
-
+# will be taken from these variables
 var net_has_correction: bool
-#var net_transform: Transform
 var net_position: Vector3
 var net_orientation: Basis
 var net_ang_velocity: Vector3
@@ -26,13 +23,6 @@ var _chash: int
 func _ready() -> void:
 	# Although the property has been set through the editor, ensure this fact here
 	custom_integrator = true
-	
-#	_current_state = {
-#		"transform": global_transform,
-#		"angular_velocity": Vector3(),
-#		"linear_velocity": Vector3(),
-#		"has_correction": false,
-#	}
 	
 	_uid = get_name().hash()
 	_chash = 0
@@ -60,6 +50,14 @@ func _physics_process(_dt: float) -> void:
 	net_ang_velocity = angular_velocity
 	net_lin_velocity = linear_velocity
 	
+	# Because creating a snapshot entity pulls directly from the script's variables,
+	# and the net_has_correction variable should always be set to true in a new
+	# snapshot, but the _integrate_forces() function executes in different ways
+	# depending on if there's a correction to be applied or not, net_has_correction
+	# needs to be always true before creating a new snapshot entity, but needs
+	# to be turned back off if it was that way before. this makes sure that the
+	# net_has_correction variable will be both set properly for extracting snapshot
+	# data and for the remainder of the node's logic
 	if net_has_correction:
 		network.snapshot_entity(self)
 	else:
@@ -75,11 +73,8 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 	if (net_has_correction):
 		# The _current_state is holding new data (taken from the server) so
 		# apply it into the object.
-#		state.transform.origin = net_position
-#		state.transform.basis = net_orientation
 		state.transform = Transform(Basis(net_orientation),net_position)
-#		assert(state.transform.basis == net_orientation and state.transform.origin == net_position)
-#		state.set_transform(_current_state.transform)
+		assert(state.transform.origin == net_position and state.transform.basis.is_equal_approx(Basis(net_orientation)))
 		state.set_angular_velocity(net_ang_velocity)
 		state.set_linear_velocity(net_lin_velocity)
 		
@@ -94,23 +89,9 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 	
 	# Store the state so it can be added into the snapshot
 	net_position = state.transform.origin
-	net_orientation = Quat(state.transform.basis.get_rotation_quat())
+	net_orientation = state.transform.basis.get_rotation_quat()
 	net_ang_velocity = state.get_angular_velocity()
 	net_lin_velocity = state.get_linear_velocity()
 
 func apply_state() -> void:
 	pass
-
-#func apply_state(state: Dictionary) -> void:
-#	# This is called during the replication system update, meaning that it
-#	# contains data from the server correcting the internal state. Indicate
-#	# the fact through the flag and store the correction so it can be applied
-#	# during the next physics iteration
-#	# First, must restore the orientation, that is compressed
-#	#var orient: Quat = KehUtils.restore_rquat_10bit(state.orientation)
-#	var t: Transform = Transform(Basis(state.orientation), state.position)
-#
-#	_current_state.has_correction = true
-#	_current_state.transform = t
-#	_current_state.angular_velocity = state.angular_velocity
-#	_current_state.linear_velocity = state.linear_velocity

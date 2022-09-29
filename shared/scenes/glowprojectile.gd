@@ -14,25 +14,20 @@ var _hit: bool = false
 # And if there is an impact, this indicate the location
 var _impact_position: Vector3 = Vector3()
 
-# Hold correction data so it is applied only during physics process. This should
-# avoid some jittery movement
-#var _correction_data: Dictionary
-
 # Cache the unique ID
 var _uid: int = 0
 
+# These variables hold correction data so it is applied only during physics
+# process. This should avoid some jittery movement
 var net_position: Vector3
 var net_orientation: Quat
 var net_has_correction: bool
 
 func _ready() -> void:
-#	_correction_data = {
-#		"position": Vector3(),
-#		"orientation": Quat(),
-#		"has_correction": false,
-#	}
 	
 	_uid = get_meta("uid") if has_meta("uid") else 0
+	# just in case
+	set_meta("uid",_uid)
 
 func _process(dt: float) -> void:
 	# The following will update the internal timer and force despawning of the
@@ -73,11 +68,14 @@ func _physics_process(dt: float) -> void:
 		
 		net_position = global_transform.origin
 		net_orientation = global_transform.basis.get_rotation_quat()
-		var sobj: Array = network.create_snap_entity(get_script(),_uid,0)
 		
-		net_has_correction = true
-		network.snapshot_entity(self)
-		net_has_correction = false
+		# See clutter_base.gd's _physics_process for detailed explanation
+		if net_has_correction:
+			network.snapshot_entity(self)
+		else:
+			net_has_correction = true
+			network.snapshot_entity(self)
+			net_has_correction = false
 
 
 func init(t: Transform) -> void:
@@ -86,10 +84,6 @@ func init(t: Transform) -> void:
 
 func apply_state() -> void:
 	pass
-#func apply_state(state: Dictionary) -> void:
-#	_correction_data.position = state.position
-#	_correction_data.orientation = Quantize.restore_rquat_9bits(state.orientation)
-#	_correction_data.has_correction = true
 
 
 func _simulate(dt: float) -> void:

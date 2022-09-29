@@ -348,10 +348,6 @@ func encode_delta(snap: NetSnapshot, oldsnap: NetSnapshot, into: EncDecBuffer, i
 			# Retrieve new state of this entity - it should exist as the iteration is based on the
 			# new snapshot.
 			var enew: Array = snap.get_entity(ehash, uid)
-#			var node: Node = einfo.get_game_node(uid)
-#			if node is p3dchar:
-#				prints(node,enew,node.net_position)
-#				assert(enew[5] == node.net_position)
 			
 			# Assume the entity is new
 			var cmask: int = einfo.get_full_change_mask()
@@ -555,10 +551,6 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 		for uid in snap._entity_data[ehash]:
 			var rentity: Array = snap.get_entity(ehash, uid)
 			var lentity: Array = local.get_entity(ehash, uid)
-#			for property in lentity:
-#				assert(property != null)
-#			for property in rentity:
-#				assert(property != null)
 			var node: Node = null
 			
 			if (!rentity.empty() && !lentity.empty()):

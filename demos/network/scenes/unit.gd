@@ -3,6 +3,8 @@ class_name CharUnitClass
 
 var net_owner_id: int = 1
 var net_target: Vector3
+var net_position: Vector3
+var net_orientation: Quat
 var net_selected: bool = false
 var net_color: Color = Color()
 
@@ -17,9 +19,11 @@ func _ready() -> void:
 
 
 func _physics_process(_dt: float) -> void:
+	global_transform = Transform(Basis(net_orientation),net_position)
 	if (network.has_authority()):
 		tick_movement()
-	
+	net_position = global_transform.origin
+	net_orientation = Quat(global_transform.basis)
 	network.snapshot_entity(self)
 
 func tick_movement() -> void:
@@ -68,11 +72,3 @@ func unhover() -> void:
 
 func apply_state() -> void:
 	pass
-
-#func apply_state(state: Dictionary) -> void:
-#	global_transform.origin = state.position
-#	global_transform.basis = Basis(state.orientation)
-#	net_owner_id = state.owner_id
-#	net_target = state.target
-#	net_selected = state.selected
-#	set_color(state.color)
