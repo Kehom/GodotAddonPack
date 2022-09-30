@@ -12,51 +12,42 @@ static func decompress_data(file: File, end: int) -> PoolByteArray:
 
 static func read_compressed_replay_file(filepath: String) -> Array:
 	var file := File.new()
-	print("reading compressed replay file...")
+	print("Reading compressed replay file...")
 	if file.open(filepath, File.READ) == OK:
 		return open_compressed(file)
 	else:
-		print("error reading compressed replay file!")
+		print("Error reading compressed replay file!")
 		return []
 
 static func open_compressed(file: File) -> Array:
-	print("opening compressed replay file")
-	file.seek_end()
-	var end := file.get_position()
-	assert(end == file.get_len())
-	file.seek(0)
-	print("decompressing replay file...")
-	var replay = bytes2var(decompress_data(file,end))
-	print("data successfully decompressed!")
+	print("Decompressing replay file...")
+	var replay = bytes2var(decompress_data(file,file.get_len()))
+	print("Data successfully decompressed!")
 	assert(replay is Array)
 	return replay
 
-static func get_file_name(title: String) -> String:
+static func make_file_name(title: String) -> String:
 	return str("%s %s %s.REPLAY"%[title, get_datetime_string(), OS.get_unique_id()])
 
 static func get_datetime_string() -> String:
 	return Time.get_datetime_string_from_system(false, true).replace(":", "-")
 
-static func file_path_debug(name: String) -> String:
-	return debug_save_path + name
-
-static func file_path_normal(name: String) -> String:
-	return save_path + name
+static func open_file_at_directory(file: File, file_name: String, directory: String) -> void:
+	make_dir_if_doesnt_exist(directory)
+	file.open(directory + file_name, File.WRITE)
 
 static func save_compressed(file: File, replay: Array, title: String) -> void:
 	# diverges behavior based on if the game is exported or not
 	if !OS.has_feature("standalone"):
-		make_dir_if_doesnt_exist(debug_save_path)
-		file.open(file_path_debug(get_file_name(title)), File.WRITE)
+		open_file_at_directory(file,make_file_name(title),debug_save_path)
 	else:
-		make_dir_if_doesnt_exist(save_path)
-		file.open(file_path_normal(get_file_name(title)), File.WRITE)
-	print("storing compressed replay file...")
+		open_file_at_directory(file,make_file_name(title),save_path)
+	print("Storing compressed replay file...")
 	file.store_buffer(replay_to_compressed_buffer(replay))
 	
-	print("closing compressed replay file...")
-	print(get_file_name(title))
+	prints("Closing compressed replay file",make_file_name(title),"...")
 	file.close()
+	prints("File closed.")
 
 static func make_dir_if_doesnt_exist(path: String) -> void:
 	var dir:= Directory.new()
@@ -65,5 +56,5 @@ static func make_dir_if_doesnt_exist(path: String) -> void:
 			# this is mad barebones
 			printerr("make_dir failed!")
 
-static func save(replay: Array) -> void:
-	save_compressed(File.new(),replay,"replay")
+static func save(replay: Array,name: String = "Replay") -> void:
+	save_compressed(File.new(),replay,name)

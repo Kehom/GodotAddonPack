@@ -185,7 +185,10 @@ func reset() -> void:
 	_server_state = null
 	_history.clear()
 	if !_lifetime_history.empty():
-		Replay.save(_lifetime_history)
+		if network.has_authority():
+			Replay.save(_lifetime_history,"Server Replay")
+		else:
+			Replay.save(_lifetime_history,"Client Replay")
 	# maybe just clear the buffer?
 	_lifetime_history_buffer = EncDecBuffer.new()
 	_lifetime_history.clear()
