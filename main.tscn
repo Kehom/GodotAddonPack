@@ -696,7 +696,15 @@ margin_right = -9.99994
 margin_bottom = -20.0
 text = "Interdependency: Network addon, EncDecBuffer
 
-DESCRIPTION GOES HERE"
+This demo provides a way to view replays of gameplay recorded in the 'mega' demo. If enabled, whenever a player manually disconnects from the mega demo, a .REPLAY file is saved to the specified file location. The demo itself is a dedicated replay viewing client, with traditional multimedia controls:
+
+- Pausing and playing				| SPACEBAR
+- Skip forward/back					| CTRL + RIGHT/LEFT ARROW KEYS
+- Adjust playback speed			| UP/DOWN ARROW KEYS
+- Adjustable timeline playhead	| RIGHT/LEFT ARROW KEYS
+- Restarting/skipping to end		| CTRL + SHIFT + RIGHT/LEFT ARROW KEYS
+
+F4 returns to the main menu."
 autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
