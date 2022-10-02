@@ -33,6 +33,7 @@ func _ready() -> void:
 	set_tab_button("bt_megademo", "megademo")
 	set_tab_button("bt_dbghelper", "dbghelper")
 	set_tab_button("bt_audiomaster", "audiomaster")
+	set_tab_button("bt_replaydemo","replaydemo")
 	
 	# Connect the networking signals. Those are necessary in order to transition
 	# into the game scene only on success and give the chance to show a message
@@ -186,11 +187,10 @@ func _on_bt_dbgload_pressed() -> void:
 func _on_bt_amasterload_pressed():
 	open_scene("res://demos/audiomaster/amaster.tscn")
 
+### Replay demo
+func _on_bt_replaydemo_pressed() -> void:
+	open_scene("res://demos/replaydemo/Replay Viewer.tscn")
+
 
 func _on_bt_quit_pressed() -> void:
 	get_tree().quit()
-
-
-
-
-
