@@ -185,6 +185,7 @@ func reset() -> void:
 	_ssig_to_snap.clear()
 	_isig_to_snap.clear()
 
+
 func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> SnapEntityBase:
 	var ret: SnapEntityBase = null
 	
@@ -581,6 +582,7 @@ func _add_to_history(snap: NetSnapshot) -> void:
 	_history.push_back(snap)
 	_ssig_to_snap[snap.signature] = snap
 	_isig_to_snap[snap.input_sig] = snap
+
 
 func _check_history_size(max_size: int, has_authority: bool) -> void:
 	var popped: int = 0
