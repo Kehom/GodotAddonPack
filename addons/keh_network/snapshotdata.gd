@@ -40,8 +40,6 @@ var _entity_name: Dictionary = {}
 
 # Holds the history of snapshots
 var _history: Array = []
-var _lifetime_history: Array = []
-var _lifetime_history_buffer := EncDecBuffer.new()
 
 # These two dictionaries are used to perform easier queries to locate specific
 # snapshots. The first one is from snapshot signature into snapshot and the
@@ -184,39 +182,8 @@ func reset() -> void:
 	
 	_server_state = null
 	_history.clear()
-	if !_lifetime_history.empty():
-		if network.has_authority():
-			Replay.save(_lifetime_history,"Server Replay")
-		else:
-			Replay.save(_lifetime_history,"Client Replay")
-	# maybe just clear the buffer?
-	_lifetime_history_buffer = EncDecBuffer.new()
-	_lifetime_history.clear()
 	_ssig_to_snap.clear()
 	_isig_to_snap.clear()
-
-# this might be OD trash for memory... maybe set up streaming func?
-func _convert_replay_to_snapshots(replay: Array) -> Array:
-	for idx in replay.size():
-		_lifetime_history_buffer.buffer = replay[idx]
-		# Maybe make this dependent on if _lifetime_history is empty or not instead?
-		if idx == 0:
-			replay[idx] = decode_full(_lifetime_history_buffer)
-		else:
-			replay[idx] = decode_delta(_lifetime_history_buffer)
-	_lifetime_history_buffer.buffer = PoolByteArray()
-	return replay
-
-# this might be OD trash for memory... maybe set up streaming func?
-func convert_replay_to_lifetime_history(replay: Array) -> void:
-	for idx in replay.size():
-		_lifetime_history_buffer.buffer = replay[idx]
-		# Maybe make this dependent on if _lifetime_history is empty or not instead?
-		if idx == 0:
-			_lifetime_history.push_back(decode_full(_lifetime_history_buffer))
-		else:
-			_lifetime_history.push_back(decode_delta(_lifetime_history_buffer))
-	_lifetime_history_buffer.buffer = PoolByteArray()
 
 func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> SnapEntityBase:
 	var ret: SnapEntityBase = null
@@ -614,18 +581,6 @@ func _add_to_history(snap: NetSnapshot) -> void:
 	_history.push_back(snap)
 	_ssig_to_snap[snap.signature] = snap
 	_isig_to_snap[snap.input_sig] = snap
-	# Only save full history if the client is a server. Not so sure about this.
-#	if network.has_authority():
-	_add_to_lifetime_history(snap)
-
-func _add_to_lifetime_history(snap: NetSnapshot) -> void:
-	# Maybe make this dependent on if _lifetime_history is empty or not instead?
-	if snap.signature == 0:
-		encode_full(snap,_lifetime_history_buffer,snap.input_sig)
-	else:
-		encode_delta(snap,_history[-1],_lifetime_history_buffer,snap.input_sig)
-	_lifetime_history.push_back(_lifetime_history_buffer.buffer)
-	_lifetime_history_buffer.buffer = PoolByteArray()
 
 func _check_history_size(max_size: int, has_authority: bool) -> void:
 	var popped: int = 0

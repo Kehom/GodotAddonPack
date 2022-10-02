@@ -217,7 +217,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "Replay",
 "language": "GDScript",
-"path": "res://addons/keh_network/replay.gd"
+"path": "res://addons/exploding_replays/replay.gd"
 }, {
 "base": "Control",
 "class": "SFXHelper",
