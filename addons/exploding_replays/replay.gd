@@ -27,23 +27,34 @@ var _history: Array
 var _tickrate: int
 var _full_snapshot_tickrate: int
 var edec: EncDecBuffer = get_net_edec()
+var _scene_path: String
 
-func _init(tickrate: int,full_snapshot_tickrate: int) -> void:
-	setup(tickrate,full_snapshot_tickrate)
+func _init(tickrate: int,full_snapshot_tickrate: int,scene_path: String) -> void:
+	setup(tickrate,full_snapshot_tickrate, scene_path)
 
-func setup(tickrate: int,full_snapshot_tickrate: int) -> void:
+func setup(tickrate: int,full_snapshot_tickrate: int, scene_path: String) -> void:
 	_tickrate = tickrate
 	_full_snapshot_tickrate = full_snapshot_tickrate
+	_scene_path = scene_path
 
 func add_snapshot(snapshot: NetSnapshot) -> void:
 	_history.append(snapshot)
+
+func is_full_snapshot(snapshot: NetSnapshot) -> bool:
+	return snapshot.signature%_full_snapshot_tickrate == 0
+
+func get_snapshot_is_full(idx: int) -> bool:
+	return is_full_snapshot(get_snapshot(idx))
+
+func get_snapshot(idx: int) -> NetSnapshot:
+	return _history[idx]
 
 func encode_snapshot(snapshot: NetSnapshot) -> PoolByteArray:
 	# There is no practical reason to cache this as a local variable.
 	# This is simply here to make some of the lower lines of code shorter.
 	var sd: NetSnapshotData = network.snapshot_data
 	edec.buffer = PoolByteArray()
-	if snapshot.signature == 0:
+	if is_full_snapshot(snapshot):
 		sd.encode_full(snapshot,edec,snapshot.input_sig)
 	else:
 		sd.encode_delta(snapshot,sd._history[-1],edec,snapshot.input_sig)
@@ -75,6 +86,7 @@ func save_and_reset(name: String, directory: String) -> void:
 	save(name,directory)
 	reset()
 
+# Maybe rename to denote that it's related to files
 func load_replay(filepath: String) -> void:
 	deserialize(read_compressed_replay_file(filepath))
 	# Could totally just be this instead:
@@ -87,8 +99,11 @@ func load_replay(filepath: String) -> void:
 func deserialize(serialized: Array) -> void:
 	assert_enumerated_array_correct(serialized)
 	assert(_history.empty())
-	setup(serialized[TICKRATE],serialized[FULL_SNAPSHOT_TICKRATE])
-	for s_snap in serialized[HISTORY]:
+	setup(serialized[TICKRATE],serialized[FULL_SNAPSHOT_TICKRATE],serialized[SCENE_PATH])
+	deserialize_history(serialized[HISTORY])
+
+func deserialize_history(serialized_history: Array) -> void:
+	for s_snap in serialized_history:
 		assert(s_snap is PoolByteArray)
 		edec.buffer = s_snap
 		if _history.empty():
@@ -96,6 +111,17 @@ func deserialize(serialized: Array) -> void:
 		else:
 			_history.append(network.snapshot_data.decode_delta(edec))
 
+func get_current_time_unix(idx: int) -> int:
+	return idx/_tickrate
+
+func get_current_time_as_string(idx: int) -> String:
+	return Time.get_time_string_from_unix_time(get_current_time_unix(idx))
+
+func get_total_time_unix() -> int:
+	return (_history.size()-1)/_tickrate
+
+func get_total_time_as_string() -> String:
+	return Time.get_time_string_from_unix_time(get_total_time_unix())
 
 
 
@@ -108,6 +134,19 @@ static func get_net_buffer() -> PoolByteArray:
 	return network._update_control.edec.buffer
 
 const default_save_path: String = "user://replays/"
+# over-engineering stuff for fun
+const explodingreplays = "exploding_addons/replays/"
+const recsetting = "record_replays"
+const capratesetting = "capture_rate"
+const fullratesetting = "full_snapshot_capture_rate"
+const defaultdiresetting = "default_replay_directory"
+
+static func get_default_directory() -> String:
+	if ProjectSettings.has_setting(explodingreplays+defaultdiresetting):
+		return ProjectSettings.get_setting(explodingreplays+defaultdiresetting)
+	else:
+		return default_save_path
+	
 
 static func convert_to_snapshots(replay: Array, buffer: EncDecBuffer) -> Array:
 	assert_enumerated_array_correct(replay)
@@ -115,16 +154,16 @@ static func convert_to_snapshots(replay: Array, buffer: EncDecBuffer) -> Array:
 	for idx in history.size():
 		assert(history[idx] is PoolByteArray)
 		buffer.buffer = history[idx]
-		if idx == 0:
+		if idx%replay[FULL_SNAPSHOT_TICKRATE] == 0:
 			history[idx] = network.snapshot_data.decode_full(buffer)
 		else:
 			history[idx] = network.snapshot_data.decode_delta(buffer)
 	# doesn't need to return necessarily, this func operates over the actual array itself
 	return replay
 
-enum {TICKRATE,FULL_SNAPSHOT_TICKRATE,HISTORY,REPLAY_MAX}
+enum {TICKRATE,FULL_SNAPSHOT_TICKRATE,SCENE_PATH,HISTORY,REPLAY_MAX}
 static func to_enumerated_array(replay: Replay) -> Array:
-	return [replay._tickrate,replay._full_snapshot_tickrate,replay._history]
+	return [replay._tickrate,replay._full_snapshot_tickrate,replay._scene_path,replay._history]
 
 static func assert_enumerated_array_correct(array: Array) -> void:
 	assert(array.size() == REPLAY_MAX)

@@ -4,28 +4,36 @@ var is_playing: bool
 var tenseconds: int
 var last_snap: NetSnapshot
 var replay: Replay
+var gameworld: Spatial
 onready var c: RichTextLabel = $Panel/C
 onready var files: FileDialog = $FileDialog
 onready var replayinfo: Label = $"Replay Info"
 onready var replaychanger: Button = $newreplay
-onready var timeline: HScrollBar = $VBoxContainer/Timeline
+onready var timeline: HSlider = $VBoxContainer/Timeline
 onready var playbackspeed: SpinBox = $TimeScale
 onready var viewport: Viewport = $CenterContainer/ViewportContainer/Viewport
 onready var timereadout: Label = $TimecodeInfo/TimeReadout/Readout
+onready var maxtime: Label = $TimecodeInfo/TimeReadout/Max
 onready var tickreadout: Label = $TimecodeInfo/FrameReadout/Readout
+onready var maxticks: Label = $TimecodeInfo/FrameReadout/Max
 onready var fpsreadout: Label = $FPS/Readout
-onready var playpauseicon: Button = $VBoxContainer/MediaControls/PauseAndPlayMediaControls/PauseAndPlay
+onready var playpause: Button = $VBoxContainer/MediaControls/PauseAndPlay
+onready var tickrate: Label = $ReplayInfo/Tickrate/Readout
+onready var fullrate: Label = $ReplayInfo/FullSnapshotRate/Readout
 
 var playicon: Texture = preload("res://addons/keh_gddb/editor/btplay_16x16.png")
 var pauseicon: Texture = preload("res://addons/keh_gddb/editor/btpause_16x16.png")
 
 func assign_icon() -> void:
-	playpauseicon.set_button_icon(get_icon_from_is_playing())
+	playpause.set_button_icon(get_icon_from_is_playing())
 
 func get_icon_from_is_playing() -> Texture:
 	return playicon if is_playing else pauseicon
 
+const defaultreplayfolder: String = "user://replays"
 func _ready() -> void:
+	Replay.make_dir_if_doesnt_exist(defaultreplayfolder)
+	files.set_current_dir(defaultreplayfolder)
 	files.call_deferred("invalidate")
 	change_replay()
 
@@ -77,11 +85,7 @@ func _input(event: InputEvent) -> void:
 					OS.vsync_enabled = !OS.vsync_enabled
 				
 				KEY_F4:
-					# Restore mouse visibility
-					Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-					# Go back to the main menu
-					# warning-ignore:return_value_discarded
-					get_tree().change_scene("res://main.tscn")
+					goto_main_menu()
 				
 				KEY_F10:
 					OverlayDebugInfo.toggle_visibility()
@@ -97,39 +101,77 @@ func _input(event: InputEvent) -> void:
 						# It's captured, so show it
 						Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
-#static func get_time_from_ticknum(ticknum: int, tickrate: int) -> String:
-#	return History.get_replay_length_from_tick_count(ticknum, tickrate)
-
-func tick_feed(value: int) -> void:
-	pass
-
 func simulate_up_to_current_snapshot(this_snap: NetSnapshot) -> void:
-	pass
+	var remainder: int = this_snap.signature%replay._tickrate+1
+	var last_full_snap_idx: int = this_snap.signature
+	for i in remainder:
+		assert(last_snap.signature + i != this_snap.signature)
+		update_entities(replay.get_snapshot(last_full_snap_idx+i))
 
 func change_replay() -> void:
 	files.show()
 	# setup subwindow size (godot 4 quack func)
 
 func clear_replay() -> void:
-	pass
+	pause_if_playing()
+	if gameworld:
+		gameworld.queue_free()
+		gameworld = null
+	last_snap = null
 
-func read_replay() -> void:
-	pass
+# Maybe rename to denote that it's related to files
+static func load_new_replay(filepath: String) -> Replay:
+	var serialized: Array = Replay.read_compressed_replay_file(filepath)
+	Replay.assert_enumerated_array_correct(serialized)
+	var ret = Replay.new(serialized[Replay.TICKRATE],serialized[Replay.FULL_SNAPSHOT_TICKRATE],serialized[Replay.SCENE_PATH])
+	ret.deserialize_history(serialized[Replay.HISTORY])
+	return ret
+
+func read_replay(filepath: String) -> void:
+	clear_replay()
+	if replay:
+		replay = load_new_replay(filepath)
+	else:
+		replay.load_replay(filepath)
+	change_playback_speed(playbackspeed.value)
+	setup_timeline()
+	tenseconds = replay._tickratre * 10
+	setup_game_scene()
+
+func setup_game_scene() -> void:
+	var scene: Resource = load(replay._scene_path)
+	assert(scene is PackedScene)
+	gameworld = scene.instance()
+	assert(gameworld is Spatial)
+	viewport.add_child(gameworld)
+	call_deferred("set_physics_process_recursive",gameworld,false)
 
 func setup_timeline() -> void:
-	pass
+	timeline.set_min(0)
+	timeline.set_max(replay._history.size()-1)
 
-func on_timeline_ticked(value: String) -> void:
-	pass
+func on_timeline_ticked(value: int) -> void:
+	var snapshot: NetSnapshot = replay.get_snapshot(value)
+	if !replay.is_full_snapshot(snapshot) and (!last_snap or last_snap.signature != snapshot.signature - 1):
+		simulate_up_to_current_snapshot(snapshot)
+	update_entities(snapshot)
+	last_snap = snapshot
+	timereadout.set_text(replay.get_current_time_as_string(value))
+	tickreadout.set_text(str(value))
+
+func update_entities(snapshot: NetSnapshot) -> void:
+	var entity_data: Dictionary = snapshot._entity_data
+	for entity_type in entity_data.values():
+		assert(entity_type is Dictionary)
+		for entity in entity_type.values():
+			assert(entity is SnapEntityBase)
+			entity.apply_state(network.snapshot_data._get_entity_info(entity.get_script()).get_game_node(entity.id))
 
 func set_replay_info() -> void:
-	pass
-#	replayinfo.set_text("tickrate: %s | SS tickrate: %s | size: %s | length %s\nmap: %s | mode: %s"%[replay.tickrate,
-#																				replay.snapshot_tickrate,
-#																				replay.history.size(),
-#																				get_time_from_ticknum(replay.history.size(),replay.tickrate),
-#																				Map.map_name_from_path(replay.map_file_path),
-#																				Gamemodes.get_gamemode_name(replay.gamemode)])
+	tickrate.set_text(str(replay._tickrate))
+	fullrate.set_text(str(replay._full_snapshot_tickrate))
+	maxtime.set_text(replay.get_total_time_as_string())
+	maxticks.set_text(str(replay._history.size()-1))
 
 func restart() -> void:
 	timeline.set_value(0)
@@ -153,20 +195,29 @@ func go_to_end() -> void:
 	pause_if_playing()
 
 func pause_unpause() -> void:
-	is_playing = !is_playing
-	assign_icon()
+	if replay:
+		pause_or_unpause(!is_playing)
 
 func play() -> void:
-	is_playing = true
-	assign_icon()
+	pause_or_unpause(true)
 
 func pause() -> void:
-	is_playing = false
-	assign_icon()
+	pause_or_unpause(false)
 
 func on_left_pressed() -> void:
 	go_back_1()
 	pause_if_playing()
+
+func pause_or_unpause(playing: bool) -> void:
+	is_playing = playing
+	apply_pause_unpaused_differences()
+
+func apply_pause_unpaused_differences() -> void:
+#	apply_physics_processing_if_playing()
+	assign_icon()
+
+func apply_physics_processing_if_playing() -> void:
+	set_physics_process_recursive(gameworld,is_playing)
 
 func get_playback_speed() -> int:
 	return int(replay.tickrate * playbackspeed.get_value())
@@ -176,46 +227,31 @@ func on_right_pressed() -> void:
 	pause_if_playing()
 
 func change_playback_speed(value: float) -> void:
-	pass
-#	Quack.set_tickrate(replay.tickrate * value)
+	Engine.set_iterations_per_second(replay._tickrate * value)
 
 func goto_main_menu() -> void:
-	pass
-#	Quack.change_scene("res://Interface/Menus/Main Menu.tscn")
+	# Restore mouse visibility
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	# Go back to the main menu
+	# warning-ignore:return_value_discarded
+	get_tree().change_scene("res://main.tscn")
 
 func go_forward() -> void:
 	move_by_amnt(tenseconds)
 
 func go_back() -> void:
 	move_by_amnt(-tenseconds)
-	
-	
-func clear_gameplay_if_loaded() -> void:
-	pass
-#	if map_is_loaded():
-#			Network.get_entities().clear()
-#			Network.clear_map()
-
-func map_is_loaded() -> bool:
-	pass
-	return Network.map != null
-
-func setup_map() -> void:
-	pass
-#	Network.map = load(replay.map_file_path).instantiate()
-#	viewport.add_child(Network.map)
-#	Network.setup_entity_groups()
-#	last_tick = []
-
-
-func on_tree_exiting() -> void:
-	pass
-#	clear_gameplay_if_loaded()
 
 func on_timeline_scrolled() -> void:
 	pass
 	pause_if_playing()
 
-
-func Pause() -> void:
-	pass # Replace with function body.
+static func set_physics_process_recursive(node: Node, enabled: bool) -> void:
+	if !node.get_script():
+		if enabled == false:
+			assert(!node.is_physics_processing())
+	else:
+		node.set_physics_process(enabled)
+		if node.get_child_count() > 0:
+			for child in node.get_children():
+				set_physics_process_recursive(child,enabled)

@@ -46,6 +46,7 @@ var _ui_player: Dictionary = {}
 # then this property will be changed.
 var _disconnected_message: String
 
+var _replay: Replay
 
 
 func _ready() -> void:
@@ -78,8 +79,24 @@ func _ready() -> void:
 	# this way
 	if (!network.has_authority()):
 		network.notify_ready()
-
-
+	var record_replays: bool
+	var replay_capture_rate: int
+	var replay_full_capture_rate: int
+	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.recsetting):
+		record_replays = ProjectSettings.get_setting(Replay.recsetting)
+	else:
+		return
+	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.capratesetting):
+		replay_capture_rate = ProjectSettings.get_setting(Replay.capratesetting)
+	else:
+		record_replays = false
+		return
+	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.fullratesetting):
+		replay_full_capture_rate = ProjectSettings.get_setting(Replay.fullratesetting)
+	else:
+		record_replays = false
+		return
+	_replay = Replay.new(replay_capture_rate,replay_full_capture_rate,"res://demos/mega/megamain.tscn")
 
 func _exit_tree() -> void:
 	# Hide the OverlayDebugInfo
@@ -121,6 +138,8 @@ func _physics_process(_dt: float) -> void:
 		# Then each of the connected players - in this case, clients
 		for pid in network.player_data.remote_player:
 			create_player_character(network.player_data.remote_player[pid])
+	if _replay:
+		_replay.add_snapshot(network.snapshot_data._history[-1])
 	
 	# Owned custom property and own network ID
 	var owned_cprop: float = network.player_data.local_player.get_custom_property("testing_broadcast")
@@ -147,6 +166,8 @@ func _input(evt: InputEvent) -> void:
 					Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 					# Go back to the main menu
 					# warning-ignore:return_value_discarded
+					if _replay:
+						_replay.save(Replay.default_file("Replay"),Replay.get_default_directory())
 					get_tree().change_scene("res://main.tscn")
 				
 				KEY_F10:

@@ -189,7 +189,7 @@ func _on_bt_amasterload_pressed():
 
 ### Replay demo
 func _on_bt_replaydemo_pressed() -> void:
-	open_scene("res://demos/replaydemo/replayviewer.tscn")
+	open_scene("res://demos/replays/replayviewer.tscn")
 
 
 func _on_bt_quit_pressed() -> void:
