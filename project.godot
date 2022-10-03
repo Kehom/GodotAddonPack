@@ -385,6 +385,8 @@ enabled=PoolStringArray( "res://addons/exploding_replays/plugin.cfg", "res://add
 [exploding_addons]
 
 replays/record_replays=true
+replays/capture_rate=60
+replays/full_snapshot_capture_rate=60
 
 [global]
 

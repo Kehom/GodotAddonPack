@@ -93,6 +93,7 @@ __meta__ = {
 margin_top = 10.0
 margin_right = 768.0
 margin_bottom = 22.0
+max_value = 0.0
 rounded = true
 
 [node name="MediaControls" type="HBoxContainer" parent="VBoxContainer"]
@@ -358,7 +359,7 @@ margin_top = 96.0
 margin_right = 728.0
 margin_bottom = 488.0
 popup_exclusive = true
-window_title = "Select Replay"
+window_title = "Open a File"
 resizable = true
 mode = 0
 access = 2

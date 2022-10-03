@@ -9,7 +9,7 @@ onready var c: RichTextLabel = $Panel/C
 onready var files: FileDialog = $FileDialog
 onready var replayinfo: Label = $"Replay Info"
 onready var replaychanger: Button = $newreplay
-onready var timeline: HSlider = $VBoxContainer/Timeline
+onready var timeline: HScrollBar = $VBoxContainer/Timeline
 onready var playbackspeed: SpinBox = $TimeScale
 onready var viewport: Viewport = $CenterContainer/ViewportContainer/Viewport
 onready var timereadout: Label = $TimecodeInfo/TimeReadout/Readout
@@ -130,9 +130,9 @@ static func load_new_replay(filepath: String) -> Replay:
 func read_replay(filepath: String) -> void:
 	clear_replay()
 	if replay:
-		replay = load_new_replay(filepath)
-	else:
 		replay.load_replay(filepath)
+	else:
+		replay = load_new_replay(filepath)
 	change_playback_speed(playbackspeed.value)
 	setup_timeline()
 	tenseconds = replay._tickratre * 10
