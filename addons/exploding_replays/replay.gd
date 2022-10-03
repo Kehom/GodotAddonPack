@@ -36,19 +36,18 @@ func setup(tickrate: int,full_snapshot_tickrate: int) -> void:
 	_full_snapshot_tickrate = full_snapshot_tickrate
 
 func add_snapshot(snapshot: NetSnapshot) -> void:
+	_history.append(snapshot)
+
+func encode_snapshot(snapshot: NetSnapshot) -> PoolByteArray:
 	# There is no practical reason to cache this as a local variable.
 	# This is simply here to make some of the lower lines of code shorter.
 	var sd: NetSnapshotData = network.snapshot_data
+	edec.buffer = PoolByteArray()
 	if snapshot.signature == 0:
 		sd.encode_full(snapshot,edec,snapshot.input_sig)
 	else:
 		sd.encode_delta(snapshot,sd._history[-1],edec,snapshot.input_sig)
-	add_buffer()
-
-# Only for use when it is safe to assume that the buffer is full with proper
-# snapshot info
-func add_buffer() -> void:
-	_history.append(edec.buffer)
+	return edec.buffer
 
 func reset() -> void:
 	_history.clear()
@@ -59,14 +58,21 @@ func reset() -> void:
 #	tickrate = 0
 #	full_snapshot_tickrate = 0
 
-func save_self(name: String, directory: String) -> void:
+func save(name: String, directory: String) -> void:
 	if !_history.empty():
-		save(self,name,directory)
+		var newarray: Array
+		var temp: Array = _history
+		newarray.resize(_history.size())
+		for i in newarray.size():
+			newarray[i] = encode_snapshot(_history[i])
+		_history = newarray
+		save_compressed(File.new(),self,name,directory)
+		_history = temp
 	else:
 		print("Attempted to save Replay %s at %s but couldn't. Replay history is empty!"%[name,directory])
 
 func save_and_reset(name: String, directory: String) -> void:
-	save_self(name,directory)
+	save(name,directory)
 	reset()
 
 func load_replay(filepath: String) -> void:
@@ -160,11 +166,7 @@ static func open_file_at_directory(file: File, file_name: String, directory: Str
 	file.open(directory + file_name, File.WRITE)
 
 static func save_compressed(file: File, replay: Replay, title: String, directory: String) -> void:
-	# diverges behavior based on if the game is exported or not
-	if !OS.has_feature("standalone"):
-		open_file_at_directory(file,as_replay_file(title),directory)
-	else:
-		open_file_at_directory(file,as_replay_file(title),directory)
+	open_file_at_directory(file,as_replay_file(title),directory)
 	print("Storing compressed replay file...")
 	file.store_buffer(replay_to_compressed_buffer(replay))
 	
@@ -178,6 +180,3 @@ static func make_dir_if_doesnt_exist(path: String) -> void:
 		if dir.make_dir(path) != OK:
 			# this is mad barebones
 			printerr("make_dir failed!")
-
-static func save(replay: Replay,name: String, path: String) -> void:
-	save_compressed(File.new(),replay,name,path)

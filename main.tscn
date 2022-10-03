@@ -593,7 +593,7 @@ margin_top = 46.0
 margin_right = -9.99994
 margin_bottom = -20.0
 text = "Interdependency: none
-This addon is meant to provide a few  scripts to help the debugging process.
+This addon is meant to provide a few scripts to help the debugging process.
 
 Brief feature overview:
 - overlayinfo.gd: Quickly add text labels on screen without the need to create temporary UI controls all over the place. It also allows timed labels to be shown for the specified amount of seconds. Labels are added/removed into/from a container box that expands/shrinks according to the contents.
@@ -695,6 +695,7 @@ margin_top = 46.0
 margin_right = -9.99994
 margin_bottom = -20.0
 text = "Interdependency: Network addon, EncDecBuffer
+This addon is meant to provide an easy way of recording and viewing gameplay at a later time for users of the Network addon.
 
 This demo provides a way to view replays of gameplay recorded in the 'mega' demo. If enabled, whenever a player manually disconnects from the mega demo, a .REPLAY file is saved to the specified file location. The demo itself is a dedicated replay viewing client, with traditional multimedia controls:
 
