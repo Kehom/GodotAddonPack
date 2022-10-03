@@ -382,6 +382,10 @@ gdscript/warnings/unused_class_variable=true
 
 enabled=PoolStringArray( "res://addons/exploding_replays/plugin.cfg", "res://addons/keh_audiomaster/plugin.cfg", "res://addons/keh_dataasset/plugin.cfg", "res://addons/keh_dbghelper/plugin.cfg", "res://addons/keh_gddb/plugin.cfg", "res://addons/keh_network/plugin.cfg", "res://addons/keh_smooth/plugin.cfg", "res://addons/keh_ui/plugin.cfg" )
 
+[exploding_addons]
+
+replays/record_replays=true
+
 [global]
 
 warning=true

@@ -70,13 +70,17 @@ func reset() -> void:
 #	full_snapshot_tickrate = 0
 
 func save(name: String, directory: String) -> void:
+	print("Attempting to save replay...")
 	if !_history.empty():
+		print("Generating serialized history...")
 		var newarray: Array
 		var temp: Array = _history
 		newarray.resize(_history.size())
 		for i in newarray.size():
 			newarray[i] = encode_snapshot(_history[i])
+		print("Serialized history encoded and stored.")
 		_history = newarray
+		print("Attempting to write replay to disk...")
 		save_compressed(File.new(),self,name,directory)
 		_history = temp
 	else:

@@ -83,22 +83,31 @@ func _ready() -> void:
 	var replay_capture_rate: int
 	var replay_full_capture_rate: int
 	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.recsetting):
-		record_replays = ProjectSettings.get_setting(Replay.recsetting)
+		record_replays = ProjectSettings.get_setting(Replay.explodingreplays + Replay.recsetting)
 	else:
+		printsettingmsg(Replay.recsetting)
 		return
 	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.capratesetting):
-		replay_capture_rate = ProjectSettings.get_setting(Replay.capratesetting)
+		replay_capture_rate = ProjectSettings.get_setting(Replay.explodingreplays + Replay.capratesetting)
 	else:
+		printsettingmsg(Replay.capratesetting)
 		record_replays = false
 		return
 	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.fullratesetting):
-		replay_full_capture_rate = ProjectSettings.get_setting(Replay.fullratesetting)
+		replay_full_capture_rate = ProjectSettings.get_setting(Replay.explodingreplays + Replay.fullratesetting)
 	else:
+		printsettingmsg(Replay.fullratesetting)
 		record_replays = false
 		return
+	print("Recording replay of this session.")
 	_replay = Replay.new(replay_capture_rate,replay_full_capture_rate,"res://demos/mega/megamain.tscn")
 
+static func printsettingmsg(msg: String) -> void:
+	print('Cannot record replay! Cannot access %s setting'%[msg])
+
 func _exit_tree() -> void:
+	if _replay:
+		_replay.save(Replay.default_file("Replay"),Replay.get_default_directory())
 	# Hide the OverlayDebugInfo
 	OverlayDebugInfo.set_visibility(false)
 	
@@ -166,8 +175,6 @@ func _input(evt: InputEvent) -> void:
 					Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 					# Go back to the main menu
 					# warning-ignore:return_value_discarded
-					if _replay:
-						_replay.save(Replay.default_file("Replay"),Replay.get_default_directory())
 					get_tree().change_scene("res://main.tscn")
 				
 				KEY_F10:
