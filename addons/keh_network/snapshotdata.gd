@@ -622,14 +622,7 @@ func _update_prediction_count(delta: int) -> void:
 
 #######################################################################################################################
 ### Overrides
-
-
-
-
 func _init() -> void:
 	register_entity_types()
-
-
-
 
 

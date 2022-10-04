@@ -94,6 +94,11 @@ signal chat_message_received(msg, sender)
 # property name and the new value.
 signal custom_property_changed(pid, pname, value)
 
+# This will be emitted when a new snapshot is available. The argument is the snapshot itself and will always be the
+# most recent in the authority machine. So, if this is running as server (or single player) the it will be the local
+# snapshot. If this is client then it will be the most recent received snapshot. This provides means for any other
+# system to use the snapshots like a save or even a replay system. Another possible use is for debugging purposes.
+signal snapshot_generated(snap)
 
 #######################################################################################################################
 ### "Public" properties
@@ -772,6 +777,8 @@ func _on_snapshot_finished(snap: NetSnapshot) -> void:
 		# Clients don't have anything else to do here, so bail
 		return
 	
+	# If here, this is authority. So just emit the signal
+	emit_signal("snapshot_generated", snap)
 	
 	# Iterate through remote players and update as required
 	for pid in player_data.remote_player:
@@ -869,6 +876,8 @@ remote func _client_receive_full_snapshot(encoded: PoolByteArray) -> void:
 	var decoded: NetSnapshot = snapshot_data.decode_full(_update_control.edec)
 	if (decoded):
 		_handle_snapshot(decoded)
+		
+		emit_signal("snapshot_generated", decoded)
 
 
 remote func _client_receive_delta_snapshot(encoded: PoolByteArray) -> void:
@@ -880,6 +889,8 @@ remote func _client_receive_delta_snapshot(encoded: PoolByteArray) -> void:
 	var decoded: NetSnapshot = snapshot_data.decode_delta(_update_control.edec)
 	if (decoded):
 		_handle_snapshot(decoded)
+		
+		emit_signal("snapshot_generated", decoded)
 
 
 # This will be (internally) called whenever the physics update ends and should be
