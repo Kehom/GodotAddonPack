@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,216 @@
 extends Node
 class_name NetPlayerNode
 
+
+#######################################################################################################################
+### Signals and definitions
+
+
+#######################################################################################################################
+### "Public" properties
 var net_id: int = 1 setget set_network_id
 
+# "Signaler" for new ping values
+var ping_signaler: FuncRef
+
+# "Signaler" for custom property changes
+var custom_prop_signaler: FuncRef
+
+# The FuncRef pointing to the function that will request the server to actually
+# broadcast the specified custom property
+var custom_prop_broadcast_requester: FuncRef
+
+#######################################################################################################################
+### "Public" functions
+func reset_data() -> void:
+	_input_cache.sbuffer = {}
+	_input_cache.cbuffer = []
+	_input_cache.last_sig = 0
+	_input_cache.snapinpu = {}
+	_input_cache.no_input_count = 0
+	_input_cache.last_ack_snap = 0
+
+
+# The server uses this to know if the client is ready to receive snapshot data.
+func is_ready() -> bool:
+	return _is_ready
+
+
+# Obtain input data. If running on the local machine the state will be polled.
+# If on a client (still local machine) then the data will be sent to the server.
+# If on server (but not local) the data will be retrieved from the cache/buffer.
+func get_input(snap_sig: int) -> InputData:
+	# This will be used for a few tests within this function
+	var is_authority: bool = !get_tree().has_network_peer() || get_tree().is_network_server()
+	
+	# This function should be called only by the authority or local machine
+	assert(_is_local || is_authority)
+
+	var retval: InputData
+	if (_is_local):
+		retval = _poll_input()
+		
+		if (!is_authority):
+			# Local machine but on a client. This means, input data must be sent to the server
+			# First, cache the new input object
+			_input_cache.cbuffer.push_back(retval)
+			
+			# Input will be sent to the server when the snapshot is finished just so it give a
+			# chance for custom input to be correctly set before dispatching
+	
+	else:
+		# In theory if here it's authority machine as the assert above should
+		# break if not local machine and not on authority. Asserts are removed
+		# from release builds and that assert in this function is mostly to *try*
+		# to catch errors early. Anyway, checking here again just to make sure
+		if (!is_authority):
+			return null
+		
+		# Running on the server but for a client. Must retrieve the data from
+		# the input cache
+		if (_input_cache.sbuffer.size() > 0):
+			retval = _input_cache.sbuffer.get(_input_cache.last_sig + 1)
+			if (retval):
+				# There is a valid input object in the cache, so update the last
+				# used signature
+				_input_cache.last_sig += 1
+				# The object that will be used is not needed within the cache anymore
+				# so remove it
+				# warning-ignore:return_value_discarded
+				_input_cache.sbuffer.erase(_input_cache.last_sig)
+		
+		if (!retval):
+			retval = _input_info.make_empty()
+		
+		# Later, given the snapshot obtain the input signature from the snapinpu dictionary
+		_input_cache.associate(snap_sig, retval.signature)
+	
+	return retval
+
+
+# This should already be the correct player within the hierarchy node.
+remote func server_receive_input(encoded: PoolByteArray) -> void:
+	assert(get_tree().is_network_server())
+	
+	_edec_input.buffer = encoded
+	# Decode the amount of input objects
+	var count: int = _edec_input.read_ushort()
+	
+	# Decode each one of the objects
+	for _i in count:
+		var input: InputData = _input_info.decode_from(_edec_input)
+		
+		# Cache this if it's newer than the last input signature
+		if (input.signature > _input_cache.last_sig):
+			_input_cache.sbuffer[input.signature] = input
+
+
+# Retrieve the signature of the last input data used on this machine
+func get_last_input_signature() -> int:
+	return _input_cache.last_sig
+
+
+# Given the snapshot signature, return the input signature that was used. This will
+# be "valid" only on servers on a node corresponding to a client
+func get_used_input_in_snap(sig: int) -> int:
+	assert(get_tree().has_network_peer() && get_tree().is_network_server())
+	
+	var ret: int = _input_cache.snapinpu.get(sig, 0)
+	
+	return ret
+
+
+# Returns the signature of the last acknowledged snapshot
+func get_last_acked_snap_sig() -> int:
+	return _input_cache.last_ack_snap
+
+
+# Returns the amount of non acknowledged snapshots, which will be used by the
+# server to determine if full snapshot data must be sent or not
+func get_non_acked_snap_count() -> int:
+	return _input_cache.snapinpu.size()
+
+
+# Tells if there is any non acknowledged snapshot that didn't use any input from the
+# client corresponding to this node. This is another condition that will be used to
+# determine which data will be sent to this client
+func has_snap_with_no_input() -> bool:
+	return _input_cache.no_input_count > 0
+
+
+# This function is meant to be run on clients but not called remotely.
+# It removes from the cache all the input objects older and equal to the specified signature
+func client_acknowledge_input(sig: int) -> void:
+	assert(get_tree().has_network_peer() && !get_tree().is_network_server())
+	
+	while (_input_cache.cbuffer.size() > 0 && _input_cache.cbuffer.front().signature <= sig):
+		_input_cache.cbuffer.pop_front()
+
+
+# Retrieve the list of cached input objects, which corresponds to non acknowledged input data.
+func get_cached_input_list() -> Array:
+	return _input_cache.cbuffer
+
+
+# This function is meant to be run on servers but not called remotely.
+# Basically, when a client receives snapshot data, an answer must be given specifying
+# the signature of the newest received. With this, internal cleanup can be performed
+# and then later only the relevant data can be sent to the client
+func server_acknowledge_snapshot(sig: int) -> void:
+	assert(get_tree().has_network_peer() && get_tree().is_network_server())
+	
+	_input_cache.acknowledge(sig)
+
+
+# Start the "loop" to perform "pings"
+func start_ping() -> void:
+	_ping = NetPingInfo.new(net_id, self)
+
+
+func has_dirty_custom_prop() -> bool:
+	return _custom_prop_dirty_count > 0
+
+
+func set_custom_property(pname: String, value) -> void:
+	assert(_custom_data.has(pname))
+	
+	var prop: NetCustomProperty = _custom_data[pname]
+	# This line automatically marks the property as "dirty" if necessary. Dirty properties will be synchronized
+	# at a later moment.
+	prop.value = value
+	if (prop.dirty):
+		_custom_prop_dirty_count += 1
+
+
+# This is used to retrieve the value of a custom property
+func get_custom_property(pname: String, defval = null):
+	var prop: NetCustomProperty = _custom_data.get(pname, null)
+	return prop.value if prop else defval
+
+
+# This function is meant to be called by (and in) the server in order to send all properties
+# set to "ServerBroadcast" to the specified player
+func sync_custom_with(pid: int) -> void:
+	if (!get_tree().is_network_server()):
+		return
+	
+	for pname in _custom_data:
+		var prop: NetCustomProperty = _custom_data[pname]
+		
+		if (prop.replicate == NetCustomProperty.ReplicationMode.ServerBroadcast):
+			rpc_id(pid, "_rem_set_custom_property", pname, prop.value)
+
+
+### Setters/Getters
+func set_network_id(id: int) -> void:
+	net_id = id
+	set_name("player_%d" % net_id)
+
+func set_ready(r: bool) -> void:
+	_is_ready = r
+
+#######################################################################################################################
+### "Private" definitions
 # The input cache is used in two different ways, depending on which machine
 # it's running and which player this node corresponds to.
 # Running on server:
@@ -116,7 +324,8 @@ class InputCache:
 		
 		last_ack_snap = snap_sig
 
-
+#######################################################################################################################
+### "Private" properties
 # The input cache
 var _input_cache: InputCache
 
@@ -157,40 +366,8 @@ var _local_input_enabled: bool = true
 ### Options retrieved from project settings
 var _broadcast_ping: bool = false
 
-# "Signaler" for new ping values
-var ping_signaler: FuncRef
-# "Signaler" for custom property changes
-var custom_prop_signaler: FuncRef
-# The FuncRef pointing to the function that will request the server to actually
-# broadcast the specified custom property
-var custom_prop_broadcast_requester: FuncRef
-
-
-func _init(input_info: NetInputInfo, is_local: bool = false) -> void:
-	_is_local = is_local
-	_input_info = input_info
-	_input_cache = InputCache.new()
-	_edec_input = EncDecBuffer.new()
-	_ping = null
-	_custom_data = {}
-	
-	if (ProjectSettings.has_setting("keh_addons/network/broadcast_measured_ping")):
-		_broadcast_ping = ProjectSettings.get_setting("keh_addons/network/broadcast_measured_ping")
-
-
-func _ready() -> void:
-	set_process_input(_is_local)
-
-
-
-func _input(evt: InputEvent) -> void:
-	if (evt is InputEventMouseMotion):
-		#_mposition = evt.position        # Should mouse position be used?
-		# Accumulate mouse relative so behavior is more consistent when VSync is toggled
-		_mrelative += evt.relative
-		_mspeed = evt.speed
-
-
+#######################################################################################################################
+### "Private" functions
 func _poll_input() -> InputData:
 	assert(_is_local)
 	
@@ -226,21 +403,6 @@ func _poll_input() -> InputData:
 	return retval
 
 
-func reset_data() -> void:
-	_input_cache.sbuffer = {}
-	_input_cache.cbuffer = []
-	_input_cache.last_sig = 0
-	_input_cache.snapinpu = {}
-	_input_cache.no_input_count = 0
-	_input_cache.last_ack_snap = 0
-
-
-
-# The server uses this to know if the client is ready to receive snapshot data.
-func is_ready() -> bool:
-	return _is_ready
-
-
 # This must be called only on client machines belonging to the local player. All of the cached
 # input data will be encoded and sent to the server.
 func _dispatch_input_data() -> void:
@@ -265,133 +427,6 @@ func _dispatch_input_data() -> void:
 	rpc_unreliable_id(1, "server_receive_input", _edec_input.buffer)
 
 
-# Obtain input data. If running on the local machine the state will be polled.
-# If on a client (still local machine) then the data will be sent to the server.
-# If on server (but not local) the data will be retrieved from the cache/buffer.
-func get_input(snap_sig: int) -> InputData:
-	# This will be used for a few tests within this function
-	var is_authority: bool = !get_tree().has_network_peer() || get_tree().is_network_server()
-	
-	# This function should be called only by the authority or local machine
-	assert(_is_local || is_authority)
-
-	var retval: InputData
-	if (_is_local):
-		retval = _poll_input()
-		
-		if (!is_authority):
-			# Local machine but on a client. This means, input data must be sent to the server
-			# First, cache the new input object
-			_input_cache.cbuffer.push_back(retval)
-			
-			# Input will be sent to the server when the snapshot is finished just so it give a
-			# chance for custom input to be correctly set before dispatching
-	
-	else:
-		# In theory if here it's authority machine as the assert above should
-		# break if not local machine and not on authority. Asserts are removed
-		# from release builds and that assert in this function is mostly to *try*
-		# to catch errors early. Anyway, checking here again just to make sure
-		if (!is_authority):
-			return null
-		
-		# Running on the server but for a client. Must retrieve the data from
-		# the input cache
-		if (_input_cache.sbuffer.size() > 0):
-			retval = _input_cache.sbuffer.get(_input_cache.last_sig + 1)
-			if (retval):
-				# There is a valid input object in the cache, so update the last
-				# used signature
-				_input_cache.last_sig += 1
-				# The object that will be used is not needed within the cache anymore
-				# so remove it
-				# warning-ignore:return_value_discarded
-				_input_cache.sbuffer.erase(_input_cache.last_sig)
-		
-		if (!retval):
-			retval = _input_info.make_empty()
-		
-		# Later, given the snapshot obtain the input signature from the snapinpu dictionary
-		_input_cache.associate(snap_sig, retval.signature)
-	
-	return retval
-
-
-
-# This should already be the correct player within the hierarchy node.
-remote func server_receive_input(encoded: PoolByteArray) -> void:
-	assert(get_tree().is_network_server())
-	
-	_edec_input.buffer = encoded
-	# Decode the amount of input objects
-	var count: int = _edec_input.read_ushort()
-	
-	# Decode each one of the objects
-	for _i in count:
-		var input: InputData = _input_info.decode_from(_edec_input)
-		
-		# Cache this if it's newer than the last input signature
-		if (input.signature > _input_cache.last_sig):
-			_input_cache.sbuffer[input.signature] = input
-
-
-# Retrieve the signature of the last input data used on this machine
-func get_last_input_signature() -> int:
-	return _input_cache.last_sig
-
-# Given the snapshot signature, return the input signature that was used. This will
-# be "valid" only on servers on a node corresponding to a client
-func get_used_input_in_snap(sig: int) -> int:
-	assert(get_tree().has_network_peer() && get_tree().is_network_server())
-	
-	var ret: int = _input_cache.snapinpu.get(sig, 0)
-	
-	return ret
-
-
-# Returns the signature of the last acknowledged snapshot
-func get_last_acked_snap_sig() -> int:
-	return _input_cache.last_ack_snap
-
-
-# Returns the amount of non acknowledged snapshots, which will be used by the
-# server to determine if full snapshot data must be sent or not
-func get_non_acked_snap_count() -> int:
-	return _input_cache.snapinpu.size()
-
-# Tells if there is any non acknowledged snapshot that didn't use any input from the
-# client corresponding to this node. This is another condition that will be used to
-# determine which data will be sent to this client
-func has_snap_with_no_input() -> bool:
-	return _input_cache.no_input_count > 0
-
-# This function is meant to be run on clients but not called remotely.
-# It removes from the cache all the input objects older and equal to the specified signature
-func client_acknowledge_input(sig: int) -> void:
-	assert(get_tree().has_network_peer() && !get_tree().is_network_server())
-	
-	while (_input_cache.cbuffer.size() > 0 && _input_cache.cbuffer.front().signature <= sig):
-		_input_cache.cbuffer.pop_front()
-
-# Retrieve the list of cached input objects, which corresponds to non acknowledged input data.
-func get_cached_input_list() -> Array:
-	return _input_cache.cbuffer
-
-
-# This function is meant to be run on servers but not called remotely.
-# Basically, when a client receives snapshot data, an answer must be given specifying
-# the signature of the newest received. With this, internal cleanup can be performed
-# and then later only the relevant data can be sent to the client
-func server_acknowledge_snapshot(sig: int) -> void:
-	assert(get_tree().has_network_peer() && get_tree().is_network_server())
-	
-	_input_cache.acknowledge(sig)
-
-
-### Ping/Pong system
-func start_ping() -> void:
-	_ping = NetPingInfo.new(net_id, self)
-
 # When the interval timer expires, a function will be called and that function will
 # remote call this, which is meant to be run only on client machines
 remote func _client_ping(sig: int, last_ping: float) -> void:
@@ -399,6 +434,7 @@ remote func _client_ping(sig: int, last_ping: float) -> void:
 	rpc_unreliable_id(1, "_server_pong", sig)
 	if (sig > 1):
 		ping_signaler.call_func(net_id, last_ping)
+
 
 remote func _server_pong(sig: int) -> void:
 	# Bail if not the server - this should be an error though
@@ -418,6 +454,7 @@ remote func _server_pong(sig: int) -> void:
 		# The server must get a signal with the measured value
 		ping_signaler.call_func(net_id, measured)
 
+
 # If the broadcast ping option is enabled then the server will call this function on
 # each client in order to give the measured ping value and allow other clients to
 # display somewhere the player's latency values
@@ -432,8 +469,6 @@ remote func _client_ping_broadcast(value: float) -> void:
 func _add_custom_property(pname: String, prop: NetCustomProperty) -> void:
 	_custom_data[pname] = NetCustomProperty.new(prop.value, prop.replicate)
 
-func has_dirty_custom_prop() -> bool:
-	return _custom_prop_dirty_count > 0
 
 # Encode the "dirty" supported custom properties into the given EncDecBuffer. If a non supported property is
 # found then it will be directly sent through the "_check_replication()" function.
@@ -507,7 +542,6 @@ func _decode_custom_props(from: EncDecBuffer, prop_ref: Dictionary, isauthority:
 			_custom_prop_dirty_count += 1
 
 
-
 func _check_replication(pname: String, prop: NetCustomProperty) -> void:
 	var is_authority: bool = (!get_tree().has_network_peer() || get_tree().is_network_server())
 	match prop.replicate:
@@ -531,39 +565,6 @@ func _check_replication(pname: String, prop: NetCustomProperty) -> void:
 	prop.dirty = false
 
 
-
-func set_custom_property(pname: String, value) -> void:
-	assert(_custom_data.has(pname))
-	
-	var prop: NetCustomProperty = _custom_data[pname]
-	# This line automatically marks the property as "dirty" if necessary. Dirty properties will be synchronized
-	# at a later moment.
-	prop.value = value
-	if (prop.dirty):
-		_custom_prop_dirty_count += 1
-
-
-
-# This is used to retrieve the value of a custom property
-func get_custom_property(pname: String, defval = null):
-	var prop: NetCustomProperty = _custom_data.get(pname, null)
-	return prop.value if prop else defval
-
-
-
-# This function is meant to be called by (and in) the server in order to send all properties
-# set to "ServerBroadcast" to the specified player
-func sync_custom_with(pid: int) -> void:
-	if (!get_tree().is_network_server()):
-		return
-	
-	for pname in _custom_data:
-		var prop: NetCustomProperty = _custom_data[pname]
-		
-		if (prop.replicate == NetCustomProperty.ReplicationMode.ServerBroadcast):
-			rpc_id(pid, "_rem_set_custom_property", pname, prop.value)
-
-
 # This is meant to set the custom property but by using remote calls. This should be
 # automatically called based on the replication setting. One thing to note is that
 # this will be called using the reliable channel
@@ -576,11 +577,31 @@ remote func _rem_set_custom_property(pname: String, val) -> void:
 	custom_prop_signaler.call_func(net_id, pname, val)
 
 
-### Setters/Getters
-func set_network_id(id: int) -> void:
-	net_id = id
-	set_name("player_%d" % net_id)
+#######################################################################################################################
+### Event handlers
 
-func set_ready(r: bool) -> void:
-	_is_ready = r
 
+#######################################################################################################################
+### Overrides
+func _input(evt: InputEvent) -> void:
+	if (evt is InputEventMouseMotion):
+		#_mposition = evt.position        # Should mouse position be used?
+		# Accumulate mouse relative so behavior is more consistent when VSync is toggled
+		_mrelative += evt.relative
+		_mspeed = evt.speed
+
+
+func _ready() -> void:
+	set_process_input(_is_local)
+
+
+func _init(input_info: NetInputInfo, is_local: bool = false) -> void:
+	_is_local = is_local
+	_input_info = input_info
+	_input_cache = InputCache.new()
+	_edec_input = EncDecBuffer.new()
+	_ping = null
+	_custom_data = {}
+	
+	if (ProjectSettings.has_setting("keh_addons/network/broadcast_measured_ping")):
+		_broadcast_ping = ProjectSettings.get_setting("keh_addons/network/broadcast_measured_ping")

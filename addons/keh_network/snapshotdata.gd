@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,35 +29,16 @@ extends Reference
 class_name NetSnapshotData
 
 
-# Each entry in this dictionary is an instance of the EntityInfo, keyed by the
-# hashed name of the entity class derived from SnapEntityBase (snapentity.gd)
-var _entity_info: Dictionary = {}
-
-# This dictionary is a helper container that takes the resource name (normally
-# directly the class_name) and points to the hashed name, which will then help
-# get into the desired entry within _entity_info
-var _entity_name: Dictionary = {}
-
-# Holds the history of snapshots
-var _history: Array = []
-
-# These two dictionaries are used to perform easier queries to locate specific
-# snapshots. The first one is from snapshot signature into snapshot and the
-# second one is from input signature into snapshot.
-var _ssig_to_snap: Dictionary = {}
-var _isig_to_snap: Dictionary = {}
-
-# This object will hold the most recent snapshot data received from the server.
-# When delta snapshot is received, a reference must be used in order to rebuild
-# the full snapshot, which will be exactly the contents of this object.
-var _server_state: NetSnapshot = null
+#######################################################################################################################
+### Signals and definitions
 
 
+#######################################################################################################################
+### "Public" properties
 
-func _init() -> void:
-	register_entity_types()
 
-
+#######################################################################################################################
+### "Public" functions
 # This function gather the list of available (script) classes and for each entry
 # corresponding to a class derived from SnapEntityBase will then be further analyzed.
 # In that case, provided it contains any valid replicable property and implements
@@ -92,7 +73,6 @@ func register_entity_types() -> void:
 				}
 
 
-
 # Spawners are the main mean to create game nodes in association with the various
 # classes derived from SnapEntityBase
 func register_spawner(eclass: Resource, chash: int, spawner: NetNodeSpawner, parent: Node, esetup: FuncRef = null) -> void:
@@ -121,13 +101,6 @@ func spawn_node(eclass: Resource, uid: int, chash: int) -> Node:
 	
 	return ret
 
-# Internally used to retrieve the EntityInfo instance associated with specified snapshot entity class
-func _get_entity_info(snapres: Resource) -> EntityInfo:
-	var ename: Dictionary = _entity_name.get(snapres)
-	if (ename):
-		return _entity_info.get(ename.hash)
-	
-	return null
 
 # Retrieve a game node given its unique ID and associated snapshot entity class
 func get_game_node(uid: int, snapres: Resource) -> Node:
@@ -149,13 +122,13 @@ func get_prediction_count(uid: int, snapres: Resource) -> int:
 	return ret
 
 
-
 # Despawn a node from the game
 func despawn_node(eclass: Resource, uid: int) -> void:
 	var ename: Dictionary = _entity_name.get(eclass)
 	if (ename):
 		var einfo: EntityInfo = _entity_info.get(ename.hash)
 		einfo.despawn_node(uid)
+
 
 # Adds a "pre-spawned" node into the internal node management so it can be
 # properly handled (located) by the replication system.
@@ -175,7 +148,6 @@ func get_snapshot_by_input(isig: int) -> NetSnapshot:
 	return _isig_to_snap.get(isig, null)
 
 
-
 func reset() -> void:
 	for ehash in _entity_info:
 		_entity_info[ehash].clear_nodes()
@@ -184,16 +156,6 @@ func reset() -> void:
 	_history.clear()
 	_ssig_to_snap.clear()
 	_isig_to_snap.clear()
-
-
-func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> SnapEntityBase:
-	var ret: SnapEntityBase = null
-	
-	var einfo: EntityInfo = _get_entity_info(eclass)
-	if (einfo):
-		ret = einfo.create_instance(uid, chash)
-	
-	return ret
 
 
 # Encode the provided snapshot into the given EncDecBuffer, "attaching" the given
@@ -577,6 +539,55 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 	# All entities have been verified. Now update the prediction count
 	_update_prediction_count(-popcount)
 
+#######################################################################################################################
+### "Private" definitions
+
+
+#######################################################################################################################
+### "Private" properties
+# Each entry in this dictionary is an instance of the EntityInfo, keyed by the
+# hashed name of the entity class derived from SnapEntityBase (snapentity.gd)
+var _entity_info: Dictionary = {}
+
+# This dictionary is a helper container that takes the resource name (normally
+# directly the class_name) and points to the hashed name, which will then help
+# get into the desired entry within _entity_info
+var _entity_name: Dictionary = {}
+
+# Holds the history of snapshots
+var _history: Array = []
+
+# These two dictionaries are used to perform easier queries to locate specific
+# snapshots. The first one is from snapshot signature into snapshot and the
+# second one is from input signature into snapshot.
+var _ssig_to_snap: Dictionary = {}
+var _isig_to_snap: Dictionary = {}
+
+# This object will hold the most recent snapshot data received from the server.
+# When delta snapshot is received, a reference must be used in order to rebuild
+# the full snapshot, which will be exactly the contents of this object.
+var _server_state: NetSnapshot = null
+
+#######################################################################################################################
+### "Private" functions
+# Internally used to retrieve the EntityInfo instance associated with specified snapshot entity class
+func _get_entity_info(snapres: Resource) -> EntityInfo:
+	var ename: Dictionary = _entity_name.get(snapres)
+	if (ename):
+		return _entity_info.get(ename.hash)
+	
+	return null
+
+
+func _instantiate_snap_entity(eclass: Script, uid: int, chash: int) -> SnapEntityBase:
+	var ret: SnapEntityBase = null
+	
+	var einfo: EntityInfo = _get_entity_info(eclass)
+	if (einfo):
+		ret = einfo.create_instance(uid, chash)
+	
+	return ret
+
 
 func _add_to_history(snap: NetSnapshot) -> void:
 	_history.push_back(snap)
@@ -604,3 +615,21 @@ func _update_prediction_count(delta: int) -> void:
 	for ehash in _entity_info:
 		var einfo: EntityInfo = _entity_info[ehash]
 		einfo.update_pred_count(delta)
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
+
+
+
+
+func _init() -> void:
+	register_entity_types()
+
+
+
+
+

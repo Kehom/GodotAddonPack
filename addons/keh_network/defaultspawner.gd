@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,14 +29,42 @@
 extends NetNodeSpawner
 class_name NetDefaultSpawner
 
+#######################################################################################################################
+### Signals and definitions
+
+
+#######################################################################################################################
+### "Public" properties
+
+
+#######################################################################################################################
+### "Public" functions
+
+
+#######################################################################################################################
+### "Private" definitions
+
+
+#######################################################################################################################
+### "Private" properties
 # This holds the packed scene corresponding to the node that should be spawned
 var _scene_class: PackedScene = null
+
+#######################################################################################################################
+### "Private" functions
+
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
+# Function that must be overridden. This is where the actual node is instanced
+func spawn() -> Node:
+	return _scene_class.instance() if _scene_class else null
 
 
 func _init(ps: PackedScene) -> void:
 	_scene_class = ps
-
-# Function that must be overridden. This is where the actual node is instanced
-func spawn() -> Node:
-	return _scene_class.instance() if _scene_class else null
 

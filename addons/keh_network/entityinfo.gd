@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,8 @@ extends Reference
 class_name EntityInfo
 
 
+#######################################################################################################################
+### Signals and definitions
 # Those are just shortcuts
 const CTYPE_UINT: int = SnapEntityBase.CTYPE_UINT
 const CTYPE_USHORT: int = SnapEntityBase.CTYPE_USHORT
@@ -41,195 +43,14 @@ const CTYPE_BYTE: int = SnapEntityBase.CTYPE_BYTE
 # Maximum amount of array elements (PoolByteArray, PoolRealArray and PoolIntArray)
 const MAX_ARRAY_SIZE: int = 0xFF
 
-# During the registration of snapshot entity objects, supported properties
-# that can be replicated through this system must have some internal data
-# necessary to help with the tasks. Each one will have an instance of this
-# inner class.
-class ReplicableProperty:
-	var name: String
-	var type: int
-	var mask: int
-	
-	func _init(_name: String, _type: int, _mask: int) -> void:
-		name = _name
-		type = _type
-		mask = _mask
-	
-	# Unfortunately must use variant (arguments) here instead of static type
-	func compare(v1, v2) -> bool:
-		return v1 == v2
-
-# This is a specialized replicable property for floating point numbers when a tolerance must
-# be used when comparing values. In this case the is_equal_approx() function is used
-class RPropApprox extends ReplicableProperty:
-	func _init(_name: String, _mask: int).(_name, TYPE_REAL, _mask) -> void:
-		pass
-	
-	func compare(v1: float, v2: float) -> bool:
-		return is_equal_approx(v1, v2)
-
-# Vector2, Vector3, Quat etc offers a function to perform the is_equal_approx() on each
-# component. This specialized ReplicableProperty performs the comparison using that
-class RPropApproxi extends ReplicableProperty:
-	func _init(_name: String, _type: int, _mask: int).(_name, _type, _mask) -> void:
-		pass
-	
-	func compare(v1, v2) -> bool:
-		return v1.is_equal_approx(v2)
-
-# Although a bunch of work to create one specialized replicable property for each one
-# of the types bellow, it has been done because there is no easy easy way to directly
-# access each component of "compound types" without using the correct names. Moreover,
-# instead of creating a new base for each of those, still directly use ReplicableProperty
-# as base in order to help with readability and **maybe** performance
-# Nevertheless, the specializations bellow are meant to offer custom tolerance values
-# to compare floating point values
-class RPropTolFloat extends ReplicableProperty:
-	var tolerance: float
-	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_REAL, _mask) -> void:
-		tolerance = _tolerance
-	
-	func compare(v1: float, v2: float) -> bool:
-		return (abs(v1 - v2) < tolerance)
-
-class RPropTolVec2 extends ReplicableProperty:
-	var tolerance: float
-	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_VECTOR2, _mask) -> void:
-		tolerance = _tolerance
-	
-	func compare(v1: Vector2, v2: Vector2) -> bool:
-		return (abs(v1.x - v2.x) < tolerance &&
-			abs(v1.y - v2.y) < tolerance)
-
-class RPropTolRec2 extends ReplicableProperty:
-	var tolerance: float
-	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_RECT2, _mask) -> void:
-		tolerance = _tolerance
-	
-	func compare(v1: Rect2, v2: Rect2) -> bool:
-		return (abs(v1.position.x - v2.position.x) < tolerance &&
-			abs(v1.position.y - v2.position.y) < tolerance &&
-			abs(v1.size.x - v2.size.x) < tolerance &&
-			abs(v1.size.y - v2.size.y) < tolerance)
-
-class RPropTolQuat extends ReplicableProperty:
-	var tolerance: float
-	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_QUAT, _mask) -> void:
-		tolerance = _tolerance
-	
-	func compare(v1: Quat, v2: Quat) -> bool:
-		return (abs(v1.x - v2.x) < tolerance &&
-			abs(v1.y - v2.y) < tolerance &&
-			abs(v1.z - v2.z) < tolerance &&
-			abs(v1.w - v2.w) < tolerance)
-
-class RPropTolVec3 extends ReplicableProperty:
-	var tolerance: float
-	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_VECTOR3, _mask) -> void:
-		tolerance = _tolerance
-	
-	func compare(v1: Vector3, v2: Vector3) -> bool:
-		return (abs(v1.x - v2.x) < tolerance &&
-			abs(v1.y - v2.y) < tolerance &&
-			abs(v1.z - v2.z) < tolerance)
-
-class RPropTolColor extends ReplicableProperty:
-	var tolerance: float
-	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_COLOR, _mask) -> void:
-		tolerance = _tolerance
-	
-	func compare(v1: Color, v2: Color) -> bool:
-		return (abs(v1.r - v2.r) < tolerance &&
-			abs(v1.g - v2.g) < tolerance &&
-			abs(v1.b - v2.b) < tolerance &&
-			abs(v1.a - v2.a) < tolerance)
-
-
-# Storing registered spawners could be done through dictionaries however
-# that did result in errors when trying to reference non existing spawners.
-# Namely, assigning "nill to a variable of type dictionary". Because of that,
-# using this inner class to hold the registered spawner data
-class SpawnerData:
-	var spawner: NetNodeSpawner
-	var parent: Node
-	var extra_setup: FuncRef
-	
-	func _init(s: NetNodeSpawner, p: Node, es: FuncRef) -> void:
-		spawner = s
-		parent = p
-		extra_setup = es
-
-# This inner class is meant to make things slightly easier to deal with instead of using
-# "dictionary as struct" contained in yet another dictionary. More specifically, this is
-# meant to keep track of game nodes and any other extra data associated with that specific
-# node.
-class GameEntity:
-	# The game node, mostly likely a visual representation of this entity
-	var node: Node
-	# Useful only on clients, keep track of how many frames were used during prediction for
-	# this entity. This can be used later to re-simulate entities that don't require any
-	# input data when correction is applied.
-	var predcount: int
-	
-	func _init(n: Node, pc: int) -> void:
-		node = n
-		predcount = pc
-
-
-
-# The entity type name is hashed into this property
-var _name_hash: int
-# Resource that is used in order to create instances of the object described by 
-# this entity info.
-var _resource: Resource
-# The replicable properties list. Each entry in this array is an instance of the
-# inner class ReplicableProperty
-var replicable: Array
-# This is held mostly to help with debugging
-var _namestr: String
-# Snap entity objects may disable the class_hash and this info is cashed in this
-# property to make things simpler to deal with when encoding/decoding data.
-var _has_chash: bool = true
-
+#######################################################################################################################
+### "Public" properties
 # If this string is not empty after instantiating this class, then there was an error,
 # with details stored in the property
 var error: String
 
-# When encoding delta snapshot, the change mask has to be added before the entity
-# itself. This variable holds how many bytes (1, 2 or 4) are used for this information
-# within the raw data for this entity type. Yes, this sort of limit the number of
-# properties per entity to only 30/31 (id takes one spot and if not disabled the
-# class_hash takes another)).
-var _cmask_size: int
-
-# Key = unique entity ID
-# Value instance of the inner GameEntity class:
-var _entity: Dictionary
-
-
-# Key = class_hash - yes, this sort of force the creation of multiple spawners, even if the
-# actual class_hash only points to inner properties of the spawned node. This design decision
-# greatly simplifies the automatic snapshot system.
-# Value = Instances of the SpawnerData inner class
-var _spawner_data: Dictionary = {}
-
-
-func _init(cname: String, rpath: String) -> void:
-	replicable = []
-	# Verifies if the resource contains replicable properties and if implements
-	# the required apply_state(node) function.
-	_check_properties(cname, rpath)
-	
-	if replicable.size() <= 8:
-		_cmask_size = 1
-	elif replicable.size() <= 16:
-		_cmask_size = 2
-	elif replicable.size() <= 32:
-		_cmask_size = 4
-	else:
-		error = "There are more than 32 replicable properties, which is not supported by this system."
-
-
+#######################################################################################################################
+### "Public" functions
 
 # Spawners (classes derived from NetNodeSpawner) are necessary in order to automate the
 # node spawning during the synchronization. The class_hash becomes the ID key to the
@@ -414,7 +235,6 @@ func match_delta(changed: SnapEntityBase, source: SnapEntityBase, cmask: int) ->
 			changed.set(repl.name, source.get(repl.name))
 
 
-
 # Retrieve a game node given its unique ID.
 func get_game_node(uid: int) -> Node:
 	var ge: GameEntity = _entity.get(uid)
@@ -422,7 +242,6 @@ func get_game_node(uid: int) -> Node:
 		return ge.node
 	
 	return null
-
 
 
 # Perform full cleanup of the internal container that is used to manage the
@@ -474,6 +293,204 @@ func add_pre_spawned(uid: int, node: Node) -> void:
 	_entity[uid] = GameEntity.new(node, 0)
 
 
+func update_pred_count(delta: int) -> void:
+	for uid in _entity:
+		_entity[uid].predcount = int(max(_entity[uid].predcount + delta, 0))
+
+
+func get_pred_count(uid: int) -> int:
+	var ge: GameEntity = _entity.get(uid)
+	if (ge):
+		return ge.predcount
+	
+	return 0
+
+
+#######################################################################################################################
+### "Private" definitions
+# During the registration of snapshot entity objects, supported properties
+# that can be replicated through this system must have some internal data
+# necessary to help with the tasks. Each one will have an instance of this
+# inner class.
+class ReplicableProperty:
+	var name: String
+	var type: int
+	var mask: int
+	
+	func _init(_name: String, _type: int, _mask: int) -> void:
+		name = _name
+		type = _type
+		mask = _mask
+	
+	# Unfortunately must use variant (arguments) here instead of static type
+	func compare(v1, v2) -> bool:
+		return v1 == v2
+
+
+# This is a specialized replicable property for floating point numbers when a tolerance must
+# be used when comparing values. In this case the is_equal_approx() function is used
+class RPropApprox extends ReplicableProperty:
+	func _init(_name: String, _mask: int).(_name, TYPE_REAL, _mask) -> void:
+		pass
+	
+	func compare(v1: float, v2: float) -> bool:
+		return is_equal_approx(v1, v2)
+
+
+# Vector2, Vector3, Quat etc offers a function to perform the is_equal_approx() on each
+# component. This specialized ReplicableProperty performs the comparison using that
+class RPropApproxi extends ReplicableProperty:
+	func _init(_name: String, _type: int, _mask: int).(_name, _type, _mask) -> void:
+		pass
+	
+	func compare(v1, v2) -> bool:
+		return v1.is_equal_approx(v2)
+
+
+# Although a bunch of work to create one specialized replicable property for each one
+# of the types bellow, it has been done because there is no easy easy way to directly
+# access each component of "compound types" without using the correct names. Moreover,
+# instead of creating a new base for each of those, still directly use ReplicableProperty
+# as base in order to help with readability and **maybe** performance
+# Nevertheless, the specializations bellow are meant to offer custom tolerance values
+# to compare floating point values
+class RPropTolFloat extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_REAL, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: float, v2: float) -> bool:
+		return (abs(v1 - v2) < tolerance)
+
+
+class RPropTolVec2 extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_VECTOR2, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Vector2, v2: Vector2) -> bool:
+		return (abs(v1.x - v2.x) < tolerance &&
+			abs(v1.y - v2.y) < tolerance)
+
+
+class RPropTolRec2 extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_RECT2, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Rect2, v2: Rect2) -> bool:
+		return (abs(v1.position.x - v2.position.x) < tolerance &&
+			abs(v1.position.y - v2.position.y) < tolerance &&
+			abs(v1.size.x - v2.size.x) < tolerance &&
+			abs(v1.size.y - v2.size.y) < tolerance)
+
+
+class RPropTolQuat extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_QUAT, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Quat, v2: Quat) -> bool:
+		return (abs(v1.x - v2.x) < tolerance &&
+			abs(v1.y - v2.y) < tolerance &&
+			abs(v1.z - v2.z) < tolerance &&
+			abs(v1.w - v2.w) < tolerance)
+
+
+class RPropTolVec3 extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_VECTOR3, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Vector3, v2: Vector3) -> bool:
+		return (abs(v1.x - v2.x) < tolerance &&
+			abs(v1.y - v2.y) < tolerance &&
+			abs(v1.z - v2.z) < tolerance)
+
+
+class RPropTolColor extends ReplicableProperty:
+	var tolerance: float
+	func _init(_name: String, _mask: int, _tolerance: float).(_name, TYPE_COLOR, _mask) -> void:
+		tolerance = _tolerance
+	
+	func compare(v1: Color, v2: Color) -> bool:
+		return (abs(v1.r - v2.r) < tolerance &&
+			abs(v1.g - v2.g) < tolerance &&
+			abs(v1.b - v2.b) < tolerance &&
+			abs(v1.a - v2.a) < tolerance)
+
+
+# Storing registered spawners could be done through dictionaries however
+# that did result in errors when trying to reference non existing spawners.
+# Namely, assigning "nill to a variable of type dictionary". Because of that,
+# using this inner class to hold the registered spawner data
+class SpawnerData:
+	var spawner: NetNodeSpawner
+	var parent: Node
+	var extra_setup: FuncRef
+	
+	func _init(s: NetNodeSpawner, p: Node, es: FuncRef) -> void:
+		spawner = s
+		parent = p
+		extra_setup = es
+
+
+# This inner class is meant to make things slightly easier to deal with instead of using
+# "dictionary as struct" contained in yet another dictionary. More specifically, this is
+# meant to keep track of game nodes and any other extra data associated with that specific
+# node.
+class GameEntity:
+	# The game node, mostly likely a visual representation of this entity
+	var node: Node
+	# Useful only on clients, keep track of how many frames were used during prediction for
+	# this entity. This can be used later to re-simulate entities that don't require any
+	# input data when correction is applied.
+	var predcount: int
+	
+	func _init(n: Node, pc: int) -> void:
+		node = n
+		predcount = pc
+
+
+#######################################################################################################################
+### "Private" properties
+# The entity type name is hashed into this property
+var _name_hash: int
+
+# Resource that is used in order to create instances of the object described by 
+# this entity info.
+var _resource: Resource
+
+# The replicable properties list. Each entry in this array is an instance of the
+# inner class ReplicableProperty
+var replicable: Array
+
+# This is held mostly to help with debugging
+var _namestr: String
+
+# Snap entity objects may disable the class_hash and this info is cashed in this
+# property to make things simpler to deal with when encoding/decoding data.
+var _has_chash: bool = true
+
+# When encoding delta snapshot, the change mask has to be added before the entity
+# itself. This variable holds how many bytes (1, 2 or 4) are used for this information
+# within the raw data for this entity type. Yes, this sort of limit the number of
+# properties per entity to only 30/31 (id takes one spot and if not disabled the
+# class_hash takes another)).
+var _cmask_size: int
+
+# Key = unique entity ID
+# Value instance of the inner GameEntity class:
+var _entity: Dictionary
+
+# Key = class_hash - yes, this sort of force the creation of multiple spawners, even if the
+# actual class_hash only points to inner properties of the spawned node. This design decision
+# greatly simplifies the automatic snapshot system.
+# Value = Instances of the SpawnerData inner class
+var _spawner_data: Dictionary = {}
+
+#######################################################################################################################
+### "Private" functions
 # This will check the specified resource and if there are any replicable
 # properties finalize the initialization of this object.
 func _check_properties(cname: String, rpath: String) -> void:
@@ -581,6 +598,7 @@ func _property_reader(repl: ReplicableProperty, from: EncDecBuffer, into: SnapEn
 				a.append(from.read_float())
 			into.set(repl.name, a)
 
+
 # Based on the given instance of ReplicableProperty, writes a property from the
 # instance of snapshot entity object into the specified byte array
 func _property_writer(repl: ReplicableProperty, entity: SnapEntityBase, into: EncDecBuffer) -> void:
@@ -642,7 +660,6 @@ func _property_writer(repl: ReplicableProperty, entity: SnapEntityBase, into: En
 			# Then the floats
 			for f in val:
 				into.write_float(f)
-
 
 
 func _build_replicable_prop(name: String, tp: int, mask: int, obj: Object) -> ReplicableProperty:
@@ -707,15 +724,23 @@ func _build_replicable_prop(name: String, tp: int, mask: int, obj: Object) -> Re
 	
 	return ret
 
-
-func update_pred_count(delta: int) -> void:
-	for uid in _entity:
-		_entity[uid].predcount = int(max(_entity[uid].predcount + delta, 0))
+#######################################################################################################################
+### Event handlers
 
 
-func get_pred_count(uid: int) -> int:
-	var ge: GameEntity = _entity.get(uid)
-	if (ge):
-		return ge.predcount
+#######################################################################################################################
+### Overrides
+func _init(cname: String, rpath: String) -> void:
+	replicable = []
+	# Verifies if the resource contains replicable properties and if implements
+	# the required apply_state(node) function.
+	_check_properties(cname, rpath)
 	
-	return 0
+	if replicable.size() <= 8:
+		_cmask_size = 1
+	elif replicable.size() <= 16:
+		_cmask_size = 2
+	elif replicable.size() <= 32:
+		_cmask_size = 4
+	else:
+		error = "There are more than 32 replicable properties, which is not supported by this system."

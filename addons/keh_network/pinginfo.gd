@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,14 @@
 extends Reference
 class_name NetPingInfo
 
+
+#######################################################################################################################
+### Signals and definitions
 const PING_INTERVAL: float = 1.0        # Wait one second between ping requests
 const PING_TIMEOUT: float = 5.0         # Wait five seconds before considering a ping request as lost
 
+#######################################################################################################################
+### "Public" properties
 var interval: Timer          # Timer to control interval between ping requests
 var timeout: Timer           # Timer to control ping timeouts
 var signature: int           # Signature of the ping request
@@ -38,6 +43,48 @@ var lost_packets: int        # Number of packets considered lost
 var last_ping: float         # Last measured ping, in milliseconds
 var parent: Node             # Node to hold the timers and remote functions. It should be a NetPlayerNode
 
+#######################################################################################################################
+### "Public" functions
+func calculate_and_restart(sig: int) -> float:
+	var ret: float = -1.0
+	if (signature == sig):
+		# Obtain the amount of time and convert to milliseconds
+		last_ping = (PING_TIMEOUT - timeout.time_left) * 1000
+		ret = last_ping
+		timeout.stop()
+		interval.start()
+	
+	return ret
+
+#######################################################################################################################
+### "Private" definitions
+
+
+#######################################################################################################################
+### "Private" properties
+
+
+#######################################################################################################################
+### "Private" functions
+func _request_ping(pid: int) -> void:
+	signature += 1
+	interval.stop()
+	timeout.start()
+	parent.rpc_unreliable_id(pid, "_client_ping", signature, last_ping)
+
+func _on_ping_timeout(pid: int) -> void:
+	# The last ping request has timed out. No answer received, so assume the packet has been lost
+	lost_packets += 1
+	# Request a new ping - no need to wait through interval since there was already 5 seconds
+	# from the previous request
+	_request_ping(pid)
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
 func _init(pid: int, node: Node) -> void:
 	signature = 0
 	lost_packets = 0
@@ -67,27 +114,3 @@ func _init(pid: int, node: Node) -> void:
 	timeout.stop()
 	interval.start()
 
-
-func _request_ping(pid: int) -> void:
-	signature += 1
-	interval.stop()
-	timeout.start()
-	parent.rpc_unreliable_id(pid, "_client_ping", signature, last_ping)
-
-func _on_ping_timeout(pid: int) -> void:
-	# The last ping request has timed out. No answer received, so assume the packet has been lost
-	lost_packets += 1
-	# Request a new ping - no need to wait through interval since there was already 5 seconds
-	# from the previous request
-	_request_ping(pid)
-
-func calculate_and_restart(sig: int) -> float:
-	var ret: float = -1.0
-	if (signature == sig):
-		# Obtain the amount of time and convert to milliseconds
-		last_ping = (PING_TIMEOUT - timeout.time_left) * 1000
-		ret = last_ping
-		timeout.stop()
-		interval.start()
-	
-	return ret

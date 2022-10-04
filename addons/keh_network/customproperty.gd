@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,8 @@
 extends Reference
 class_name NetCustomProperty
 
+#######################################################################################################################
+### Signals and definitions
 # Properties through this system can be marked for automatic replication.
 # This enumeration configures how that will work
 enum ReplicationMode {
@@ -45,6 +47,8 @@ enum ReplicationMode {
 	ServerBroadcast,    # Property value will be broadcast to every player through the server
 }
 
+#######################################################################################################################
+### "Public" properties
 # Because custom properties can be of any type, this class' property meant to hold
 # the actual custom value is not static typed
 var value setget _setval
@@ -56,14 +60,8 @@ var replicate: int = ReplicationMode.ServerOnly
 # changing the "value" property.
 var dirty: bool
 
-
-func _init(initial_val, repl_mode: int = ReplicationMode.ServerOnly) -> void:
-	value = initial_val
-	replicate = repl_mode
-	dirty = false
-
-
-
+#######################################################################################################################
+### "Public" functions
 func encode_to(edec: EncDecBuffer, pname: String, expected_type: int) -> bool:
 	if (!dirty):
 		return false
@@ -126,7 +124,16 @@ func decode_from(edec: EncDecBuffer, expected_type: int, make_dirty: bool) -> bo
 	
 	return !cfunc.empty()
 
+#######################################################################################################################
+### "Private" definitions
 
+
+#######################################################################################################################
+### "Private" properties
+
+
+#######################################################################################################################
+### "Private" functions
 func _setval(v) -> void:
 	# By not doing anything if the incoming value is not different from the already stored value some bandwidth
 	# will be saved. This happens because data is only sent if it is marked as "dirty">
@@ -134,3 +141,13 @@ func _setval(v) -> void:
 		value = v
 		dirty = replicate != ReplicationMode.None
 
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
+func _init(initial_val, repl_mode: int = ReplicationMode.ServerOnly) -> void:
+	value = initial_val
+	replicate = repl_mode
+	dirty = false
