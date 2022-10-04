@@ -363,7 +363,7 @@ window_title = "Open a File"
 resizable = true
 mode = 0
 access = 2
-filters = PoolStringArray( ".REPLAY" )
+filters = PoolStringArray( "*.REPLAY" )
 
 [connection signal="scrolling" from="VBoxContainer/Timeline" to="." method="on_timeline_scrolled"]
 [connection signal="value_changed" from="VBoxContainer/Timeline" to="." method="on_timeline_ticked"]

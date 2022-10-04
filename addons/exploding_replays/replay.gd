@@ -104,7 +104,7 @@ func deserialize(serialized: Array) -> void:
 	assert_enumerated_array_correct(serialized)
 	assert(_history.empty())
 	setup(serialized[TICKRATE],serialized[FULL_SNAPSHOT_TICKRATE],serialized[SCENE_PATH])
-	deserialize_history(serialized[HISTORY])
+	call_deferred("deserialize_history",serialized[HISTORY])
 
 func deserialize_history(serialized_history: Array) -> void:
 	for s_snap in serialized_history:

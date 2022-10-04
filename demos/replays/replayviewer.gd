@@ -118,13 +118,14 @@ func clear_replay() -> void:
 		gameworld.queue_free()
 		gameworld = null
 	last_snap = null
+	network.reset_system()
 
 # Maybe rename to denote that it's related to files
 static func load_new_replay(filepath: String) -> Replay:
 	var serialized: Array = Replay.read_compressed_replay_file(filepath)
 	Replay.assert_enumerated_array_correct(serialized)
 	var ret = Replay.new(serialized[Replay.TICKRATE],serialized[Replay.FULL_SNAPSHOT_TICKRATE],serialized[Replay.SCENE_PATH])
-	ret.deserialize_history(serialized[Replay.HISTORY])
+	ret.call_deferred("deserialize_history",serialized[Replay.HISTORY])
 	return ret
 
 func read_replay(filepath: String) -> void:
@@ -135,8 +136,13 @@ func read_replay(filepath: String) -> void:
 		replay = load_new_replay(filepath)
 	change_playback_speed(playbackspeed.value)
 	setup_timeline()
-	tenseconds = replay._tickratre * 10
+	tenseconds = replay._tickrate * 10
 	setup_game_scene()
+	network._update_control.sig += 1
+	network._update_control.snap = NetSnapshot.new(network._update_control.sig)
+	for k in network.snapshot_data._entity_info.keys():
+		network._update_control.snap.add_type(k)
+	network.snapshot_data.client_check_snapshot(network._update_control.snap)
 
 func setup_game_scene() -> void:
 	var scene: Resource = load(replay._scene_path)
