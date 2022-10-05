@@ -775,9 +775,7 @@ func snapshot_entity(node: Node) -> void:
 	assert(_update_control.snap)
 	assert(snapshot_data._entity_name.has(node.get_script()))
 	
-	var ehash: int = snapshot_data._entity_name.get(node.get_script()).hash
-											# long ass accessor no CAAAAP
-	_update_control.snap.add_entity(ehash, snapshot_data._entity_info[ehash].get_properties_from_node(node))
+	add_node_to_snapshot(node,_update_control.snap)
 
 
 
@@ -786,10 +784,17 @@ func correct_in_snapshot(node: Node, input: InputData) -> void:
 	
 	var snap: NetSnapshot = snapshot_data.get_snapshot_by_input(input.signature)
 	if (snap):
-		var ehash: int = snapshot_data._entity_name.get(node.get_script()).hash
-		snap.add_entity(ehash, snapshot_data._entity_info[ehash].get_properties_from_node(node))
+		add_node_to_snapshot(node,snap)
 
+func add_node_to_snapshot(node: Node, snapshot: NetSnapshot) -> void:
+	var ehash: int = get_node_ehash(node)
+	snapshot.add_entity(ehash, get_node_properties(ehash, node))
 
+func get_node_properties(ehash: int, node: Node) -> Array:
+	return snapshot_data._entity_info[ehash].get_properties_from_node(node)
+
+func get_node_ehash(node: Node) -> int:
+	return snapshot_data._entity_name.get(node.get_script()).hash
 
 # This function will be automatically called whenever the snapshot is actually finished,
 # through the deferred call. This function is meant to iterate through connected players

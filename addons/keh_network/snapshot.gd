@@ -79,4 +79,3 @@ func build_tracker() -> Dictionary:
 		ret[ehash] = _entity_data[ehash].keys()
 	
 	return ret
-

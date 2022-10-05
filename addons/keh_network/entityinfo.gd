@@ -271,19 +271,6 @@ func apply_properties_to_node(node: Node,entity: Array) -> void:
 		var repl: ReplicableProperty = replicable[idx]
 		node[repl.name] = entity[idx + VARS]
 
-# Creates a clone of the specified entity.
-# depreciated. just duplicate array
-#func clone_entity(entity: Array) -> SnapEntityBase:
-#	# If failing here, then provided entity is of different type than the one described by this info
-#	assert(entity.get_script() == _resource)
-#
-#	var ret: SnapEntityBase = create_instance(0, 0)
-#
-#	for repl in replicable:
-#		ret.set(repl.name, entity.get(repl.name))
-#
-#	return ret
-
 
 # Just to give a different access to the change mask size property.
 func get_change_mask_size() -> int:
@@ -314,6 +301,8 @@ func encode_full_entity(entity: Array, into: EncDecBuffer) -> void:
 	# Next, if the class_hash has not been disabled, encode it first
 	if (_has_chash):
 		into.write_uint(entity[CHASH])
+	else:
+		print("oh fuck")
 	
 	for idx in replicable.size():
 		var repl: ReplicableProperty = replicable[idx]
