@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,13 @@
 extends Reference
 class_name NetSnapshot
 
+
+#######################################################################################################################
+### Signals and definitions
+
+
+#######################################################################################################################
+### "Public" properties
 # Signature can also be called frame or even timestamp. In any case, this is
 # just an incrementing number to help identify the snapshots
 var signature: int
@@ -38,31 +45,27 @@ var signature: int
 # to compare with incoming snapshot data
 var input_sig: int
 
-# Key = (snap) entity hashed name | Value = Dictionary
-# Inner Dictionary, Key = entity unique ID | Value = instance of SnapEntityBase
-var _entity_data: Dictionary
-
-
-func _init(sig: int) -> void:
-	signature = sig
-	input_sig = 0
-	_entity_data = {}
-
+#######################################################################################################################
+### "Public" functions
 func add_type(nhash: int) -> void:
 	_entity_data[nhash] = {}
+
 
 func get_entity_count(nhash: int) -> int:
 	assert(_entity_data.has(nhash))
 	return _entity_data[nhash].size()
 
+
 func add_entity(nhash: int, entity: SnapEntityBase) -> void:
 	assert(_entity_data.has(nhash))
 	_entity_data[nhash][entity.id] = entity
+
 
 func remove_entity(nhash: int, uid: int) -> void:
 	assert(_entity_data.has(nhash))
 	if (_entity_data[nhash].has(uid)):
 		_entity_data[nhash].erase(uid)
+
 
 func get_entity(nhash: int, uid: int) -> SnapEntityBase:
 	assert(_entity_data.has(nhash))
@@ -77,3 +80,27 @@ func build_tracker() -> Dictionary:
 	
 	return ret
 
+#######################################################################################################################
+### "Private" definitions
+
+
+#######################################################################################################################
+### "Private" properties
+# Key = (snap) entity hashed name | Value = Dictionary
+# Inner Dictionary, Key = entity unique ID | Value = instance of SnapEntityBase
+var _entity_data: Dictionary
+
+#######################################################################################################################
+### "Private" functions
+
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
+func _init(sig: int) -> void:
+	signature = sig
+	input_sig = 0
+	_entity_data = {}

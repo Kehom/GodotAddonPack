@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -44,11 +44,15 @@
 extends Reference
 class_name SnapEntityBase
 
+
+#######################################################################################################################
+### Signals and definitions
 const CTYPE_UINT: int = 65538
 const CTYPE_BYTE: int = 131074
 const CTYPE_USHORT: int = 196610
 
-
+#######################################################################################################################
+### "Public" properties
 # A unique ID is necessary in order to correctly find the node within the game
 # world that is associated with this entity data.
 # Note that the uniqueness is a requirement within the entity type and not necessarily
@@ -65,8 +69,28 @@ var id: int
 # Yes, this means you can't create a field named no_class_hash and set it to be unsigned.
 var class_hash: int
 
+#######################################################################################################################
+### "Public" functions
 
 
+#######################################################################################################################
+### "Private" definitions
+
+
+#######################################################################################################################
+### "Private" properties
+
+
+#######################################################################################################################
+### "Private" functions
+
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
 func _init(uid: int, chash: int) -> void:
 	id = uid
 	class_hash = chash
@@ -82,7 +106,6 @@ func _init(uid: int, chash: int) -> void:
 ############################################################################
 ### Copy the code bellow into a derived entity type to have a "template" ###
 ############################################################################
-
 #extends SnapEntityBase
 #class_name TheEntityTypeNameClass
 #

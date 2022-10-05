@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,13 @@
 extends Reference
 class_name NetPlayerData
 
+
+#######################################################################################################################
+### Signals and definitions
+
+
+#######################################################################################################################
+### "Public" properties
 # This input info will be given to each instance of NetPlayerNode so proper input processing
 # can be done, specially encoding/decoding
 var input_info: NetInputInfo
@@ -51,12 +58,8 @@ var ping_signaler: FuncRef setget set_ping_signaler
 var cprop_signaler: FuncRef setget set_cprop_signaler
 var cprop_broadcaster: FuncRef setget set_cprop_broadcaster
 
-func _init() -> void:
-	input_info = NetInputInfo.new()
-	local_player = NetPlayerNode.new(input_info, true)
-	remote_player = {}
-	custom_property = {}
-
+#######################################################################################################################
+### "Public" functions
 # Create an instance of a NetPlayerNode while also adding the necessary
 # internal data to the created object.
 func create_player(id: int) -> NetPlayerNode:
@@ -126,3 +129,28 @@ func set_cprop_signaler(cps: FuncRef) -> void:
 func set_cprop_broadcaster(cpb: FuncRef) -> void:
 	cprop_broadcaster = cpb
 	local_player.custom_prop_broadcast_requester = cpb
+
+#######################################################################################################################
+### "Private" definitions
+
+
+#######################################################################################################################
+### "Private" properties
+
+
+#######################################################################################################################
+### "Private" functions
+
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
+func _init() -> void:
+	input_info = NetInputInfo.new()
+	local_player = NetPlayerNode.new(input_info, true)
+	remote_player = {}
+	custom_property = {}
+

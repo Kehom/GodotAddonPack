@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2019 Yuri Sarudiansky
+# Copyright (c) 2019-2022 Yuri Sarudiansky
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,34 +27,19 @@
 extends Reference
 class_name NetEventInfo
 
+#######################################################################################################################
+### Signals and definitions
 # Those are just shortcuts
 const CTYPE_UINT: int = SnapEntityBase.CTYPE_UINT
 const CTYPE_USHORT: int = SnapEntityBase.CTYPE_USHORT
 const CTYPE_BYTE: int = SnapEntityBase.CTYPE_BYTE
 
-# Type ID of events described by this
-var _type_id: int
-
-# This array holds the types of the parameters expected by events this type
-var _param_types: Array
-
-# Functions held here will be called as soon as events are decoded. Each entry is
-# a dictionary with the following fields:
-# - obj: Object instance holding the function to be called
-# - funcname: Function name to be called
-var _evt_handlers: Array
+#######################################################################################################################
+### "Public" properties
 
 
-func _init(id: int, pt: Array) -> void:
-	# Event type ID must fit in 16 bits
-	assert(id >= 0 && id < 0xFFFF)
-	# If the next assert fails, then an unsupported parameter type is in the array
-	assert(check_types(pt))
-	
-	_type_id = id
-	_param_types = pt
-
-
+#######################################################################################################################
+### "Public" functions
 func attach_handler(obj: Object, fname: String) -> void:
 	_evt_handlers.push_back({"obj": obj, "funcname": fname})
 
@@ -153,3 +138,41 @@ func check_types(ptypes: Array) -> bool:
 			_:
 				return false
 	return true
+
+
+#######################################################################################################################
+### "Private" definitions
+
+
+#######################################################################################################################
+### "Private" properties
+# Type ID of events described by this
+var _type_id: int
+
+# This array holds the types of the parameters expected by events this type
+var _param_types: Array
+
+# Functions held here will be called as soon as events are decoded. Each entry is
+# a dictionary with the following fields:
+# - obj: Object instance holding the function to be called
+# - funcname: Function name to be called
+var _evt_handlers: Array
+
+#######################################################################################################################
+### "Private" functions
+
+
+#######################################################################################################################
+### Event handlers
+
+
+#######################################################################################################################
+### Overrides
+func _init(id: int, pt: Array) -> void:
+	# Event type ID must fit in 16 bits
+	assert(id >= 0 && id < 0xFFFF)
+	# If the next assert fails, then an unsupported parameter type is in the array
+	assert(check_types(pt))
+	
+	_type_id = id
+	_param_types = pt
