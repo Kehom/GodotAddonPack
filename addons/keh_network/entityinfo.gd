@@ -272,11 +272,15 @@ func get_properties_from_node(node: Node) -> Array:
 #		assert(node[repl.name] == proplist[-1])
 	return proplist
 
+const correctionstring: String = "net_has_correction"
 func apply_properties_to_node(node: Node,entity: Array) -> void:
 	# maybe just store a list of all variable names tbh
 	for idx in replicable.size():
 		var repl: ReplicableProperty = replicable[idx]
-		node[repl.name] = entity[idx + VARS]
+		if repl.name == correctionstring:
+			node[correctionstring] = true
+		else:
+			node[repl.name] = entity[idx + VARS]
 
 
 # Just to give a different access to the change mask size property.

@@ -67,7 +67,7 @@ func _physics_process(dt: float) -> void:
 	if (!_hit):
 		
 		net_position = global_transform.origin
-		net_orientation = global_transform.basis.get_rotation_quat()
+		net_orientation = Quat(global_transform.basis)
 		
 		# See clutter_base.gd's _physics_process for detailed explanation
 		if net_has_correction:

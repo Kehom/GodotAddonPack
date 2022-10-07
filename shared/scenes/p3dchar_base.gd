@@ -81,7 +81,7 @@ var net_pitch_angle: float
 var net_position: Vector3
 var net_orientation: Quat
 var net_stamina: float = 1.0
-var net_corrected: bool
+var net_has_correction: bool
 var net_effects: PoolByteArray = PoolByteArray()
 
 # Cache UID - as retrieved from the meta
@@ -113,9 +113,10 @@ func _ready() -> void:
 	
 	
 	# Initialize the correction data dictionary
-	net_corrected = false
+	net_has_correction = false
 	net_position = global_transform.origin
 	net_orientation = Quat(global_transform.basis)
+	net_velocity = _velocity
 	net_pitch_angle = _pitch_angle
 	net_stamina = 1.0
 #	_pitch_angle
@@ -129,11 +130,11 @@ func _ready() -> void:
 
 func _physics_process(_dt: float) -> void:
 	# Verify if there is any correction to be performed
-	if (net_corrected):
+	if (net_has_correction):
 		DEBUG_correction_count += 1
 		# Reset the flag otherwise this "correction" may be played again
 		# and will result in errors
-		net_corrected = false
+		net_has_correction = false
 		
 		# Apply the correct state 
 		global_transform = Transform(Basis(net_orientation),net_position)
@@ -177,12 +178,12 @@ func _physics_process(_dt: float) -> void:
 	net_position = global_transform.origin
 	net_orientation = global_transform.basis.get_rotation_quat()
 	net_effects = _effects
-	if net_corrected:
+	if net_has_correction:
 		network.snapshot_entity(self)
 	else:
-		net_corrected = true
+		net_has_correction = true
 		network.snapshot_entity(self)
-		net_corrected = false
+		net_has_correction = false
 	
 	# Even if the value hasn't changed this will ensure the HUD can stay updated
 	emit_signal("stamina_changed", _uid, current_stamina)
