@@ -252,6 +252,14 @@ func create_instance(uid: int, chash: int) -> Array:
 	ret.append_array(default_values.duplicate(true))
 	return ret
 
+func clone_entity(entity: Array) -> Array:
+	assert(!entity.empty())
+	var ret: Array = create_instance(0,0)
+	assert(ret.size() == entity.size())
+	for idx in replicable.size():
+		ret[idx+VARS] = entity[idx+VARS]
+	return ret
+
 enum {UID,CHASH,VARS}
 func get_properties_from_node(node: Node) -> Array:
 	assert(node.has_meta("uid"))
@@ -265,7 +273,6 @@ func get_properties_from_node(node: Node) -> Array:
 	return proplist
 
 func apply_properties_to_node(node: Node,entity: Array) -> void:
-	var i: int
 	# maybe just store a list of all variable names tbh
 	for idx in replicable.size():
 		var repl: ReplicableProperty = replicable[idx]

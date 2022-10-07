@@ -47,7 +47,7 @@ func check_selection(points: Dictionary, state: PhysicsDirectSpaceState, validat
 	for h in hits:
 		if (h.collider is CharUnitClass):
 			var unit: CharUnitClass = h.collider
-			if (unit._owner_id == _owner):
+			if (unit.net_owner_id == _owner):
 				if (validating):
 					_selected.push_back(unit)
 					unit.select(false)

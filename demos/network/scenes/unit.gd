@@ -16,6 +16,8 @@ var _materials: Dictionary
 
 func _ready() -> void:
 	net_target = global_transform.origin
+	net_position = global_transform.origin
+	net_orientation = Quat(global_transform.basis)
 
 
 func _physics_process(_dt: float) -> void:

@@ -474,7 +474,7 @@ func decode_delta(from: EncDecBuffer) -> NetSnapshot:
 		var einfo: EntityInfo = _entity_info.get(ehash)
 		for uid in tracker[ehash]:
 			var entity: Array = _server_state.get_entity(ehash, uid)
-			retval.add_entity(ehash, entity.duplicate(true))
+			retval.add_entity(ehash, einfo.clone_entity(entity))
 	
 	return retval
 
@@ -582,7 +582,7 @@ func client_check_snapshot(snap: NetSnapshot) -> void:
 				
 				# "Propagate" the server's data into every snapshot in the local history
 				for s in _history:
-					s.add_entity(ehash, rentity.duplicate(true))
+					s.add_entity(ehash, einfo.clone_entity(rentity))
 		
 		# Now check the entities that are in the local snapshot but not on the
 		# remote one. The local ones must be removed from the game.

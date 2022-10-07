@@ -10,7 +10,7 @@ class_name ClutterBase
 # will be taken from these variables
 var net_has_correction: bool
 var net_position: Vector3
-var net_orientation: Basis
+var net_orientation: Quat
 var net_ang_velocity: Vector3
 var net_lin_velocity: Vector3
 
@@ -23,7 +23,11 @@ var _chash: int
 func _ready() -> void:
 	# Although the property has been set through the editor, ensure this fact here
 	custom_integrator = true
-	
+	net_position = global_transform.origin
+	net_orientation = Quat(global_transform.basis)
+	net_ang_velocity = Vector3.ZERO
+	net_lin_velocity = Vector3.ZERO
+	net_has_correction = false
 	_uid = get_name().hash()
 	_chash = 0
 	set_meta("uid",_uid)
@@ -46,7 +50,7 @@ func _physics_process(_dt: float) -> void:
 	# Generate the snapshot entity object and add to the snapshot
 	
 	net_position = global_transform.origin
-	net_orientation = global_transform.basis
+	net_orientation = Quat(global_transform.basis)
 	net_ang_velocity = angular_velocity
 	net_lin_velocity = linear_velocity
 	
@@ -89,7 +93,7 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 	
 	# Store the state so it can be added into the snapshot
 	net_position = state.transform.origin
-	net_orientation = state.transform.basis.get_rotation_quat()
+	net_orientation = Quat(state.transform.basis)
 	net_ang_velocity = state.get_angular_velocity()
 	net_lin_velocity = state.get_linear_velocity()
 
