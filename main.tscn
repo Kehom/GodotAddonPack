@@ -10,9 +10,6 @@ anchor_bottom = 1.0
 margin_top = 1.0
 margin_bottom = 1.0
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="mpnl" type="Panel" parent="."]
 anchor_right = 1.0
@@ -140,6 +137,14 @@ toggle_mode = true
 group = ExtResource( 2 )
 text = "Complete"
 
+[node name="bt_replaydemo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 314.0
+margin_right = 206.0
+margin_bottom = 334.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "Replay"
+
 [node name="bt_quit" type="Button" parent="mpnl/demo_list/pnl"]
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -148,9 +153,6 @@ margin_top = -34.3674
 margin_right = 231.0
 margin_bottom = -14.3674
 text = "Quit"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="stabs" type="TabContainer" parent="mpnl"]
 anchor_right = 1.0
@@ -591,7 +593,7 @@ margin_top = 46.0
 margin_right = -9.99994
 margin_bottom = -20.0
 text = "Interdependency: none
-This addon is meant to provide a few  scripts to help the debugging process.
+This addon is meant to provide a few scripts to help the debugging process.
 
 Brief feature overview:
 - overlayinfo.gd: Quickly add text labels on screen without the need to create temporary UI controls all over the place. It also allows timed labels to be shown for the specified amount of seconds. Labels are added/removed into/from a container box that expands/shrinks according to the contents.
@@ -666,6 +668,49 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="replaydemo" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_replaydemo" type="Button" parent="mpnl/stabs/replaydemo"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 122.0
+margin_bottom = 31.0
+text = "Load"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="description" type="Label" parent="mpnl/stabs/replaydemo"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 14.0
+margin_top = 46.0
+margin_right = -9.99994
+margin_bottom = -20.0
+text = "Interdependency: Network addon, EncDecBuffer
+This addon is meant to provide an easy way of recording and viewing gameplay at a later time for users of the Network addon.
+
+This demo provides a way to view replays of gameplay recorded in the 'mega' demo. If enabled, whenever a player manually disconnects from the mega demo, a .REPLAY file is saved to the specified file location. The demo itself is a dedicated replay viewing client, with traditional multimedia controls:
+
+- Pausing and playing				| SPACEBAR
+- Skip forward/back					| CTRL + RIGHT/LEFT ARROW KEYS
+- Adjust playback speed			| UP/DOWN ARROW KEYS
+- Adjustable timeline playhead	| RIGHT/LEFT ARROW KEYS
+- Restarting/skipping to end		| CTRL + SHIFT + RIGHT/LEFT ARROW KEYS
+
+F4 returns to the main menu."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="audiomaster" type="Panel" parent="mpnl/stabs"]
 visible = false
 anchor_right = 1.0
@@ -712,6 +757,7 @@ autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
 [connection signal="pressed" from="mpnl/demo_list/pnl/bt_quit" to="." method="_on_bt_quit_pressed"]
 [connection signal="pressed" from="mpnl/stabs/encdecbuffer/bt_encdecload" to="." method="_on_bt_encdecload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/quantize/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]
@@ -726,4 +772,5 @@ __meta__ = {
 [connection signal="pressed" from="mpnl/stabs/fancyle/bt_fleload" to="." method="_on_bt_fleload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/dbghelper/bt_dbgload" to="." method="_on_bt_dbgload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/inventory/bt_invdemoload" to="." method="_on_bt_invdemoload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/replaydemo/bt_replaydemo" to="." method="_on_bt_replaydemo_pressed"]
 [connection signal="pressed" from="mpnl/stabs/audiomaster/bt_amasterload" to="." method="_on_bt_amasterload_pressed"]

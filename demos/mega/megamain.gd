@@ -46,6 +46,7 @@ var _ui_player: Dictionary = {}
 # then this property will be changed.
 var _disconnected_message: String
 
+var _replay: Replay
 
 
 func _ready() -> void:
@@ -78,10 +79,37 @@ func _ready() -> void:
 	# this way
 	if (!network.has_authority()):
 		network.notify_ready()
+	var record_replays: bool
+	var replay_capture_rate: int
+	var replay_full_capture_rate: int
+	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.recsetting):
+		record_replays = ProjectSettings.get_setting(Replay.explodingreplays + Replay.recsetting)
+	else:
+		printsettingmsg(Replay.recsetting)
+		return
+	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.capratesetting):
+		replay_capture_rate = ProjectSettings.get_setting(Replay.explodingreplays + Replay.capratesetting)
+	else:
+		printsettingmsg(Replay.capratesetting)
+		record_replays = false
+		return
+	if ProjectSettings.has_setting(Replay.explodingreplays + Replay.fullratesetting):
+		replay_full_capture_rate = ProjectSettings.get_setting(Replay.explodingreplays + Replay.fullratesetting)
+	else:
+		printsettingmsg(Replay.fullratesetting)
+		record_replays = false
+		return
+	print("Recording replay of this session.")
+	_replay = Replay.new(replay_capture_rate,replay_full_capture_rate,"res://demos/mega/megamain.tscn")
+#	if !get_tree().has_network_peer():
+#		pass
 
-
+static func printsettingmsg(msg: String) -> void:
+	print('Cannot record replay! Cannot access %s setting'%[msg])
 
 func _exit_tree() -> void:
+	if _replay:
+		_replay.save(Replay.default_file("Replay"),Replay.get_default_directory())
 	# Hide the OverlayDebugInfo
 	OverlayDebugInfo.set_visibility(false)
 	
@@ -121,6 +149,8 @@ func _physics_process(_dt: float) -> void:
 		# Then each of the connected players - in this case, clients
 		for pid in network.player_data.remote_player:
 			create_player_character(network.player_data.remote_player[pid])
+	if _replay:
+		call_deferred("add_most_recent_snapshot_to_replay")
 	
 	# Owned custom property and own network ID
 	var owned_cprop: float = network.player_data.local_player.get_custom_property("testing_broadcast")
@@ -132,7 +162,8 @@ func _physics_process(_dt: float) -> void:
 		var cprop: float = network.player_data.remote_player[pid].get_custom_property("testing_broadcast")
 		OverlayDebugInfo.set_label("test_broad%s" % pid, "Custom Value (%s): %s" % [pid, cprop])
 
-
+func add_most_recent_snapshot_to_replay() -> void:
+	_replay.add_snapshot(network.snapshot_data._history[-1])
 
 # Provide means to get back to the main menu
 func _input(evt: InputEvent) -> void:

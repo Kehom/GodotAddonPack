@@ -1,0 +1,379 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://addons/keh_gddb/editor/btplay_16x16.png" type="Texture" id=1]
+[ext_resource path="res://shared/fonts/Aileron-Bold.otf" type="DynamicFontData" id=2]
+[ext_resource path="res://shared/fonts/aileron-bold.tres" type="DynamicFont" id=3]
+[ext_resource path="res://demos/replays/replayviewer.gd" type="Script" id=4]
+
+[sub_resource type="DynamicFont" id=1]
+size = 14
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 8
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 24
+font_data = ExtResource( 2 )
+
+[node name="Replay Viewer" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 4 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+margin_top = 64.0
+margin_right = 1024.0
+margin_bottom = 512.0
+
+[node name="ViewportContainer" type="ViewportContainer" parent="CenterContainer"]
+margin_left = 149.0
+margin_top = 20.0
+margin_right = 875.0
+margin_bottom = 428.0
+
+[node name="Viewport" type="Viewport" parent="CenterContainer/ViewportContainer"]
+size = Vector2( 726, 408 )
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="FPS" type="HBoxContainer" parent="."]
+margin_left = 904.0
+margin_top = 48.0
+margin_right = 968.0
+margin_bottom = 68.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="FPS"]
+margin_right = 36.0
+margin_bottom = 20.0
+custom_fonts/font = ExtResource( 3 )
+text = "FPS: "
+
+[node name="Readout" type="Label" parent="FPS"]
+margin_left = 36.0
+margin_right = 36.0
+margin_bottom = 20.0
+custom_fonts/font = ExtResource( 3 )
+
+[node name="TimeScaleLabel" type="Label" parent="."]
+margin_left = 904.0
+margin_top = 520.0
+margin_right = 1028.0
+margin_bottom = 538.0
+custom_fonts/font = SubResource( 1 )
+text = "Playback Speed:"
+
+[node name="TimeScale" type="SpinBox" parent="."]
+margin_left = 904.0
+margin_top = 538.0
+margin_right = 1024.0
+margin_bottom = 562.0
+min_value = 0.1
+max_value = 5.0
+step = 0.1
+value = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 128.0
+margin_top = 498.0
+margin_right = 896.0
+margin_bottom = 560.0
+custom_constants/separation = 0
+alignment = 2
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="Timeline" type="HScrollBar" parent="VBoxContainer"]
+margin_top = 10.0
+margin_right = 768.0
+margin_bottom = 22.0
+max_value = 0.0
+rounded = true
+
+[node name="MediaControls" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 22.0
+margin_right = 768.0
+margin_bottom = 62.0
+rect_min_size = Vector2( 0, 40 )
+custom_constants/separation = 0
+alignment = 1
+
+[node name="Restart" type="Button" parent="VBoxContainer/MediaControls"]
+margin_left = 48.0
+margin_right = 144.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 96, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "[<-"
+icon_align = 1
+
+[node name="10SecondsBack" type="Button" parent="VBoxContainer/MediaControls"]
+margin_left = 144.0
+margin_right = 240.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 96, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "<<"
+icon_align = 1
+
+[node name="1FrameBack" type="Button" parent="VBoxContainer/MediaControls"]
+margin_left = 240.0
+margin_right = 336.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 96, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "<"
+icon_align = 1
+
+[node name="PauseAndPlay" type="Button" parent="VBoxContainer/MediaControls"]
+margin_left = 336.0
+margin_right = 432.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 96, 0 )
+custom_fonts/font = ExtResource( 3 )
+icon = ExtResource( 1 )
+icon_align = 1
+
+[node name="1FrameForward" type="Button" parent="VBoxContainer/MediaControls"]
+margin_left = 432.0
+margin_right = 528.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 96, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = ">"
+icon_align = 1
+
+[node name="10SecondsForward" type="Button" parent="VBoxContainer/MediaControls"]
+margin_left = 528.0
+margin_right = 624.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 96, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = ">>"
+icon_align = 1
+
+[node name="ToEnd" type="Button" parent="VBoxContainer/MediaControls"]
+margin_left = 624.0
+margin_right = 720.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 96, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "->]"
+icon_align = 1
+
+[node name="TimecodeInfo" type="VBoxContainer" parent="."]
+margin_left = 8.0
+margin_top = 520.0
+margin_right = 130.0
+margin_bottom = 550.0
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="TimeReadout" type="HBoxContainer" parent="TimecodeInfo"]
+margin_right = 122.0
+margin_bottom = 10.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="TimecodeInfo/TimeReadout"]
+margin_right = 62.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "Timecode:           "
+
+[node name="Readout" type="Label" parent="TimecodeInfo/TimeReadout"]
+margin_left = 62.0
+margin_right = 84.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "00:00"
+
+[node name="Max" type="Label" parent="TimecodeInfo/TimeReadout"]
+margin_left = 84.0
+margin_right = 109.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "/00:00"
+
+[node name="FrameReadout" type="HBoxContainer" parent="TimecodeInfo"]
+margin_top = 14.0
+margin_right = 122.0
+margin_bottom = 24.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="TimecodeInfo/FrameReadout"]
+margin_right = 59.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "Current frame: "
+
+[node name="Readout" type="Label" parent="TimecodeInfo/FrameReadout"]
+margin_left = 59.0
+margin_right = 89.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "000000"
+
+[node name="Max" type="Label" parent="TimecodeInfo/FrameReadout"]
+margin_left = 89.0
+margin_right = 122.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "/000000"
+
+[node name="ReplayInfo" type="VBoxContainer" parent="."]
+margin_left = 8.0
+margin_top = 88.0
+margin_right = 130.0
+margin_bottom = 118.0
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Tickrate" type="HBoxContainer" parent="ReplayInfo"]
+margin_right = 128.0
+margin_bottom = 10.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="ReplayInfo/Tickrate"]
+margin_right = 36.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "Tickrate: "
+
+[node name="Readout" type="Label" parent="ReplayInfo/Tickrate"]
+margin_left = 36.0
+margin_right = 46.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "30"
+
+[node name="FullSnapshotRate" type="HBoxContainer" parent="ReplayInfo"]
+margin_top = 14.0
+margin_right = 128.0
+margin_bottom = 24.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="ReplayInfo/FullSnapshotRate"]
+margin_right = 75.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "Full Snapshot rate: "
+
+[node name="Readout" type="Label" parent="ReplayInfo/FullSnapshotRate"]
+margin_left = 75.0
+margin_right = 128.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "30 (1 second)"
+
+[node name="Scene" type="HBoxContainer" parent="ReplayInfo"]
+margin_top = 28.0
+margin_right = 128.0
+margin_bottom = 38.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="ReplayInfo/Scene"]
+margin_right = 28.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "Scene: "
+
+[node name="Readout" type="Label" parent="ReplayInfo/Scene"]
+margin_left = 28.0
+margin_right = 68.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "mega.tscn"
+
+[node name="GameInfo" type="VBoxContainer" parent="."]
+visible = false
+margin_left = 8.0
+margin_top = 120.0
+margin_right = 136.0
+margin_bottom = 150.0
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Tickrate" type="HBoxContainer" parent="GameInfo"]
+margin_right = 128.0
+margin_bottom = 10.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="GameInfo/Tickrate"]
+margin_right = 36.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "Tickrate: "
+
+[node name="Readout" type="Label" parent="GameInfo/Tickrate"]
+margin_left = 36.0
+margin_right = 46.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "30"
+
+[node name="FullSnapshotRate" type="HBoxContainer" parent="GameInfo"]
+margin_top = 14.0
+margin_right = 128.0
+margin_bottom = 24.0
+custom_constants/separation = 0
+
+[node name="Label" type="Label" parent="GameInfo/FullSnapshotRate"]
+margin_right = 75.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "Full Snapshot rate: "
+
+[node name="Readout" type="Label" parent="GameInfo/FullSnapshotRate"]
+margin_left = 75.0
+margin_right = 128.0
+margin_bottom = 10.0
+custom_fonts/font = SubResource( 2 )
+text = "30 (1 second)"
+
+[node name="ChangeReplay" type="Button" parent="."]
+margin_left = 185.0
+margin_right = 370.0
+margin_bottom = 36.0
+custom_fonts/font = SubResource( 3 )
+text = "Change Replay"
+
+[node name="MainMenu" type="Button" parent="."]
+margin_right = 185.0
+margin_bottom = 36.0
+custom_fonts/font = SubResource( 3 )
+text = "Main Menu"
+
+[node name="FileDialog" type="FileDialog" parent="."]
+visible = true
+margin_left = 152.0
+margin_top = 96.0
+margin_right = 728.0
+margin_bottom = 488.0
+popup_exclusive = true
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 2
+filters = PoolStringArray( "*.REPLAY" )
+
+[connection signal="scrolling" from="VBoxContainer/Timeline" to="." method="on_timeline_scrolled"]
+[connection signal="value_changed" from="VBoxContainer/Timeline" to="." method="on_timeline_ticked"]
+[connection signal="pressed" from="VBoxContainer/MediaControls/Restart" to="." method="restart"]
+[connection signal="pressed" from="VBoxContainer/MediaControls/10SecondsBack" to="." method="go_back"]
+[connection signal="pressed" from="VBoxContainer/MediaControls/1FrameBack" to="." method="go_back_1"]
+[connection signal="pressed" from="VBoxContainer/MediaControls/PauseAndPlay" to="." method="pause_unpause"]
+[connection signal="pressed" from="VBoxContainer/MediaControls/1FrameForward" to="." method="go_forward_1"]
+[connection signal="pressed" from="VBoxContainer/MediaControls/10SecondsForward" to="." method="go_forward"]
+[connection signal="pressed" from="VBoxContainer/MediaControls/ToEnd" to="." method="go_to_end"]
+[connection signal="pressed" from="ChangeReplay" to="." method="change_replay"]
+[connection signal="pressed" from="MainMenu" to="." method="goto_main_menu"]
+[connection signal="file_selected" from="FileDialog" to="." method="read_replay"]
