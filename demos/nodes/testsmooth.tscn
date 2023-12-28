@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://demos/nodes/testsmooth.gd" type="Script" id=1]
 [ext_resource path="res://shared/scenes/check_plane_floor.tscn" type="PackedScene" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://addons/keh_smooth/smooth2d/smooth2d.gd" type="Script" id=7]
 [ext_resource path="res://addons/keh_smooth/autointerpolate.gd" type="Script" id=8]
 [ext_resource path="res://addons/keh_ui/expanel/expanel.gd" type="Script" id=9]
+[ext_resource path="res://shared/textures/godot_icon.png" type="Texture" id=10]
 
 [sub_resource type="BoxShape" id=1]
 
@@ -239,6 +240,9 @@ margin_top = -30.0
 margin_right = -11.0
 margin_bottom = -10.0
 text = "Back"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="s3d" type="Spatial" parent="."]
 
@@ -329,7 +333,7 @@ rotation = 0.610865
 shape = SubResource( 13 )
 
 [node name="Sprite" type="Sprite" parent="s2d/non_smooth"]
-texture = ExtResource( 6 )
+texture = ExtResource( 10 )
 
 [node name="smoothed" parent="s2d" instance=ExtResource( 5 )]
 position = Vector2( 618, 310 )
@@ -343,7 +347,7 @@ script = ExtResource( 7 )
 
 [node name="sprite" type="Sprite" parent="s2d/smoothed/Smooth2D"]
 self_modulate = Color( 1, 0.00784314, 0.00784314, 1 )
-texture = ExtResource( 6 )
+texture = ExtResource( 10 )
 
 [node name="refsprite" type="Sprite" parent="s2d/smoothed"]
 visible = false
@@ -362,16 +366,17 @@ script = ExtResource( 8 )
 enabled = true
 interpolate = 7
 target = NodePath("")
-"Interpolate 1" = null
+"Interpolate 1" = NodePath("../smoth_sprite")
+"Interpolate 2" = null
 
 [node name="smoth_sprite" type="Sprite" parent="s2d/autosmoothed"]
 self_modulate = Color( 0.890196, 0.827451, 0.176471, 1 )
-texture = ExtResource( 6 )
+texture = ExtResource( 10 )
 
 [node name="refsprite" type="Sprite" parent="s2d/autosmoothed"]
 visible = false
 self_modulate = Color( 0.290196, 0.278431, 0.278431, 0.478431 )
-texture = ExtResource( 6 )
+texture = ExtResource( 10 )
 [connection signal="toggled" from="hud/expandable/pnl/chk_enable2d" to="." method="_on_chk_enable2d_toggled"]
 [connection signal="toggled" from="hud/expandable/pnl/chk_enable3d" to="." method="_on_chk_enable3d_toggled"]
 [connection signal="pressed" from="hud/expandable/pnl/bt_replay" to="." method="_on_bt_replay_pressed"]
