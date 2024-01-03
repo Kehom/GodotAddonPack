@@ -1,0 +1,906 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://demos/radimpulse/ball3d.tscn" type="PackedScene" id=1]
+[ext_resource path="res://addons/keh_radimpulse/radimpulse3d.gd" type="Script" id=2]
+[ext_resource path="res://demos/radimpulse/rimpulse3d.gd" type="Script" id=3]
+[ext_resource path="res://addons/keh_ui/expanel/expanel.gd" type="Script" id=4]
+[ext_resource path="res://addons/keh_nodes/cam3d/cam3d.tscn" type="PackedScene" id=5]
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_color = Color( 0.290196, 0.486275, 0.0745098, 1 )
+
+[sub_resource type="CubeMesh" id=2]
+material = SubResource( 1 )
+size = Vector3( 10, 0.1, 10 )
+
+[sub_resource type="BoxShape" id=3]
+extents = Vector3( 5, 0.05, 5 )
+
+[sub_resource type="BoxShape" id=4]
+extents = Vector3( 0.5, 5, 5 )
+
+[sub_resource type="SpatialMaterial" id=5]
+flags_transparent = true
+flags_unshaded = true
+flags_do_not_receive_shadows = true
+flags_disable_ambient_light = true
+params_cull_mode = 2
+albedo_color = Color( 0.496094, 0.496094, 0.496094, 0.5 )
+
+[sub_resource type="SphereMesh" id=6]
+material = SubResource( 5 )
+radial_segments = 32
+
+[node name="rimpulse3d" type="Spatial"]
+script = ExtResource( 3 )
+
+[node name="ui" type="CanvasLayer" parent="."]
+
+[node name="panel" type="Control" parent="ui"]
+anchor_bottom = 1.0
+margin_right = 144.0
+rect_min_size = Vector2( 5, 5 )
+rect_clip_content = true
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+border = 0
+current_page = -1
+toggle_button_separation = 10
+keep_toggle_button_focus = false
+animation/update_on_physics = false
+animation/shrink_on_page_change = true
+animation/expand_time = 0.25
+animation/expand_curve = null
+animation/shrink_time = 0.15
+animation/shrink_curve = null
+__content_size = Vector2( 126, 12 )
+__page_data = {
+"Settings": {
+"expanded_icon": null,
+"icon_color": Color( 1, 1, 1, 1 ),
+"shrinked_icon": null
+}
+}
+CustomStyles/background = null
+CustomStyles/bar = null
+CustomStyles/button_expanded_hover = null
+CustomStyles/button_expanded_pressed = null
+CustomStyles/button_expanded_focus = null
+CustomStyles/button_expanded_normal = null
+CustomStyles/button_shrinked_hover = null
+CustomStyles/button_shrinked_pressed = null
+CustomStyles/button_shrinked_focus = null
+CustomStyles/button_shrinked_normal = null
+CustomConstants/updown_width = null
+CustomConstants/updown_height = null
+CustomConstants/leftright_width = null
+CustomConstants/leftright_height = null
+
+[node name="Settings" type="VBoxContainer" parent="ui/panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 4.0
+margin_right = -22.0
+margin_bottom = -4.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="lbl_falloff" type="Label" parent="ui/panel/Settings"]
+margin_right = 118.0
+margin_bottom = 14.0
+text = "Falloff"
+
+[node name="opt_falloff" type="OptionButton" parent="ui/panel/Settings"]
+margin_top = 18.0
+margin_right = 118.0
+margin_bottom = 38.0
+
+[node name="spacer" type="Control" parent="ui/panel/Settings"]
+margin_top = 42.0
+margin_right = 118.0
+margin_bottom = 57.0
+rect_min_size = Vector2( 0, 15 )
+
+[node name="lbl_impval" type="Label" parent="ui/panel/Settings"]
+margin_top = 61.0
+margin_right = 118.0
+margin_bottom = 75.0
+text = "Impulse value"
+
+[node name="txt_impulse" type="SpinBox" parent="ui/panel/Settings"]
+margin_top = 79.0
+margin_right = 118.0
+margin_bottom = 103.0
+min_value = 15.0
+max_value = 300.0
+value = 100.0
+
+[node name="spacer_big" type="Control" parent="ui/panel/Settings"]
+margin_top = 107.0
+margin_right = 118.0
+margin_bottom = 568.0
+size_flags_vertical = 3
+
+[node name="bt_back" type="Button" parent="ui/panel/Settings"]
+margin_left = 48.0
+margin_top = 572.0
+margin_right = 118.0
+margin_bottom = 592.0
+rect_min_size = Vector2( 70, 0 )
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="env" type="Spatial" parent="."]
+
+[node name="light" type="DirectionalLight" parent="env"]
+transform = Transform( 1, 0, 0, 0, 0.173648, 0.984808, 0, -0.984808, 0.173648, 0, 12, 0 )
+shadow_enabled = true
+shadow_color = Color( 0.145098, 0.145098, 0.145098, 1 )
+
+[node name="static" type="Spatial" parent="."]
+
+[node name="floor" type="StaticBody" parent="static"]
+collision_layer = 3
+collision_mask = 3
+
+[node name="mesh" type="MeshInstance" parent="static/floor"]
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="shape" type="CollisionShape" parent="static/floor"]
+shape = SubResource( 3 )
+
+[node name="wall1" type="StaticBody" parent="static"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 5, 0 )
+
+[node name="shape" type="CollisionShape" parent="static/wall1"]
+shape = SubResource( 4 )
+
+[node name="wall2" type="StaticBody" parent="static"]
+transform = Transform( -1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 5.5, 5, 0 )
+
+[node name="shape" type="CollisionShape" parent="static/wall2"]
+shape = SubResource( 4 )
+
+[node name="wall3" type="StaticBody" parent="static"]
+transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 5, 5.5 )
+
+[node name="shape" type="CollisionShape" parent="static/wall3"]
+shape = SubResource( 4 )
+
+[node name="wall4" type="StaticBody" parent="static"]
+transform = Transform( 1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, 0, 5, -5.5 )
+
+[node name="shape" type="CollisionShape" parent="static/wall4"]
+shape = SubResource( 4 )
+
+[node name="ceiling" type="StaticBody" parent="static"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0 )
+
+[node name="shape" type="CollisionShape" parent="static/ceiling"]
+shape = SubResource( 3 )
+
+[node name="rigid" type="Spatial" parent="."]
+
+[node name="ball1" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, -4 )
+
+[node name="ball2" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, -4 )
+
+[node name="ball3" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, -4 )
+
+[node name="ball4" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, -4 )
+
+[node name="ball5" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, -4 )
+
+[node name="ball6" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, -4 )
+
+[node name="ball7" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, -4 )
+
+[node name="ball8" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, -4 )
+
+[node name="ball9" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, -4 )
+
+[node name="ball10" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, -3 )
+
+[node name="ball11" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, -3 )
+
+[node name="ball12" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, -3 )
+
+[node name="ball13" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, -3 )
+
+[node name="ball14" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, -3 )
+
+[node name="ball15" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, -3 )
+
+[node name="ball16" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, -3 )
+
+[node name="ball17" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, -3 )
+
+[node name="ball18" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, -3 )
+
+[node name="ball19" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, -2 )
+
+[node name="ball20" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, -2 )
+
+[node name="ball21" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, -2 )
+
+[node name="ball22" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, -2 )
+
+[node name="ball23" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, -2 )
+
+[node name="ball24" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, -2 )
+
+[node name="ball25" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, -2 )
+
+[node name="ball26" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, -2 )
+
+[node name="ball27" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, -2 )
+
+[node name="ball28" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, -1 )
+
+[node name="ball29" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, -1 )
+
+[node name="ball30" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, -1 )
+
+[node name="ball31" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, -1 )
+
+[node name="ball32" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, -1 )
+
+[node name="ball33" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, -1 )
+
+[node name="ball34" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, -1 )
+
+[node name="ball35" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, -1 )
+
+[node name="ball36" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, -1 )
+
+[node name="ball37" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, 0 )
+
+[node name="ball38" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, 0 )
+
+[node name="ball39" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, 0 )
+
+[node name="ball40" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, 0 )
+
+[node name="ball41" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, 0 )
+
+[node name="ball42" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, 0 )
+
+[node name="ball43" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, 0 )
+
+[node name="ball44" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, 0 )
+
+[node name="ball45" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, 0 )
+
+[node name="ball46" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, 1 )
+
+[node name="ball47" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, 1 )
+
+[node name="ball48" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, 1 )
+
+[node name="ball49" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, 1 )
+
+[node name="ball50" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, 1 )
+
+[node name="ball51" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, 1 )
+
+[node name="ball52" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, 1 )
+
+[node name="ball53" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, 1 )
+
+[node name="ball54" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, 1 )
+
+[node name="ball55" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, 2 )
+
+[node name="ball56" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, 2 )
+
+[node name="ball57" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, 2 )
+
+[node name="ball58" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, 2 )
+
+[node name="ball59" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, 2 )
+
+[node name="ball60" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, 2 )
+
+[node name="ball61" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, 2 )
+
+[node name="ball62" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, 2 )
+
+[node name="ball63" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, 2 )
+
+[node name="ball64" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, 3 )
+
+[node name="ball65" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, 3 )
+
+[node name="ball66" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, 3 )
+
+[node name="ball67" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, 3 )
+
+[node name="ball68" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, 3 )
+
+[node name="ball69" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, 3 )
+
+[node name="ball70" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, 3 )
+
+[node name="ball71" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, 3 )
+
+[node name="ball72" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, 3 )
+
+[node name="ball73" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.92887, 4 )
+
+[node name="ball74" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.92887, 4 )
+
+[node name="ball75" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4.92887, 4 )
+
+[node name="ball76" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.92887, 4 )
+
+[node name="ball77" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.92887, 4 )
+
+[node name="ball78" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 4.92887, 4 )
+
+[node name="ball79" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4.92887, 4 )
+
+[node name="ball80" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.92887, 4 )
+
+[node name="ball81" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 4.92887, 4 )
+
+[node name="ball146" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, -4 )
+
+[node name="ball147" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, -4 )
+
+[node name="ball148" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, -4 )
+
+[node name="ball149" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, -4 )
+
+[node name="ball150" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, -4 )
+
+[node name="ball151" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, -4 )
+
+[node name="ball152" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, -4 )
+
+[node name="ball153" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, -4 )
+
+[node name="ball154" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, -4 )
+
+[node name="ball155" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, -3 )
+
+[node name="ball156" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, -3 )
+
+[node name="ball157" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, -3 )
+
+[node name="ball158" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, -3 )
+
+[node name="ball159" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, -3 )
+
+[node name="ball160" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, -3 )
+
+[node name="ball161" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, -3 )
+
+[node name="ball162" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, -3 )
+
+[node name="ball163" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, -3 )
+
+[node name="ball164" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, -2 )
+
+[node name="ball165" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, -2 )
+
+[node name="ball166" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, -2 )
+
+[node name="ball167" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, -2 )
+
+[node name="ball168" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, -2 )
+
+[node name="ball169" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, -2 )
+
+[node name="ball170" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, -2 )
+
+[node name="ball171" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, -2 )
+
+[node name="ball172" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, -2 )
+
+[node name="ball173" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, -1 )
+
+[node name="ball174" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, -1 )
+
+[node name="ball175" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, -1 )
+
+[node name="ball176" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, -1 )
+
+[node name="ball177" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, -1 )
+
+[node name="ball178" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, -1 )
+
+[node name="ball179" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, -1 )
+
+[node name="ball180" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, -1 )
+
+[node name="ball181" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, -1 )
+
+[node name="ball182" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, 0 )
+
+[node name="ball183" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, 0 )
+
+[node name="ball184" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, 0 )
+
+[node name="ball185" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, 0 )
+
+[node name="ball186" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, 0 )
+
+[node name="ball187" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, 0 )
+
+[node name="ball188" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, 0 )
+
+[node name="ball189" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, 0 )
+
+[node name="ball190" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, 0 )
+
+[node name="ball191" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, 1 )
+
+[node name="ball192" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, 1 )
+
+[node name="ball193" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, 1 )
+
+[node name="ball194" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, 1 )
+
+[node name="ball195" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, 1 )
+
+[node name="ball196" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, 1 )
+
+[node name="ball197" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, 1 )
+
+[node name="ball198" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, 1 )
+
+[node name="ball199" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, 1 )
+
+[node name="ball200" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, 2 )
+
+[node name="ball201" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, 2 )
+
+[node name="ball202" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, 2 )
+
+[node name="ball203" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, 2 )
+
+[node name="ball204" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, 2 )
+
+[node name="ball205" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, 2 )
+
+[node name="ball206" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, 2 )
+
+[node name="ball207" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, 2 )
+
+[node name="ball208" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, 2 )
+
+[node name="ball209" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, 3 )
+
+[node name="ball210" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, 3 )
+
+[node name="ball211" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, 3 )
+
+[node name="ball212" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, 3 )
+
+[node name="ball213" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, 3 )
+
+[node name="ball214" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, 3 )
+
+[node name="ball215" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, 3 )
+
+[node name="ball216" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, 3 )
+
+[node name="ball217" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, 3 )
+
+[node name="ball218" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 8.92887, 4 )
+
+[node name="ball219" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 8.92887, 4 )
+
+[node name="ball220" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.92887, 4 )
+
+[node name="ball221" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 8.92887, 4 )
+
+[node name="ball222" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.92887, 4 )
+
+[node name="ball223" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 8.92887, 4 )
+
+[node name="ball224" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8.92887, 4 )
+
+[node name="ball225" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 8.92887, 4 )
+
+[node name="ball226" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.92887, 4 )
+
+[node name="ball82" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, -3.37518 )
+
+[node name="ball83" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, -3.37518 )
+
+[node name="ball84" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, -3.37518 )
+
+[node name="ball85" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, -3.37518 )
+
+[node name="ball86" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, -3.37518 )
+
+[node name="ball87" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, -3.37518 )
+
+[node name="ball88" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, -3.37518 )
+
+[node name="ball89" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, -3.37518 )
+
+[node name="ball90" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, -2.37518 )
+
+[node name="ball91" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, -2.37518 )
+
+[node name="ball92" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, -2.37518 )
+
+[node name="ball93" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, -2.37518 )
+
+[node name="ball94" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, -2.37518 )
+
+[node name="ball95" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, -2.37518 )
+
+[node name="ball96" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, -2.37518 )
+
+[node name="ball97" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, -2.37518 )
+
+[node name="ball98" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, -1.37518 )
+
+[node name="ball99" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, -1.37518 )
+
+[node name="ball100" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, -1.37518 )
+
+[node name="ball101" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, -1.37518 )
+
+[node name="ball102" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, -1.37518 )
+
+[node name="ball103" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, -1.37518 )
+
+[node name="ball104" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, -1.37518 )
+
+[node name="ball105" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, -1.37518 )
+
+[node name="ball106" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, -0.375176 )
+
+[node name="ball107" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, -0.375176 )
+
+[node name="ball108" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, -0.375176 )
+
+[node name="ball109" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, -0.375176 )
+
+[node name="ball110" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, -0.375176 )
+
+[node name="ball111" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, -0.375176 )
+
+[node name="ball112" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, -0.375176 )
+
+[node name="ball113" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, -0.375176 )
+
+[node name="ball114" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, 0.624824 )
+
+[node name="ball115" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, 0.624824 )
+
+[node name="ball116" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, 0.624824 )
+
+[node name="ball117" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, 0.624824 )
+
+[node name="ball118" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, 0.624824 )
+
+[node name="ball119" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, 0.624824 )
+
+[node name="ball120" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, 0.624824 )
+
+[node name="ball121" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, 0.624824 )
+
+[node name="ball122" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, 1.62482 )
+
+[node name="ball123" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, 1.62482 )
+
+[node name="ball124" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, 1.62482 )
+
+[node name="ball125" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, 1.62482 )
+
+[node name="ball126" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, 1.62482 )
+
+[node name="ball127" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, 1.62482 )
+
+[node name="ball128" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, 1.62482 )
+
+[node name="ball129" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, 1.62482 )
+
+[node name="ball130" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, 2.62482 )
+
+[node name="ball131" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, 2.62482 )
+
+[node name="ball132" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, 2.62482 )
+
+[node name="ball133" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, 2.62482 )
+
+[node name="ball134" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, 2.62482 )
+
+[node name="ball135" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, 2.62482 )
+
+[node name="ball136" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, 2.62482 )
+
+[node name="ball137" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, 2.62482 )
+
+[node name="ball138" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.49419, 6.92887, 3.62482 )
+
+[node name="ball139" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.49419, 6.92887, 3.62482 )
+
+[node name="ball140" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49419, 6.92887, 3.62482 )
+
+[node name="ball141" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.494188, 6.92887, 3.62482 )
+
+[node name="ball142" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.505812, 6.92887, 3.62482 )
+
+[node name="ball143" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.50581, 6.92887, 3.62482 )
+
+[node name="ball144" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.50581, 6.92887, 3.62482 )
+
+[node name="ball145" parent="rigid" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.50581, 6.92887, 3.62482 )
+
+[node name="cam_ctrl" type="Spatial" parent="."]
+
+[node name="cam" parent="cam_ctrl" instance=ExtResource( 5 )]
+transform = Transform( 1, 0, 0, 0, 0.819152, 0.573577, 0, -0.573577, 0.819152, 0, 0, 0 )
+arm_length = 9.0
+lock_rotation = 3
+interpolate_pivot = false
+interpolate_orientation = false
+camera_lag = 0
+lag_speed = 0.1
+collision_mode = 0
+collision_layers = 2147483647
+shake_mode = 1
+trauma_decay = 0.75
+shake_frequency = 1.0
+max_shake_rotation = Vector3( 2, 2, 2 )
+max_shake_offset = Vector3( 1, 1, 1 )
+keep_aspect = 1
+environment = null
+h_offset = 0.0
+v_offset = 0.0
+doppler_tracking = 0
+projection = 0
+current = true
+fov = 70.0
+far = 100.0
+
+[node name="radimpulse" type="Spatial" parent="."]
+script = ExtResource( 2 )
+force = 100.0
+layer = 1
+mask = 1
+
+[node name="visual" type="MeshInstance" parent="radimpulse"]
+cast_shadow = 0
+mesh = SubResource( 6 )
+material/0 = null
+[connection signal="item_selected" from="ui/panel/Settings/opt_falloff" to="." method="_on_opt_falloff_item_selected"]
+[connection signal="value_changed" from="ui/panel/Settings/txt_impulse" to="." method="_on_txt_impulse_value_changed"]
+[connection signal="pressed" from="ui/panel/Settings/bt_back" to="." method="_on_bt_back_pressed"]

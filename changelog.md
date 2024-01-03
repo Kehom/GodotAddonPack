@@ -1,5 +1,8 @@
 Some smaller commits related to minor fixes (specially comment corrections) are not going to be listed here.
 
+#### 2024 Jan 03
+* New addon, *RadialImpulse*, which adds two new nodes, `RadialImpulse2D` and `RadialImpulse3D`. Those applies impulses to all rigid bodies within the circular/spherical area of the node.
+
 #### 2022 Sep 15
 * New addon, `AudioMaster`, a system to help playback audio without having to worry about node lifetime.
 

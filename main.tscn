@@ -127,15 +127,23 @@ toggle_mode = true
 group = ExtResource( 2 )
 text = "AudioMaster"
 
-[node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
+[node name="bt_radimpulse" type="Button" parent="mpnl/demo_list/pnl/vbox"]
 margin_top = 270.0
 margin_right = 206.0
-margin_bottom = 274.0
+margin_bottom = 290.0
+toggle_mode = true
+group = ExtResource( 2 )
+text = "Radial Impulse"
 
-[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
-margin_top = 284.0
+[node name="separator" type="HSeparator" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 300.0
 margin_right = 206.0
 margin_bottom = 304.0
+
+[node name="bt_megademo" type="Button" parent="mpnl/demo_list/pnl/vbox"]
+margin_top = 314.0
+margin_right = 206.0
+margin_bottom = 334.0
 toggle_mode = true
 group = ExtResource( 2 )
 text = "Complete"
@@ -712,6 +720,63 @@ autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="radimpulse" type="Panel" parent="mpnl/stabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 8.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="bt_demo2d" type="Button" parent="mpnl/stabs/radimpulse"]
+margin_left = 14.0
+margin_top = 11.0
+margin_right = 122.0
+margin_bottom = 31.0
+text = "Impulse 2D"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="bt_demo3d" type="Button" parent="mpnl/stabs/radimpulse"]
+margin_left = 142.0
+margin_top = 11.0
+margin_right = 250.0
+margin_bottom = 31.0
+text = "Impulse 3D"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="description" type="Label" parent="mpnl/stabs/radimpulse"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 8.0
+margin_top = 46.0
+margin_right = -8.0
+margin_bottom = -8.0
+text = "Interdependency: None
+
+This addon adds two new nodes, one for 2D (RadialImpulse2D) and another for 3D (RadialImpulse3D). Once the node's \"apply_impulse()\" function is called, all rigid bodies within radius will get an impulse applied to them, in the direction away from the RadialImpulse*D's center.
+
+How the demos (2D and 3D) work:
+
+* Moving the mouse within the area containing the rigid bodies will move the RadialImpulse node.
+* There is a \"Settings\" expandable panel that allows changing two properties of the RadialImpulse node, FallOff mode and the base impulse value to be applied in case \"apply_impulse()\" is called.
+* Left clicking will trigger the \"apply_impulse()\" function of the RadialImpulse in its current position, using the settings assigned to it.
+* The mouse wheel can be used to change the radius property of the RadialImpulse.
+
+The FallOff property works like this:
+
+* If it's set to \"CONSTANT\" (default) then the base impulse value will be the same regardless of distance from the RadialImpulse's center
+* If it's set to \"LINEAR\" then the impulse decreases linearly as it gets farther away from the center until it becomes 0 at \"radius\" distance.
+"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="mpnl/demo_list/pnl/bt_quit" to="." method="_on_bt_quit_pressed"]
 [connection signal="pressed" from="mpnl/stabs/encdecbuffer/bt_encdecload" to="." method="_on_bt_encdecload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/quantize/bt_utilsload" to="." method="_on_bt_utilsload_pressed"]
@@ -727,3 +792,5 @@ __meta__ = {
 [connection signal="pressed" from="mpnl/stabs/dbghelper/bt_dbgload" to="." method="_on_bt_dbgload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/inventory/bt_invdemoload" to="." method="_on_bt_invdemoload_pressed"]
 [connection signal="pressed" from="mpnl/stabs/audiomaster/bt_amasterload" to="." method="_on_bt_amasterload_pressed"]
+[connection signal="pressed" from="mpnl/stabs/radimpulse/bt_demo2d" to="." method="_on_bt_demo2d_pressed"]
+[connection signal="pressed" from="mpnl/stabs/radimpulse/bt_demo3d" to="." method="_on_bt_demo3d_pressed"]

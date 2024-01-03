@@ -1,0 +1,643 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://addons/keh_ui/expanel/expanel.gd" type="Script" id=1]
+[ext_resource path="res://demos/radimpulse/rimpulse2d.gd" type="Script" id=2]
+[ext_resource path="res://demos/radimpulse/ball2d.tscn" type="PackedScene" id=3]
+[ext_resource path="res://addons/keh_radimpulse/radimpulse2d.gd" type="Script" id=4]
+[ext_resource path="res://shared/textures/radialgrad_40x40.png" type="Texture" id=5]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 384, 8 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 8, 288 )
+
+[node name="demorimp2d" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="ui" type="CanvasLayer" parent="."]
+
+[node name="panel" type="Control" parent="ui"]
+anchor_bottom = 1.0
+margin_right = 144.0
+rect_min_size = Vector2( 5, 5 )
+rect_clip_content = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+border = 0
+current_page = 0
+toggle_button_separation = 10
+keep_toggle_button_focus = false
+animation/update_on_physics = false
+animation/shrink_on_page_change = true
+animation/expand_time = 0.25
+animation/expand_curve = null
+animation/shrink_time = 0.15
+animation/shrink_curve = null
+__content_size = Vector2( 126, 12 )
+__page_data = {
+"Settings": {
+"expanded_icon": null,
+"icon_color": Color( 1, 1, 1, 1 ),
+"shrinked_icon": null
+}
+}
+CustomStyles/background = null
+CustomStyles/bar = null
+CustomStyles/button_expanded_hover = null
+CustomStyles/button_expanded_pressed = null
+CustomStyles/button_expanded_focus = null
+CustomStyles/button_expanded_normal = null
+CustomStyles/button_shrinked_hover = null
+CustomStyles/button_shrinked_pressed = null
+CustomStyles/button_shrinked_focus = null
+CustomStyles/button_shrinked_normal = null
+CustomConstants/updown_width = null
+CustomConstants/updown_height = null
+CustomConstants/leftright_width = null
+CustomConstants/leftright_height = null
+
+[node name="Settings" type="VBoxContainer" parent="ui/panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 4.0
+margin_right = -22.0
+margin_bottom = -4.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="lbl_falloff" type="Label" parent="ui/panel/Settings"]
+margin_right = 118.0
+margin_bottom = 14.0
+text = "Falloff"
+
+[node name="opt_falloff" type="OptionButton" parent="ui/panel/Settings"]
+margin_top = 18.0
+margin_right = 118.0
+margin_bottom = 38.0
+
+[node name="spacer1" type="Control" parent="ui/panel/Settings"]
+margin_top = 42.0
+margin_right = 118.0
+margin_bottom = 57.0
+rect_min_size = Vector2( 0, 15 )
+
+[node name="lbl_force" type="Label" parent="ui/panel/Settings"]
+margin_top = 61.0
+margin_right = 118.0
+margin_bottom = 75.0
+text = "Impulse value"
+
+[node name="txt_impulse" type="SpinBox" parent="ui/panel/Settings"]
+margin_top = 79.0
+margin_right = 118.0
+margin_bottom = 103.0
+min_value = 100.0
+max_value = 3000.0
+value = 1500.0
+
+[node name="spacer_big" type="Control" parent="ui/panel/Settings"]
+margin_top = 107.0
+margin_right = 118.0
+margin_bottom = 568.0
+size_flags_vertical = 3
+
+[node name="bt_back" type="Button" parent="ui/panel/Settings"]
+margin_left = 48.0
+margin_top = 572.0
+margin_right = 118.0
+margin_bottom = 592.0
+rect_min_size = Vector2( 70, 0 )
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="static" type="Node2D" parent="."]
+
+[node name="floor" type="StaticBody2D" parent="static"]
+position = Vector2( 576, 584 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="shape" type="CollisionShape2D" parent="static/floor"]
+shape = SubResource( 1 )
+
+[node name="visual" type="ColorRect" parent="static/floor"]
+margin_left = -384.0
+margin_top = -8.0
+margin_right = 384.0
+margin_bottom = 8.0
+color = Color( 0.12549, 0.12549, 0.12549, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ceiling" type="StaticBody2D" parent="static"]
+position = Vector2( 576, 24 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="shape" type="CollisionShape2D" parent="static/ceiling"]
+shape = SubResource( 1 )
+
+[node name="visual" type="ColorRect" parent="static/ceiling"]
+margin_left = -384.0
+margin_top = -8.0
+margin_right = 384.0
+margin_bottom = 8.0
+color = Color( 0.12549, 0.12549, 0.12549, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="wall_l" type="StaticBody2D" parent="static"]
+position = Vector2( 184, 304 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="shape" type="CollisionShape2D" parent="static/wall_l"]
+shape = SubResource( 2 )
+
+[node name="visual" type="ColorRect" parent="static/wall_l"]
+margin_left = -8.0
+margin_top = -288.0
+margin_right = 8.0
+margin_bottom = 288.0
+color = Color( 0.12549, 0.12549, 0.12549, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="wall_r" type="StaticBody2D" parent="static"]
+position = Vector2( 968, 304 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="shape" type="CollisionShape2D" parent="static/wall_r"]
+shape = SubResource( 2 )
+
+[node name="visual" type="ColorRect" parent="static/wall_r"]
+margin_left = -8.0
+margin_top = -288.0
+margin_right = 8.0
+margin_bottom = 288.0
+color = Color( 0.12549, 0.12549, 0.12549, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="rigid" type="Node2D" parent="."]
+
+[node name="ball1" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 208, 368 )
+
+[node name="ball25" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 224, 336 )
+
+[node name="ball26" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 256, 336 )
+
+[node name="ball27" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 288, 336 )
+
+[node name="ball28" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 320, 336 )
+
+[node name="ball29" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 352, 336 )
+
+[node name="ball30" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 384, 336 )
+
+[node name="ball31" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 416, 336 )
+
+[node name="ball41" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 736, 336 )
+
+[node name="ball42" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 768, 336 )
+
+[node name="ball43" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 800, 336 )
+
+[node name="ball44" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 832, 336 )
+
+[node name="ball45" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 864, 336 )
+
+[node name="ball46" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 896, 336 )
+
+[node name="ball47" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 928, 336 )
+
+[node name="ball32" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 448, 336 )
+
+[node name="ball33" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 480, 336 )
+
+[node name="ball34" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 512, 336 )
+
+[node name="ball35" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 544, 336 )
+
+[node name="ball36" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 576, 336 )
+
+[node name="ball37" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 608, 336 )
+
+[node name="ball38" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 640, 336 )
+
+[node name="ball39" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 672, 336 )
+
+[node name="ball40" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 704, 336 )
+
+[node name="ball2" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 240, 368 )
+
+[node name="ball3" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 272, 368 )
+
+[node name="ball4" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 304, 368 )
+
+[node name="ball5" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 336, 368 )
+
+[node name="ball6" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 368, 368 )
+
+[node name="ball7" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 400, 368 )
+
+[node name="ball8" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 432, 368 )
+
+[node name="ball9" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 464, 368 )
+
+[node name="ball10" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 496, 368 )
+
+[node name="ball11" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 528, 368 )
+
+[node name="ball12" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 560, 368 )
+
+[node name="ball13" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 592, 368 )
+
+[node name="ball14" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 624, 368 )
+
+[node name="ball15" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 656, 368 )
+
+[node name="ball16" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 688, 368 )
+
+[node name="ball17" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 720, 368 )
+
+[node name="ball18" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 752, 368 )
+
+[node name="ball19" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 784, 368 )
+
+[node name="ball20" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 816, 368 )
+
+[node name="ball21" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 848, 368 )
+
+[node name="ball22" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 880, 368 )
+
+[node name="ball23" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 912, 368 )
+
+[node name="ball24" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 944, 368 )
+
+[node name="ball48" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 208, 304 )
+
+[node name="ball49" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 224, 272 )
+
+[node name="ball50" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 256, 272 )
+
+[node name="ball51" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 288, 272 )
+
+[node name="ball52" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 320, 272 )
+
+[node name="ball53" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 352, 272 )
+
+[node name="ball54" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 384, 272 )
+
+[node name="ball55" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 416, 272 )
+
+[node name="ball56" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 736, 272 )
+
+[node name="ball57" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 768, 272 )
+
+[node name="ball58" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 800, 272 )
+
+[node name="ball59" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 832, 272 )
+
+[node name="ball60" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 864, 272 )
+
+[node name="ball61" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 896, 272 )
+
+[node name="ball62" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 928, 272 )
+
+[node name="ball63" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 448, 272 )
+
+[node name="ball64" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 480, 272 )
+
+[node name="ball65" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 512, 272 )
+
+[node name="ball66" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 544, 272 )
+
+[node name="ball67" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 576, 272 )
+
+[node name="ball68" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 608, 272 )
+
+[node name="ball69" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 640, 272 )
+
+[node name="ball70" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 672, 272 )
+
+[node name="ball71" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 704, 272 )
+
+[node name="ball72" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 240, 304 )
+
+[node name="ball73" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 272, 304 )
+
+[node name="ball74" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 304, 304 )
+
+[node name="ball75" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 336, 304 )
+
+[node name="ball76" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 368, 304 )
+
+[node name="ball77" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 400, 304 )
+
+[node name="ball78" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 432, 304 )
+
+[node name="ball79" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 464, 304 )
+
+[node name="ball80" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 496, 304 )
+
+[node name="ball81" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 528, 304 )
+
+[node name="ball82" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 560, 304 )
+
+[node name="ball83" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 592, 304 )
+
+[node name="ball84" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 624, 304 )
+
+[node name="ball85" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 656, 304 )
+
+[node name="ball86" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 688, 304 )
+
+[node name="ball87" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 720, 304 )
+
+[node name="ball88" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 752, 304 )
+
+[node name="ball89" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 784, 304 )
+
+[node name="ball90" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 816, 304 )
+
+[node name="ball91" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 848, 304 )
+
+[node name="ball92" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 880, 304 )
+
+[node name="ball93" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 912, 304 )
+
+[node name="ball94" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 944, 304 )
+
+[node name="ball95" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 208, 240 )
+
+[node name="ball96" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 224, 208 )
+
+[node name="ball97" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 256, 208 )
+
+[node name="ball98" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 288, 208 )
+
+[node name="ball99" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 320, 208 )
+
+[node name="ball100" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 352, 208 )
+
+[node name="ball101" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 384, 208 )
+
+[node name="ball102" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 416, 208 )
+
+[node name="ball103" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 736, 208 )
+
+[node name="ball104" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 768, 208 )
+
+[node name="ball105" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 800, 208 )
+
+[node name="ball106" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 832, 208 )
+
+[node name="ball107" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 864, 208 )
+
+[node name="ball108" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 896, 208 )
+
+[node name="ball109" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 928, 208 )
+
+[node name="ball110" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 448, 208 )
+
+[node name="ball111" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 480, 208 )
+
+[node name="ball112" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 512, 208 )
+
+[node name="ball113" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 544, 208 )
+
+[node name="ball114" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 576, 208 )
+
+[node name="ball115" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 608, 208 )
+
+[node name="ball116" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 640, 208 )
+
+[node name="ball117" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 672, 208 )
+
+[node name="ball118" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 704, 208 )
+
+[node name="ball119" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 240, 240 )
+
+[node name="ball120" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 272, 240 )
+
+[node name="ball121" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 304, 240 )
+
+[node name="ball122" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 336, 240 )
+
+[node name="ball123" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 368, 240 )
+
+[node name="ball124" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 400, 240 )
+
+[node name="ball125" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 432, 240 )
+
+[node name="ball126" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 464, 240 )
+
+[node name="ball127" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 496, 240 )
+
+[node name="ball128" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 528, 240 )
+
+[node name="ball129" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 560, 240 )
+
+[node name="ball130" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 592, 240 )
+
+[node name="ball131" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 624, 240 )
+
+[node name="ball132" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 656, 240 )
+
+[node name="ball133" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 688, 240 )
+
+[node name="ball134" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 720, 240 )
+
+[node name="ball135" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 752, 240 )
+
+[node name="ball136" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 784, 240 )
+
+[node name="ball137" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 816, 240 )
+
+[node name="ball138" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 848, 240 )
+
+[node name="ball139" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 880, 240 )
+
+[node name="ball140" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 912, 240 )
+
+[node name="ball141" parent="rigid" instance=ExtResource( 3 )]
+position = Vector2( 944, 240 )
+
+[node name="helper" type="Control" parent="."]
+margin_left = 192.0
+margin_top = 32.0
+margin_right = 960.0
+margin_bottom = 576.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="radimpulse" type="Node2D" parent="."]
+position = Vector2( 576, 512 )
+script = ExtResource( 4 )
+radius = 60.0
+force = 3000.0
+layer = 1
+mask = 1
+
+[node name="visual" type="Sprite" parent="radimpulse"]
+texture = ExtResource( 5 )
+[connection signal="item_selected" from="ui/panel/Settings/opt_falloff" to="." method="_on_opt_falloff_item_selected"]
+[connection signal="value_changed" from="ui/panel/Settings/txt_impulse" to="." method="_on_txt_impulse_value_changed"]
+[connection signal="pressed" from="ui/panel/Settings/bt_back" to="." method="_on_bt_back_pressed"]

@@ -210,6 +210,16 @@ _global_script_classes=[ {
 "path": "res://addons/keh_general/data/quantize.gd"
 }, {
 "base": "Node2D",
+"class": "RadialImpulse2D",
+"language": "GDScript",
+"path": "res://addons/keh_radimpulse/radimpulse2d.gd"
+}, {
+"base": "Spatial",
+"class": "RadialImpulse3D",
+"language": "GDScript",
+"path": "res://addons/keh_radimpulse/radimpulse3d.gd"
+}, {
+"base": "Node2D",
 "class": "RectangleDrawer",
 "language": "GDScript",
 "path": "res://demos/network/scripts/rectdrawer.gd"
@@ -330,6 +340,8 @@ _global_script_class_icons={
 "NetSnapshotData": "",
 "Network": "",
 "Quantize": "",
+"RadialImpulse2D": "",
+"RadialImpulse3D": "",
 "RectangleDrawer": "",
 "SFXHelper": "",
 "SampleDataAsset": "",
@@ -374,7 +386,7 @@ gdscript/warnings/unused_class_variable=true
 
 [editor_plugins]
 
-enabled=PoolStringArray( "keh_audiomaster", "keh_dataasset", "keh_dbghelper", "keh_gddb", "keh_network", "keh_smooth", "keh_ui" )
+enabled=PoolStringArray( "keh_audiomaster", "keh_dataasset", "keh_dbghelper", "keh_gddb", "keh_network", "keh_radimpulse", "keh_smooth", "keh_ui" )
 
 [global]
 

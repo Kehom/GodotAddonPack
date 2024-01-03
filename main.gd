@@ -33,6 +33,7 @@ func _ready() -> void:
 	set_tab_button("bt_megademo", "megademo")
 	set_tab_button("bt_dbghelper", "dbghelper")
 	set_tab_button("bt_audiomaster", "audiomaster")
+	set_tab_button("bt_radimpulse", "radimpulse")
 	
 	# Connect the networking signals. Those are necessary in order to transition
 	# into the game scene only on success and give the chance to show a message
@@ -183,10 +184,18 @@ func _on_bt_dbgload_pressed() -> void:
 	open_scene("res://demos/debughelper/maindbghelper.tscn")
 
 ### AudioMaster
-func _on_bt_amasterload_pressed():
+func _on_bt_amasterload_pressed() -> void:
 	open_scene("res://demos/audiomaster/amaster.tscn")
 
+### RadialImpulse
+func _on_bt_demo2d_pressed() -> void:
+	open_scene("res://demos/radimpulse/rimpulse2d.tscn")
 
+
+func _on_bt_demo3d_pressed() -> void:
+	open_scene("res://demos/radimpulse/rimpulse3d.tscn")
+
+### Quitting
 func _on_bt_quit_pressed() -> void:
 	get_tree().quit()
 
